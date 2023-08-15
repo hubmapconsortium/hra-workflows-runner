@@ -72,7 +72,7 @@ export async function openUrlReadStream(url) {
     get(url, (incoming) => {
       if (incoming.statusCode !== 200) {
         const { statusCode, statusMessage } = incoming;
-        const message = `Download failed: ${statusCode}:${statusMessage} from ${url}`;
+        const message = `Download failed: ${statusCode}:${statusMessage}`;
         reject(new Error(message));
       } else {
         resolve(incoming);
