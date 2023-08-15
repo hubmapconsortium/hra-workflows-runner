@@ -129,6 +129,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# Virtual environment
+.venv
+
 # User configuration
 env.sh
 
