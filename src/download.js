@@ -10,7 +10,7 @@ const DATASET_LIST_URL = env['DATASET_LIST_URL'];
 const DATASET_ID_COLUMN = env['DATASET_ID_COLUMN'];
 const DATASET_TYPE_HINT_COLUMN = env['DATASET_LINK_COLUMN'];
 
-const OUTPUT_DIR = env['OUTPUT_DIR'] || '';
+const OUTPUT_DIR = env['DATA_REPO_DIR'] || '';
 const CACHE_DIR = env['CACHE_DIR'] || 'tmp';
 const ERROR_FILE = join(OUTPUT_DIR, 'errors.json');
 

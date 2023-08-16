@@ -17,7 +17,8 @@ _=${VERSION:?"No version selected!"}
 export DATASETS_DIR=${DATASETS_DIR:="./datasets"}
 export RAW_DATA_DIR=${RAW_DATA_DIR:="./raw-data"}
 export OUTPUT_DIR="$RAW_DATA_DIR/$DATASET/$VERSION"
-export CACHE_DIR="$OUTPUT_DIR/tmp"
+export DATA_REPO_DIR="$RAW_DATA_DIR/data-repo"
+export CACHE_DIR="$RAW_DATA_DIR/tmp"
 
 # Load dataset configuration
 source $DATASETS_DIR/$DATASET/config.sh
