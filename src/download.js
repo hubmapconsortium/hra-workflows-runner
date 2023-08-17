@@ -96,7 +96,7 @@ export async function main() {
 
     await Promise.all(executors);
   } catch (error) {
-    errors.push(error.message);
+    errors.push(error);
   }
 
   const stream = await openFileWriteStream(ERROR_FILE, { overwrite: true });
