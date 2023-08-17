@@ -7,7 +7,9 @@ export PYTHONPATH=".:./src"
 export GPG_TTY=$(tty)
 
 # Load environment
-source env.sh
+if [ -e env.sh ]; then
+  source env.sh
+fi
 
 # Check required configuration
 _=${DATASET:?"No dataset selected!"}
