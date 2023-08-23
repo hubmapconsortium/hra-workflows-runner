@@ -14,7 +14,7 @@ matrix:
   path: data.h5ad
 
 preprocessing:
-  geneColumn: counts
+  geneColumn: gene_name
 
 algorithms:
 #  - azimuth: {}
@@ -33,6 +33,7 @@ algorithms:
 #      referenceData:
 #        class: File
 #        path: TS_Lung_filtered.h5ad
+#      queryLayersKey: counts
 #    extract:
 #      annotationMethod: popv
 #      cellLabelColumn: popv_prediction
