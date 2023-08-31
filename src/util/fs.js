@@ -1,4 +1,19 @@
-import { open, writeFile } from 'node:fs/promises';
+import { access, constants, mkdir, open, writeFile } from 'node:fs/promises';
+import { concurrentMap } from './concurrent-map.js';
+
+export async function ensureDirsExist(...dirs) {
+  const createDir = async (dir) => await mkdir(dir, { recursive: true });
+  await concurrentMap(dirs, createDir);
+}
+
+export async function fileExists(path) {
+  try {
+    await access(path, constants.R_OK | constants.W_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function downloadFile(dest, src, options) {
   const fileHandle = await openWriteFile(dest, options);

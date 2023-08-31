@@ -37,7 +37,11 @@ export class DatasetSummary {
     }
   }
 
-  setError(step, msg) {
+  setSuccess(step) {
+    this[step] = Status.SUCCESS;
+  }
+
+  setFailure(step, msg) {
     this[step] = Status.FAILURE;
     this.errors += msg + '\n';
   }
@@ -71,7 +75,7 @@ export class DatasetSummaries {
     return this.byId.get(id);
   }
 
-  *items() {
+  *values() {
     yield* this.summaries;
   }
 
@@ -92,6 +96,6 @@ export class DatasetSummaries {
       fields: ['id', 'downloaded', ...ALGORITHMS, 'errors'],
       data: this.summaries,
     });
-    writeFile(path, content);
+    await writeFile(path, content);
   }
 }
