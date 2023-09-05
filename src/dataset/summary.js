@@ -39,15 +39,17 @@ export class DatasetSummary {
 
   setSuccess(step) {
     this[step] = Status.SUCCESS;
+    this.errors = '';
   }
 
   setFailure(step, msg) {
     this[step] = Status.FAILURE;
-    this.errors += msg + '\n';
+    this.errors = JSON.stringify(msg).slice(1, -1);
   }
 
   setNotSupported(step) {
     this[step] = Status.NOT_SUPPORTED;
+    this.errors = '';
   }
 }
 

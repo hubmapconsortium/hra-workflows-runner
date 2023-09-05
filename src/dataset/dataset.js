@@ -1,6 +1,11 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { Config } from '../util/config.js';
-import { getDataDir, getDataFilePath, getDirForId } from '../util/paths.js';
+import {
+  getDataDir,
+  getDataFilePath,
+  getDatasetFilePath,
+  getDirForId,
+} from '../util/paths.js';
 
 const CONFIG = Symbol('Configuration reference');
 const SCRATCH = Symbol('Non-serialized data');
@@ -51,6 +56,10 @@ export class Dataset {
     return getDataDir(this.config, this.dir);
   }
 
+  get filePath() {
+    return getDatasetFilePath(this.config, this.dir);
+  }
+
   get dataFilePath() {
     return getDataFilePath(this.config, this.dir);
   }
@@ -61,7 +70,7 @@ export class Dataset {
     return new Dataset(data.id, config, data);
   }
 
-  async save(path) {
+  async save(path = this.filePath) {
     const content = JSON.stringify(this, undefined, 2);
     await writeFile(path, content, { encoding: 'utf8' });
   }

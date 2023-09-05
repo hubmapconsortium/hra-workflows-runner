@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import {
   ALGORITHM_REPORT_FILE,
   CACHE_DIR,
+  DATASET_FILE,
   DATA_FILE,
   DATA_REPO_DIR,
   DEFAULT_CACHE_DIR,
@@ -41,6 +42,10 @@ export function getListingFilePath(config) {
 
 export function getSummariesFilePath(config) {
   return join(getOutputDir(config), SUMMARIES_FILE);
+}
+
+export function getDatasetFilePath(config, dir) {
+  return join(getDataDir(config, dir), DATASET_FILE);
 }
 
 export function getDataFilePath(config, dir) {

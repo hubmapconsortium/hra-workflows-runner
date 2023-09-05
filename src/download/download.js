@@ -1,12 +1,21 @@
+import { rm } from 'fs/promises';
 import { Dataset } from '../dataset/dataset.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
-import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
-import { fileExists } from '../util/fs.js';
+import {
+  DEFAULT_MAX_CONCURRENCY,
+  FORCE,
+  MAX_CONCURRENCY,
+} from '../util/constants.js';
+import { ensureDirsExist, fileExists } from '../util/fs.js';
 import { DOWNLOAD_STEP, getDownloaderRef, getSummaryRef } from './utils.js';
 
 async function tryDownload(dataset) {
-  if (fileExists(dataset.dataFilePath)) {
+  const force = dataset.config.get(FORCE, false);
+  await ensureDirsExist(dataset.dirPath);
+  // This precheck could be moved to before prepareDownloads to reduce excess work even further
+  if (!force && (await fileExists(dataset.dataFilePath))) {
+    await dataset.save();
     markSuccess(dataset);
     return;
   }
@@ -14,9 +23,11 @@ async function tryDownload(dataset) {
   try {
     const downloader = getDownloaderRef(dataset);
     await downloader.download(dataset);
+    await dataset.save();
     markSuccess(dataset);
   } catch (error) {
     markFailure(dataset, error);
+    await rm(dataset.dirPath, { recursive: true });
   }
 }
 

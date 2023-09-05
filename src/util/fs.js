@@ -21,15 +21,18 @@ export async function downloadFile(dest, src, options) {
     return;
   }
 
-  const resp = await fetch(src);
-  if (!resp.ok) {
-    const { status, statusText } = resp;
-    const message = `Download failed: ${status}:${statusText}`;
-    throw new Error(message);
-  }
+  try {
+    const resp = await fetch(src);
+    if (!resp.ok) {
+      const { status, statusText } = resp;
+      const message = `Download failed: ${status}:${statusText}`;
+      throw new Error(message);
+    }
 
-  const data = await resp.text();
-  await writeFile(fileHandle, data, { encoding: 'utf8' });
+    await writeFile(fileHandle, resp.body, { encoding: 'utf8' });
+  } finally {
+    await fileHandle.close();
+  }
 }
 
 async function openWriteFile(path, options) {
@@ -37,7 +40,7 @@ async function openWriteFile(path, options) {
   const flags = overwrite ? 'w' : 'wx';
 
   try {
-    return open(path, flags);
+    return await open(path, flags);
   } catch (error) {
     if (!overwrite && error.code === 'EEXIST') {
       return undefined;

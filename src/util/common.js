@@ -4,7 +4,7 @@ import { concurrentMap } from './concurrent-map.js';
 import { Config } from './config.js';
 import { DATASET_HANDLERS, REQUIRED_ENV_VARIABLES } from './constants.js';
 import * as DefaultDatasetHandler from './default-dataset-handler.js';
-import { defaultEnvReviver } from './env.js';
+import { defaultEnvReviver } from './default-env-reviver.js';
 import { getListingFilePath, getSrcFilePath } from './paths.js';
 
 export function getConfig() {
@@ -38,7 +38,7 @@ function parseListingRow(row, columns, props) {
   return columns.reduce((res, col, index) => ({
     ...res,
     [props[index]]: row[col],
-  }));
+  }), {});
 }
 
 export const DEFAULT_DATASET_HANDLER_NAME = '<default-dataset-handler>';

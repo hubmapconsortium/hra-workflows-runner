@@ -21,6 +21,7 @@ export const REQUIRED_ENV_VARIABLES = [
 // File names
 export const LISTING_FILE = 'listing.csv';
 export const SUMMARIES_FILE = 'summaries.csv';
+export const DATASET_FILE = 'dataset.json';
 export const DATA_FILE = 'data.h5ad';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 
