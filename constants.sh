@@ -28,5 +28,4 @@ source $DATASETS_DIR/$DATASET/config.sh
 
 # Check required dataset configuration
 _=${DATASET_LIST_URL:?"No dataset list url set!"}
-_=${DATASET_ID_COLUMN:?"No dataset list identifier column set!"}
-_=${DATASET_LINK_COLUMN:?"No dataset list link column set!"}
+_=${DATASET_COLUMN_ID:?"No dataset list identifier column set!"}
