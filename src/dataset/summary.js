@@ -11,7 +11,7 @@ export const Status = {
   SUCCESS: 'success',
   FAILURE: 'failure',
   NOT_STARTED: 'not started',
-  SKIPPED: 'skipped',
+  NOT_SUPPORTED: 'not supported',
 };
 
 export class DatasetSummary {
@@ -44,6 +44,10 @@ export class DatasetSummary {
   setFailure(step, msg) {
     this[step] = Status.FAILURE;
     this.errors += msg + '\n';
+  }
+
+  setNotSupported(step) {
+    this[step] = Status.NOT_SUPPORTED;
   }
 }
 

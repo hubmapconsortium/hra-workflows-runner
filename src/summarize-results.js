@@ -15,7 +15,7 @@ import {
 async function updateAlgorithmStatus(item, config) {
   const directory = getDirForId(item.id);
   for (const algorithm of ALGORITHMS) {
-    if (item[algorithm] !== Status.SKIPPED) {
+    if (item[algorithm] !== Status.NOT_SUPPORTED) {
       await readReport(item, algorithm, directory, config);
     }
   }
