@@ -21,7 +21,7 @@ export RAW_DATA_DIR=${RAW_DATA_DIR:="./raw-data"}
 export OUTPUT_DIR="$RAW_DATA_DIR/$DATASET/$VERSION"
 export DATA_REPO_DIR="$RAW_DATA_DIR/data-repo"
 export CACHE_DIR="$RAW_DATA_DIR/tmp"
-export SRC_DIR="/N/project/hra/hra-workflows-runner"
+export SRC_DIR="/N/project/hra/hra-workflows-runner/src"
 
 # Load dataset configuration
 source $DATASETS_DIR/$DATASET/config.sh
