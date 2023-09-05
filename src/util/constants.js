@@ -8,16 +8,14 @@ export const DATA_REPO_DIR = 'DATA_REPO_DIR';
 export const CACHE_DIR = 'CACHE_DIR';
 export const SRC_DIR = 'SRC_DIR';
 export const DATASET_LIST_URL = 'DATASET_LIST_URL';
-export const DATASET_ID_COLUMN = 'DATASET_ID_COLUMN';
-export const DATASET_LINK_COLUMN = 'DATASET_LINK_COLUMN';
+export const DATASET_COLUMN_ID = 'DATASET_COLUMN_ID';
 
 export const REQUIRED_ENV_VARIABLES = [
   OUTPUT_DIR,
   DATA_REPO_DIR,
   SRC_DIR,
   DATASET_LIST_URL,
-  DATASET_ID_COLUMN,
-  DATASET_LINK_COLUMN,
+  DATASET_COLUMN_ID,
 ];
 
 // File names
@@ -25,6 +23,9 @@ export const LISTING_FILE = 'listing.csv';
 export const SUMMARIES_FILE = 'summaries.csv';
 export const DATA_FILE = 'data.h5ad';
 export const ALGORITHM_REPORT_FILE = 'report.json';
+
+// Dataset handlers
+export const DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
 
 // Algorithms
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];

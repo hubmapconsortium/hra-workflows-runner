@@ -50,3 +50,7 @@ export function getDataFilePath(config, dir) {
 export function getAlgorithmReportFilePath(config, dir, algorithm) {
   return join(getDataDir(config, dir), algorithm, ALGORITHM_REPORT_FILE);
 }
+
+export function getSrcFilePath(config, ...paths) {
+  return join(getSrcDir(config), ...paths);
+}

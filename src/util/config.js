@@ -9,6 +9,7 @@ export class Config {
   }
 
   get(key, defaultValue) {
+    // Checking arguments.length allows undefined to be used as a default value
     if (arguments.length < 2) {
       defaultValue = REQUIRED;
     }
@@ -24,6 +25,11 @@ export class Config {
 
   set(key, value) {
     this.config.set(key, value);
+  }
+
+  getPrefixedKeys(prefix) {
+    const keys = Array.from(this.config.keys());
+    return keys.filter((key) => key.startsWith(prefix));
   }
 
   /**
