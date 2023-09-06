@@ -49,7 +49,6 @@ export class DatasetSummary {
 
   setNotSupported(step) {
     this[step] = Status.NOT_SUPPORTED;
-    this.errors = '';
   }
 }
 

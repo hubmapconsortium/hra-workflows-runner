@@ -36,8 +36,7 @@ function markSuccess(dataset) {
 }
 
 function markFailure(dataset, error) {
-  const msg = `Download failed: ${error.message ?? error}`;
-  getSummaryRef(dataset).setFailure(DOWNLOAD_STEP, msg);
+  getSummaryRef(dataset).setFailure(DOWNLOAD_STEP, error.message ?? error);
 }
 
 /**
