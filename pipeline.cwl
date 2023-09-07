@@ -25,6 +25,7 @@ requirements:
       entry: $(inputs.rawdata_dir)
 
 stdout: output.txt
+stderr: err_output.txt
 
 inputs:
   datasets_dir:
@@ -51,6 +52,8 @@ outputs:
       glob: raw-data
   command_out:
     type: stdout
+  command_err_out:
+    type: stderr
 
 baseCommand: bash
 arguments:
