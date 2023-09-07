@@ -18,7 +18,7 @@ async function prepare([downloader, datasets]) {
 
 async function tryPrepare(downloader, datasets) {
   try {
-    return downloader.prepareDownload(datasets);
+    return await downloader.prepareDownload(datasets);
   } catch (error) {
     markFailure(datasets, error);
     return undefined;
