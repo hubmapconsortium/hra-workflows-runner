@@ -5,6 +5,6 @@ set -ev
 
 for dir in $DATA_REPO_DIR/*/; do
   pushd $dir
-  sbatch $SRC_DIR/slurm/slurm-annotate.sh
+  sbatch $PROJECT_DIR/src/slurm/slurm-annotate.sh
   popd
 done
