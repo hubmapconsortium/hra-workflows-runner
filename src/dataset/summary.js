@@ -37,16 +37,41 @@ export class DatasetSummary {
     }
   }
 
-  setSuccess(step) {
+  /**
+   * Sets success for step and optionally clear errors
+   *
+   * @param {string} step
+   * @param {boolean} [clearErrors=true]
+   */
+  setSuccess(step, clearErrors = true) {
     this[step] = Status.SUCCESS;
-    this.errors = '';
+    if (clearErrors) {
+      this.errors = '';
+    }
   }
 
-  setFailure(step, msg) {
+  /**
+   * Sets failure for step and add an error message
+   *
+   * @param {string} step
+   * @param {any} msg
+   * @param {boolean} [mergeErrors=false]
+   */
+  setFailure(step, msg, mergeErrors = false) {
+    const formattedMessage = JSON.stringify(msg)
+      .slice(1, -1)
+      .replace(/\\"/g, '"');
+    const errors = mergeErrors ? this.errors + '\\n' : '';
+
     this[step] = Status.FAILURE;
-    this.errors = JSON.stringify(msg).slice(1, -1);
+    this.errors = errors + formattedMessage;
   }
 
+  /**
+   * Sets not supported for step
+   *
+   * @param {string} step
+   */
   setNotSupported(step) {
     this[step] = Status.NOT_SUPPORTED;
   }
@@ -80,10 +105,18 @@ export class DatasetSummaries {
     return this.byId.get(id);
   }
 
+  /**
+   * Iterator of each summary item
+   */
   *values() {
     yield* this.summaries;
   }
 
+  /**
+   * Load summaries from file
+   *
+   * @param {import('node:fs').PathLike} path File path
+   */
   static async load(path) {
     const content = await readFile(path, { encoding: 'utf8' });
     const parsed = Papa.parse(content, {
@@ -96,6 +129,11 @@ export class DatasetSummaries {
     return summaries;
   }
 
+  /**
+   * Save summaries to file
+   *
+   * @param {import('node:fs').PathLike} path File path
+   */
   async save(path) {
     const content = Papa.unparse({
       fields: ['id', 'downloaded', ...ALGORITHMS, 'errors'],

@@ -5,6 +5,7 @@ import { promisify } from 'node:util';
 import { Config } from '../util/config.js';
 import { FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
+import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 
 const GTEX_FULL_DATA_URL = 'GTEX_FULL_DATA_URL';
@@ -13,6 +14,7 @@ const DEFAULT_GTEX_FULL_DATA_URL =
 
 const execFile = promisify(callbackExecFile);
 
+/** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
     /** @type {Config} */

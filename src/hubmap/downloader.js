@@ -1,6 +1,7 @@
 import { Config } from '../util/config.js';
 import { FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
+import { IDownloader } from '../util/handler.js';
 import { getMetadataLookup } from './metadata.js';
 
 const HUBMAP_TOKEN = 'HUBMAP_TOKEN';
@@ -10,6 +11,7 @@ const DEFAULT_HUBMAP_SEARCH_URL =
   'https://search.api.hubmapconsortium.org/v3/portal/search';
 const DEFAULT_HUBMAP_ASSETS_URL = 'https://assets.hubmapconsortium.org/';
 
+/** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
     /** @type {Config} */
@@ -33,12 +35,15 @@ export class Downloader {
 
   async download(dataset) {
     if (!dataset.uuid) {
-      throw new Error('Missing uuid');
+      throw new Error('Missing uuid - Dataset might have been deleted');
     }
 
     const url = new URL(`${dataset.uuid}/raw_expr.h5ad`, this.assetsUrl);
     url.searchParams.set('token', this.token);
     await downloadFile(dataset.dataFilePath, url, {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
       overwrite: this.config.get(FORCE, false),
     });
   }

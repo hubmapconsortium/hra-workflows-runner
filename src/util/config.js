@@ -8,6 +8,15 @@ export class Config {
     this.config = new Map();
   }
 
+  /**
+   * Fetch a configuration value
+   *
+   * @template T
+   * @param {string} key Configuration key
+   * @param {T} [defaultValue] Default value
+   * @returns {T | undefined}
+   * @throws If the key doesn't exist and no default value was provided
+   */
   get(key, defaultValue) {
     // Checking arguments.length allows undefined to be used as a default value
     if (arguments.length < 2) {
@@ -23,10 +32,22 @@ export class Config {
     }
   }
 
+  /**
+   * Associate a new value with a configuration key
+   *
+   * @template T
+   * @param {string} key Configuration key
+   * @param {T} value New value
+   */
   set(key, value) {
     this.config.set(key, value);
   }
 
+  /**
+   * Gets all keys that starts with a prefix
+   *
+   * @param {string} prefix Key prefix
+   */
   getPrefixedKeys(prefix) {
     const keys = Array.from(this.config.keys());
     return keys.filter((key) => key.startsWith(prefix));
@@ -48,6 +69,11 @@ export class Config {
     return this;
   }
 
+  /**
+   * Loads the environment into this configuration object
+   *
+   * @param {function(string, string): any} [reviver] Reviver function
+   */
   loadEnv(reviver = (_, val) => val) {
     for (const [key, value] of Object.entries(env)) {
       this.set(key, reviver(key, value));

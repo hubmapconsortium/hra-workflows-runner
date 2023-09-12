@@ -1,7 +1,8 @@
 import { Dataset } from '../dataset/dataset.js';
 import { DatasetSummaries } from '../dataset/summary.js';
-import { loadDatasetHandlers, loadListing } from '../util/common.js';
+import { loadListing } from '../util/common.js';
 import { Config } from '../util/config.js';
+import { loadDatasetHandlers } from '../util/handler.js';
 import { mapEntries } from '../util/iter.js';
 import { setDownloaderRef, setSummaryRef } from './utils.js';
 

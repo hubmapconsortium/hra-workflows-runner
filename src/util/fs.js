@@ -1,11 +1,21 @@
 import { access, constants, mkdir, open, writeFile } from 'node:fs/promises';
 import { concurrentMap } from './concurrent-map.js';
 
+/**
+ * Ensure that all specified directories are created
+ *
+ * @param  {...import('node:fs').PathLike} dirs Directory paths
+ */
 export async function ensureDirsExist(...dirs) {
   const createDir = async (dir) => await mkdir(dir, { recursive: true });
   await concurrentMap(dirs, createDir);
 }
 
+/**
+ * Tests whether a file exists
+ *
+ * @param {import('node:fs').PathLike} path File path
+ */
 export async function fileExists(path) {
   try {
     await access(path, constants.R_OK | constants.W_OK);
@@ -15,14 +25,21 @@ export async function fileExists(path) {
   }
 }
 
-export async function downloadFile(dest, src, options) {
+/**
+ * Download a remote file
+ *
+ * @param {import('node:fs').PathLike} dest Destination file
+ * @param {string | URL} src Source url
+ * @param {RequestInfo & { overwrite?: boolean }} [options] Additional options
+ */
+export async function downloadFile(dest, src, options = {}) {
   const fileHandle = await openWriteFile(dest, options);
   if (fileHandle === undefined) {
     return;
   }
 
   try {
-    const resp = await fetch(src);
+    const resp = await fetch(src, options);
     if (!resp.ok) {
       const { status, statusText } = resp;
       const message = `Download failed: ${status}:${statusText}`;

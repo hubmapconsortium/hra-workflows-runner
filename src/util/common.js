@@ -1,29 +1,50 @@
 import { readFile } from 'node:fs/promises';
 import Papa from 'papaparse';
-import { concurrentMap } from './concurrent-map.js';
 import { Config } from './config.js';
-import { DATASET_HANDLERS, REQUIRED_ENV_VARIABLES } from './constants.js';
-import * as DefaultDatasetHandler from './default-dataset-handler.js';
+import { REQUIRED_ENV_VARIABLES } from './constants.js';
 import { defaultEnvReviver } from './default-env-reviver.js';
-import { getListingFilePath, getSrcFilePath } from './paths.js';
+import { getListingFilePath } from './paths.js';
 
+/**
+ * Gets a new configuration object with the environment loaded and validated
+ */
 export function getConfig() {
   return new Config()
     .loadEnv(defaultEnvReviver)
     .validate(REQUIRED_ENV_VARIABLES);
 }
 
+/**
+ * Load a csv file
+ *
+ * @template T
+ * @param {import('node:fs').PathLike} path Path to csv file
+ * @returns {Promise<T[]>}
+ */
 export async function loadCsv(path) {
   const content = await readFile(path, { encoding: 'utf8' });
   const { data } = Papa.parse(content, { header: true });
   return data;
 }
 
+/**
+ * Load a json file
+ *
+ * @template T
+ * @param {import('node:fs').PathLike} path Path to json file
+ * @returns {Promise<T>}
+ */
 export async function loadJson(path) {
   const content = await readFile(path, { encoding: 'utf8' });
   return JSON.parse(content);
 }
 
+/**
+ * Load the dataset's listing file
+ *
+ * @param {Config} config Configuration
+ * @returns {Promise<{ id: string; [key: string]: string }[]>}
+ */
 export async function loadListing(config) {
   const prefix = 'DATASET_COLUMN_';
   const listing = await loadCsv(getListingFilePath(config));
@@ -35,35 +56,11 @@ export async function loadListing(config) {
 }
 
 function parseListingRow(row, columns, props) {
-  return columns.reduce((res, col, index) => ({
-    ...res,
-    [props[index]]: row[col],
-  }), {});
-}
-
-export const DEFAULT_DATASET_HANDLER_NAME = '<default-dataset-handler>';
-
-/**
- * Load dataset handler modules
- *
- * @param {Config} config 
- * @returns {Promise<Map<string, any>>}
- */
-export async function loadDatasetHandlers(config) {
-  const handlers = await concurrentMap(DATASET_HANDLERS, (name) =>
-    loadDatasetHandler(name, config)
+  return columns.reduce(
+    (res, col, index) => ({
+      ...res,
+      [props[index]]: row[col],
+    }),
+    {}
   );
-  return new Map([
-    ...handlers.filter((h) => !!h),
-    [DEFAULT_DATASET_HANDLER_NAME, DefaultDatasetHandler],
-  ]);
-}
-
-async function loadDatasetHandler(name, config) {
-  try {
-    const path = getSrcFilePath(config, name, 'index.js');
-    return [name, await import(path)];
-  } catch {
-    return undefined;
-  }
 }

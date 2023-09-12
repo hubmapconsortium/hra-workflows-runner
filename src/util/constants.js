@@ -26,7 +26,7 @@ export const DATA_FILE = 'data.h5ad';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 
 // Dataset handlers
-export const DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
+export const DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene', 'default-dataset-handler'];
 
 // Algorithms
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];
