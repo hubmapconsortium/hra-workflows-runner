@@ -10,10 +10,10 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=4:00:00
 #SBATCH --mem=32G
-#SBATCH -A general
+#SBATCH -A r00355
 
 module load python
 module load singularity
 
 #Run your program
-srun cwl-runner --singularity https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.yaml
+srun cwl-runner --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.yaml
