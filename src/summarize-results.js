@@ -15,9 +15,7 @@ import {
 async function updateAlgorithmStatus(item, config) {
   const directory = getDirForId(item.id);
   for (const algorithm of ALGORITHMS) {
-    if (item[algorithm] !== Status.NOT_SUPPORTED) {
-      await readReport(item, algorithm, directory, config);
-    }
+    await readReport(item, algorithm, directory, config);
   }
 }
 
@@ -28,7 +26,7 @@ async function readReport(item, algorithm, directory, config) {
     if (status === 'success') {
       item.setSuccess(algorithm);
     } else {
-      item.setFailure(algorithm, cause);
+      item.setFailure(algorithm, cause, true);
     }
   } catch {
     // Ignore failures to load report
