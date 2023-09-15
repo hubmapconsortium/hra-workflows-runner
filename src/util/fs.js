@@ -26,6 +26,19 @@ export async function fileExists(path) {
 }
 
 /**
+ * Check whether a fetch response was successful otherwise throw an error
+ *
+ * @param {Response} response The response object
+ * @param {string} msg Message added befor the status and text
+ */
+export function checkFetchResponse(response, msg = 'Download failed') {
+  if (!response.ok) {
+    const { status, statusText } = response;
+    throw new Error(`${msg}: ${status}:${statusText}`);
+  }
+}
+
+/**
  * Download a remote file
  *
  * @param {import('node:fs').PathLike} dest Destination file
@@ -40,11 +53,7 @@ export async function downloadFile(dest, src, options = {}) {
 
   try {
     const resp = await fetch(src, options);
-    if (!resp.ok) {
-      const { status, statusText } = resp;
-      const message = `Download failed: ${status}:${statusText}`;
-      throw new Error(message);
-    }
+    checkFetchResponse(resp);
 
     await writeFile(fileHandle, resp.body, { encoding: 'utf8' });
   } finally {
