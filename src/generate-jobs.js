@@ -1,4 +1,5 @@
 import { opendir } from 'node:fs/promises';
+import { join } from 'node:path';
 import { env } from 'node:process';
 import { findGenerator } from './job-generators/index.js';
 
@@ -10,6 +11,10 @@ async function getDirectories() {
     const dirs = [];
     for await (const entry of dir) {
       if (entry.isDirectory()) {
+        if (!entry.path) {
+          entry.path = join(dir.path, entry.name);
+        }
+
         dirs.push(entry);
       }
     }
