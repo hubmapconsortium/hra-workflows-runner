@@ -6,6 +6,7 @@ import { checkFetchResponse, downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir } from '../util/paths.js';
 import { CollectionMetadata, parseMetadataFromId } from './metadata.js';
+import { getSrcFilePath } from '../util/paths.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
@@ -26,6 +27,19 @@ export class Downloader {
     this.collectionCache = new Cache();
     /** @type {Cache<string, Promise<void>>} */
     this.assetCache = new Cache();
+
+    //Start of Vicky's code
+
+    /** @type {string} */
+    this.extractScriptFile = 'extract_dataset.py';
+    /** @type {string} */
+    this.extractScriptFilePath = getSrcFilePath(
+      config,
+      'cellxgene',
+      this.extractScriptFile
+    );
+
+    //End of Vicky's code
   }
 
   async prepareDownload(datasets) {
@@ -51,12 +65,39 @@ export class Downloader {
     );
 
     await this.downloadAsset(dataset.dataset, dataset.asset, dataFilePath);
+    
     // TODO Use python script to split out from the h5ad file (like in gtex/download.js)
     // Should pass file, dataset.donor, dataset.tissue, and dataset.sample to the script
     // Script should use sample to split if a sample column exists otherwise it should
     // use donor combined with tissue to do the split
     // NOTE: Make sure donor, tissue, and sample is properly quoted when passed to the script
     // I.e. `... --tissue "tissue with spaces"` rather than `... --tissue tissue with spaces`
+
+    // Start of Vicky's code
+    
+    if (!dataset.sample) {
+      await execFile('python3', [
+        this.extractScriptFilePath,
+        dataFilePath,
+        '--donor',
+        dataset.donor,
+        '--tissue',
+        dataset.tissue,
+        '--output',
+        dataset.dataFilePath,
+      ]);
+    } else {
+      await execFile('python3', [
+        this.extractScriptFilePath,
+        dataFilePath,
+        '--sample',
+        dataset.sample,
+        '--output',
+        dataset.dataFilePath,
+      ]);
+    }
+
+    // End of Vicky's code
   }
 
   async downloadCollection(collection) {
