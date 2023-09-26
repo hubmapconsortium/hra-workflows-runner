@@ -1,6 +1,7 @@
 // Environment variables
 export const FORCE = 'FORCE';
 export const MAX_CONCURRENCY = 'MAX_CONCURRENCY';
+export const DATASET_HANDLERS = 'DATASET_HANDLERS';
 export const DATASET = 'DATASET';
 export const VERSION = 'VERSION';
 export const OUTPUT_DIR = 'OUTPUT_DIR';
@@ -25,12 +26,10 @@ export const DATASET_FILE = 'dataset.json';
 export const DATA_FILE = 'data.h5ad';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 
-// Dataset handlers
-export const DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene', 'default-dataset-handler'];
-
 // Algorithms
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];
 
 // Default values
 export const DEFAULT_MAX_CONCURRENCY = 10;
 export const DEFAULT_CACHE_DIR = './tmp';
+export const DEFAULT_DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
