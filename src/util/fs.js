@@ -29,7 +29,7 @@ export async function fileExists(path) {
  * Check whether a fetch response was successful otherwise throw an error
  *
  * @param {Response} response The response object
- * @param {string} msg Message added befor the status and text
+ * @param {string} [msg] Message added before the status and text
  */
 export function checkFetchResponse(response, msg = 'Download failed') {
   if (!response.ok) {

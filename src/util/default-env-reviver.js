@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import {
   CACHE_DIR,
+  DATASET_HANDLERS,
   DATA_REPO_DIR,
   DEFAULT_MAX_CONCURRENCY,
   FORCE,
@@ -18,6 +19,9 @@ export function defaultEnvReviver(key, value) {
       const num = Number.parseInt(value);
       return num > 0 ? num : DEFAULT_MAX_CONCURRENCY;
     }
+
+    case DATASET_HANDLERS:
+      return value.split(/[\s,;]/g);
 
     case OUTPUT_DIR:
     case DATA_REPO_DIR:
