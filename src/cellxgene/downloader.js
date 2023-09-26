@@ -1,17 +1,26 @@
+import { execFile as callbackExecFile } from 'node:child_process';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
+import { createScratchGetSet } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
+import { FORCE } from '../util/constants.js';
 import { checkFetchResponse, downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
-import { getCacheDir } from '../util/paths.js';
+import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { CollectionMetadata, parseMetadataFromId } from './metadata.js';
-import { getSrcFilePath } from '../util/paths.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
 const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
+
+const execFile = promisify(callbackExecFile);
+
+const { get: getCollectionMetadata, set: setCollectionMetadata } =
+  /** @type {import('../dataset/dataset.js').ScratchGetSetPair<CollectionMetadata | undefined>} */
+  (createScratchGetSet('collectionMetadata'));
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -27,9 +36,6 @@ export class Downloader {
     this.collectionCache = new Cache();
     /** @type {Cache<string, Promise<void>>} */
     this.assetCache = new Cache();
-
-    //Start of Vicky's code
-
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset.py';
     /** @type {string} */
@@ -38,8 +44,6 @@ export class Downloader {
       'cellxgene',
       this.extractScriptFile
     );
-
-    //End of Vicky's code
   }
 
   async prepareDownload(datasets) {
@@ -50,8 +54,11 @@ export class Downloader {
         const collection = await this.downloadCollection(collectionId);
         const { id: asset } = collection.findH5adAsset(datasetId) ?? {};
         Object.assign(dataset, metadata, { asset });
+        setCollectionMetadata(dataset, collection);
       }
     });
+
+    // TODO make tissue to organ query
   }
 
   async download(dataset) {
@@ -59,45 +66,24 @@ export class Downloader {
       throw new Error(`Cannot find h5ad data file`);
     }
 
-    const dataFilePath = join(
+    const assetDataFilePath = join(
       getCacheDir(this.config),
       `cellxgene-${dataset.asset}.h5ad`
     );
 
-    await this.downloadAsset(dataset.dataset, dataset.asset, dataFilePath);
-    
-    // TODO Use python script to split out from the h5ad file (like in gtex/download.js)
-    // Should pass file, dataset.donor, dataset.tissue, and dataset.sample to the script
-    // Script should use sample to split if a sample column exists otherwise it should
-    // use donor combined with tissue to do the split
-    // NOTE: Make sure donor, tissue, and sample is properly quoted when passed to the script
-    // I.e. `... --tissue "tissue with spaces"` rather than `... --tissue tissue with spaces`
-
-    // Start of Vicky's code
-    
-    if (!dataset.sample) {
-      await execFile('python3', [
-        this.extractScriptFilePath,
-        dataFilePath,
-        '--donor',
-        dataset.donor,
-        '--tissue',
-        dataset.tissue,
-        '--output',
-        dataset.dataFilePath,
-      ]);
-    } else {
-      await execFile('python3', [
-        this.extractScriptFilePath,
-        dataFilePath,
-        '--sample',
-        dataset.sample,
-        '--output',
-        dataset.dataFilePath,
-      ]);
-    }
-
-    // End of Vicky's code
+    await this.downloadAsset(dataset.dataset, dataset.asset, assetDataFilePath);
+    await execFile('python3', [
+      this.extractScriptFilePath,
+      assetDataFilePath,
+      '--donor',
+      dataset.donor,
+      '--tissue',
+      dataset.tissue,
+      '--sample',
+      dataset.sample,
+      '--output',
+      dataset.dataFilePath,
+    ]);
   }
 
   async downloadCollection(collection) {
@@ -115,7 +101,9 @@ export class Downloader {
       checkFetchResponse(resp, 'CellXGene asset download failed');
 
       const { presigned_url } = await resp.json();
-      await downloadFile(outputFile, presigned_url);
+      await downloadFile(outputFile, presigned_url, {
+        overwrite: this.config.get(FORCE, false),
+      });
     });
   }
 }
