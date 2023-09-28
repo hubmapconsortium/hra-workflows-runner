@@ -16,4 +16,4 @@ module load python
 module load singularity
 
 #Run your program
-srun cwl-runner --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.yaml
+srun cwl-runner --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.json

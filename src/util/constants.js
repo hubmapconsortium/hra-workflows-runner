@@ -24,6 +24,7 @@ export const LISTING_FILE = 'listing.csv';
 export const SUMMARIES_FILE = 'summaries.csv';
 export const DATASET_FILE = 'dataset.json';
 export const DATA_FILE = 'data.h5ad';
+export const JOB_FILE = 'job.json';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 
 // Algorithms

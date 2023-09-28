@@ -13,6 +13,9 @@ import { getSrcFilePath } from './paths.js';
  *
  * @property {function(new:IDownloader, Config)} Downloader
  * Class implementing the data downloading interface
+ *
+ * @property {function(new:IJobGenerator, Config)} JobGenerator
+ * Class implementing the job generator interface
  */
 
 /**
@@ -43,6 +46,42 @@ export class IDownloader {
    * @throws If the download fails
    */
   async download(dataset) {}
+}
+
+/**
+ * @typedef {Object} JobMetadataCommon
+ * @property {string} organ Dataset organ as an uberon id
+ */
+
+/**
+ * @typedef {JobMetadataCommon & Object<string, Object | false>} JobMetadata
+ * Metadata returned by a job generator.
+ * Can specify options for each algorithm or
+ * set to false to disable individual algorithms.
+ */
+
+/**
+ * Job generator interface implemented by handlers
+ *
+ * @interface
+ */
+export class IJobGenerator {
+  /**
+   * Prepares datasets for job generation.
+   *
+   * @param {Dataset[]} datasets Datasets to prepare for job generation
+   * @returns {Promise<Dataset[] | undefined>}
+   * A subset of the initial datasets or undefined to generate jobs for all datasets
+   */
+  async prepareJobs(datasets) {}
+
+  /**
+   * Create job metadata for a dataset
+   *
+   * @param {Dataset} dataset Dataset to generate job metadata for
+   * @returns {Promise<JobMetadata>}
+   */
+  async createJob(dataset) {}
 }
 
 /**
@@ -96,7 +135,8 @@ function verifyDatasetHandler(maybeHandler) {
   const [name, module] = maybeHandler;
   const hasSupports = typeof module.supports === 'function';
   const hasDownloader = typeof module.Downloader === 'function';
-  if (!hasSupports || !hasDownloader) {
+  const hasGenerator = typeof module.JobGenerator === 'function';
+  if (!hasSupports || !hasDownloader || !hasGenerator) {
     const msg = `Dataset handler '${name}' does not implement the required interfaces`;
     console.warn(msg);
     return false;

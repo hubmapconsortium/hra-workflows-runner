@@ -44,7 +44,7 @@ export class Downloader {
   }
 
   async download(dataset) {
-    await execFile('python3', [
+    const { stdout } = await execFile('python3', [
       this.extractScriptFilePath,
       this.dataFilePath,
       '--dataset',
@@ -52,5 +52,9 @@ export class Downloader {
       '--output',
       dataset.dataFilePath,
     ]);
+
+    // Parse organ line. Format: `organ: X\n`
+    const match = /organ:(.+)\n/i.exec(stdout);
+    dataset.organ = match?.[1].trim() ?? '';
   }
 }

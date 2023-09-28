@@ -5,6 +5,7 @@ import {
   getDataFilePath,
   getDatasetFilePath,
   getDirForId,
+  getJobFilePath,
 } from '../util/paths.js';
 
 const CONFIG = Symbol('Configuration reference');
@@ -69,6 +70,10 @@ export class Dataset {
 
   get dataFilePath() {
     return getDataFilePath(this.config, this.dir);
+  }
+
+  get jobFilePath() {
+    return getJobFilePath(this.config, this.dir);
   }
 
   /**

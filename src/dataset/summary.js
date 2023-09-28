@@ -1,5 +1,6 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import Papa from 'papaparse';
+import { loadCsv } from '../util/common.js';
 import { ALGORITHMS } from '../util/constants.js';
 
 /**
@@ -14,7 +15,35 @@ export const Status = {
   NOT_SUPPORTED: 'not supported',
 };
 
+/**
+ * Builtin steps
+ * @readonly
+ * @enum {string}
+ */
+export const Step = {
+  DOWNLOADED: 'downloaded',
+};
+
+/**
+ * Builtin algorithm steps
+ * @readonly
+ * @enum {string}
+ */
+export const AlgorithmStep = ALGORITHMS.reduce(
+  (result, algorithm) => ({
+    ...result,
+    [algorithm.toUpperCase()]: algorithm,
+  }),
+  /** @type {Object<string, string>} */ ({})
+);
+
+const STEPS = Object.values({
+  ...Step,
+  ...AlgorithmStep,
+});
+
 export class DatasetSummary {
+  /** @private */
   static fromRaw(data) {
     return Object.assign(new DatasetSummary(data.id), data);
   }
@@ -27,13 +56,49 @@ export class DatasetSummary {
   constructor(id) {
     /** @type {string} */
     this.id = id;
-    /** @type {Status} */
-    this.downloaded = Status.NOT_STARTED;
     /** @type {string} */
     this.errors = '';
 
-    for (const algorithm of ALGORITHMS) {
-      this[algorithm] = Status.NOT_STARTED;
+    for (const step of STEPS) {
+      this[step] = Status.NOT_STARTED;
+    }
+  }
+
+  /**
+   * Get the status of a step
+   *
+   * @param {string} step
+   * @returns {Status}
+   */
+  getStatus(step) {
+    return this[step] ?? Status.NOT_STARTED;
+  }
+
+  /**
+   * Updates the status of a step
+   *
+   * @param {string} step
+   * @param {Status} status
+   */
+  setStatus(step, status) {
+    this[step] = status;
+  }
+
+  /**
+   * Add an error
+   *
+   * @param {any} message Error or error message
+   * @param {'replace' | 'merge'} resolve How to combine with existing error messages
+   */
+  addError(message, resolve = 'replace') {
+    const formattedMessage = JSON.stringify(message)
+      .slice(1, -1)
+      .replace(/\\"/g, '"');
+
+    if (resolve === 'merge' && this.errors) {
+      this.errors = `${this.errors}\\n${formattedMessage}`;
+    } else {
+      this.errors = formattedMessage;
     }
   }
 
@@ -44,10 +109,21 @@ export class DatasetSummary {
    * @param {boolean} [clearErrors=true]
    */
   setSuccess(step, clearErrors = true) {
-    this[step] = Status.SUCCESS;
+    this.setStatus(step, Status.SUCCESS);
     if (clearErrors) {
       this.errors = '';
     }
+  }
+
+  /**
+   * Sets success for step on multiple summaries
+   *
+   * @param {DatasetSummary[]} summaries
+   * @param {string} step
+   * @param {boolean} [clearErrors=true]
+   */
+  static setSuccessMany(summaries, step, clearErrors) {
+    summaries.forEach((summary) => summary.setSuccess(step, clearErrors));
   }
 
   /**
@@ -58,13 +134,20 @@ export class DatasetSummary {
    * @param {boolean} [mergeErrors=false]
    */
   setFailure(step, msg, mergeErrors = false) {
-    const formattedMessage = JSON.stringify(msg)
-      .slice(1, -1)
-      .replace(/\\"/g, '"');
-    const errors = mergeErrors ? this.errors + '\\n' : '';
+    this.setStatus(step, Status.FAILURE);
+    this.addError(msg, mergeErrors ? 'merge' : 'replace');
+  }
 
-    this[step] = Status.FAILURE;
-    this.errors = errors + formattedMessage;
+  /**
+   * Sets failure for step on multiple summaries
+   *
+   * @param {DatasetSummary[]} summaries
+   * @param {string} step
+   * @param {any} msg
+   * @param {boolean} [mergeErrors=false]
+   */
+  static setFailureMany(summaries, step, msg, mergeErrors) {
+    summaries.forEach((summary) => summary.setFailure(step, msg, mergeErrors));
   }
 
   /**
@@ -73,7 +156,17 @@ export class DatasetSummary {
    * @param {string} step
    */
   setNotSupported(step) {
-    this[step] = Status.NOT_SUPPORTED;
+    this.setStatus(step, Status.NOT_SUPPORTED);
+  }
+
+  /**
+   * Sets not supported for step on multiple summaries
+   *
+   * @param {DatasetSummary[]} summaries
+   * @param {string} step
+   */
+  static setNotSupportedMany(summaries, step) {
+    summaries.forEach((summary) => summary.setNotSupported(step));
   }
 }
 
@@ -113,17 +206,25 @@ export class DatasetSummaries {
   }
 
   /**
+   * Filters summary items whose step has the specified status
+   *
+   * @param {string} step
+   * @param {Status} status
+   */
+  filterByStatus(step, status) {
+    return this.summaries.filter(
+      (summary) => summary.getStatus(step) === status
+    );
+  }
+
+  /**
    * Load summaries from file
    *
    * @param {import('node:fs').PathLike} path File path
    */
   static async load(path) {
-    const content = await readFile(path, { encoding: 'utf8' });
-    const parsed = Papa.parse(content, {
-      header: true,
-      skipEmptyLines: 'greedy',
-    });
-    const items = parsed.data.map(DatasetSummary.fromRaw);
+    const rows = await loadCsv(path);
+    const items = rows.map(DatasetSummary.fromRaw);
     const summaries = new DatasetSummaries();
     summaries.push(...items);
     return summaries;
@@ -133,10 +234,11 @@ export class DatasetSummaries {
    * Save summaries to file
    *
    * @param {import('node:fs').PathLike} path File path
+   * @param {string[]} [steps] Steps to serialize
    */
-  async save(path) {
+  async save(path, steps = STEPS) {
     const content = Papa.unparse({
-      fields: ['id', 'downloaded', ...ALGORITHMS, 'errors'],
+      fields: ['id', ...steps, 'errors'],
       data: this.summaries,
     });
     await writeFile(path, content);

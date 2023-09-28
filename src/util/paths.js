@@ -7,6 +7,7 @@ import {
   DATA_FILE,
   DATA_REPO_DIR,
   DEFAULT_CACHE_DIR,
+  JOB_FILE,
   LISTING_FILE,
   OUTPUT_DIR,
   SRC_DIR,
@@ -104,6 +105,16 @@ export function getDatasetFilePath(config, dir) {
  */
 export function getDataFilePath(config, dir) {
   return join(getDataDir(config, dir), DATA_FILE);
+}
+
+/**
+ * Get the configured job file path
+ *
+ * @param {Config} config Configuration
+ * @param {string} dir Dataset directory
+ */
+export function getJobFilePath(config, dir) {
+  return join(getDataDir(config, dir), JOB_FILE);
 }
 
 /**
