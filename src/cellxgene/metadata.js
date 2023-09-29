@@ -1,6 +1,11 @@
 import { basename } from 'node:path';
 import { checkFetchResponse } from '../util/fs.js';
 
+/**
+ * Parses metadata from an id
+ *
+ * @param {string} id Id to parse
+ */
 export function parseMetadataFromId(id) {
   const { pathname, hash } = new URL(id);
   const collection = basename(pathname);
@@ -28,9 +33,15 @@ export class CollectionMetadata {
   }
 
   findH5adAsset(id) {
-    const isH5ad = ({ filetype }) => /h5ad/i.test(filetype);
-    const { dataset_assets: assets = [] } = this.findDataset(id) ?? [];
+    const isH5ad = ({ filetype }) => /^h5ad$/i.test(filetype);
+    const { dataset_assets: assets = [] } = this.findDataset(id) ?? {};
     return assets.find(isH5ad);
+  }
+
+  findTissueId(id, tissue) {
+    const { tissue: tissues = [] } = this.findDataset(id) ?? {};
+    const entry = tissues.find(({ label }) => label === tissue);
+    return entry ? { id: entry.ontology_term_id, tissue } : undefined;
   }
 
   static async download(url) {

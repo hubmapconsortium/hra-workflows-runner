@@ -13,7 +13,7 @@ export class JobGenerator {
   createJob(dataset) {
     return {
       organ: dataset.organ,
-      geneColumn: 'gene_name', // TODO fix!
+      geneColumn: 'feature_name',
       azimuth: false,
       celltypist: {},
       popv: false,

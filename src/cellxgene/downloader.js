@@ -1,7 +1,6 @@
 import { execFile as callbackExecFile } from 'node:child_process';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { createScratchGetSet } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
@@ -10,6 +9,7 @@ import { checkFetchResponse, downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { CollectionMetadata, parseMetadataFromId } from './metadata.js';
+import { getOrganLookup } from './organ-lookup.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
@@ -17,10 +17,6 @@ const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
 
 const execFile = promisify(callbackExecFile);
-
-const { get: getCollectionMetadata, set: setCollectionMetadata } =
-  /** @type {import('../dataset/dataset.js').ScratchGetSetPair<CollectionMetadata | undefined>} */
-  (createScratchGetSet('collectionMetadata'));
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -49,16 +45,25 @@ export class Downloader {
   async prepareDownload(datasets) {
     await concurrentMap(datasets, async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { dataset: datasetId, collection: collectionId } = metadata;
+      const { dataset: datasetId, collection: collectionId, tissue } = metadata;
       if (collectionId) {
         const collection = await this.downloadCollection(collectionId);
+        const { id: tissueId } = collection.findTissueId(datasetId, tissue);
         const { id: asset } = collection.findH5adAsset(datasetId) ?? {};
-        Object.assign(dataset, metadata, { asset });
-        setCollectionMetadata(dataset, collection);
+        Object.assign(dataset, metadata, { tissueId, asset });
       }
     });
 
-    // TODO make tissue to organ query
+    const tissueIds = datasets.map((dataset) => dataset.tissueId);
+    const uniqueTissueIds = new Set(tissueIds);
+    uniqueTissueIds.delete(undefined);
+
+    const organLookup = await getOrganLookup(Array.from(uniqueTissueIds));
+    for (const dataset of datasets) {
+      dataset.organ = organLookup.get(dataset.tissueId);
+    }
+
+    return datasets.filter((dataset) => dataset.organ);
   }
 
   async download(dataset) {
