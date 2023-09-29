@@ -43,7 +43,7 @@ export class JobGenerator {
     return {
       organ: uberon,
       geneColumn: 'gene_name',
-      azimuth: false,
+      azimuth: {},
       celltypist: {},
       popv: false,
     };

@@ -14,7 +14,7 @@ export class JobGenerator {
     return {
       organ: dataset.organ,
       geneColumn: 'feature_name',
-      azimuth: false,
+      azimuth: {},
       celltypist: {},
       popv: false,
     };

@@ -56,7 +56,7 @@ export class JobGenerator {
     return {
       organ: uberon,
       geneColumn: 'hugo_symbol',
-      azimuth: false,
+      azimuth: {},
       celltypist: {},
       popv: false,
     };
