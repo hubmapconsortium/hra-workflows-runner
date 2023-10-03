@@ -48,3 +48,8 @@ for DIR in $(node $SRC_DIR/list-downloaded-dirs.js); do
     popd
   fi
 done
+
+if [[ $RUNNER == "slurm" ]]; then
+  echo "Slurm requires some manual work. Exiting..."
+  exit 0
+fi
