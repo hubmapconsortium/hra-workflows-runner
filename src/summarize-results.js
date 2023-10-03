@@ -14,6 +14,7 @@ import {
 
 async function updateAlgorithmStatus(item, config) {
   const directory = getDirForId(item.id);
+  item.errors = '';
   for (const algorithm of ALGORITHMS) {
     await readReport(item, algorithm, directory, config);
   }
