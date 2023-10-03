@@ -32,5 +32,4 @@ export SIF_CACHE_DIR="/N/project/hra/sif-cache"
 source $DATASETS_DIR/$DATASET/config.sh
 
 # Check required dataset configuration
-_=${DATASET_LIST_URL:?"No dataset list url set!"}
 _=${DATASET_COLUMN_ID:?"No dataset list identifier column set!"}
