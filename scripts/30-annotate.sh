@@ -6,16 +6,24 @@ set -ev
 CWL_PIPELINE="https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl"
 CWL_OPTS=()
 
-if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
+if [[ $RUNNER == "slurm" ]]; then
   CWL_OPTS+=(--singularity)
+  SBATCH_FILE="$OUTPUT_DIR/sbatch.sh"
 
-  if [[ -d $SIF_CACHE_DIR ]]; then
-    LINK_SIF_CACHE=true
-  fi
+  : >$SBATCH_FILE # Create/truncate the file
+  chmod +x $SBATCH_FILE
+  echo "#!/bin/bash" >>$SBATCH_FILE
+  echo "source constants.sh" >>$SBATCH_FILE
+elif [[ $RUNNER == "singularity" ]]; then
+  CWL_OPTS+=(--singularity)
 fi
 
 if [[ -n $TEMP ]]; then
   CWL_OPTS+=(--tmpdir-prefix $TEMP)
+fi
+
+if [[ -d $SIF_CACHE_DIR && ${CWL_OPTS[@]} =~ "singularity" ]]; then
+  LINK_SIF_CACHE=true
 fi
 
 link_sif_cache() {
@@ -26,17 +34,17 @@ link_sif_cache() {
 }
 
 for DIR in $(node $SRC_DIR/list-downloaded-dirs.js); do
-  pushd $DIR
-
   if [[ -n $LINK_SIF_CACHE ]]; then
     link_sif_cache $DIR
   fi
 
   if [[ $RUNNER == "slurm" ]]; then
-    sbatch $PROJECT_DIR/src/slurm/slurm-annotate.sh
+    echo "pushd $DIR" >>$SBATCH_FILE
+    echo "sbatch $PROJECT_DIR/src/slurm/slurm-annotate.sh" >>$SBATCH_FILE
+    echo "popd" >>$SBATCH_FILE
   else
+    pushd $DIR
     cwl-runner ${CWL_OPTS[@]} $CWL_PIPELINE job.json
+    popd
   fi
-
-  popd
 done
