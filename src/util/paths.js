@@ -3,10 +3,14 @@ import { Config } from './config.js';
 import {
   ALGORITHM_REPORT_FILE,
   CACHE_DIR,
+  DATASET,
+  DATASETS_DIR,
   DATASET_FILE,
+  DATASET_LIST,
   DATA_FILE,
   DATA_REPO_DIR,
   DEFAULT_CACHE_DIR,
+  DEFAULT_DATASET_LIST,
   JOB_FILE,
   LISTING_FILE,
   OUTPUT_DIR,
@@ -21,6 +25,15 @@ import {
  */
 export function getDirForId(id) {
   return id.replaceAll(/[^\w-._]/gi, '_');
+}
+
+/**
+ * Get the configured dataset directory
+ *
+ * @param {Config} config Configuration
+ */
+export function getDatasetDir(config) {
+  return join(config.get(DATASETS_DIR), config.get(DATASET));
 }
 
 /**
@@ -67,6 +80,18 @@ export function getCacheDir(config) {
  */
 export function getSrcDir(config) {
   return config.get(SRC_DIR);
+}
+
+/**
+ * Get the configured list file path
+ *
+ * @param {Config} config Configuration
+ */
+export function getDatasetListFilePath(config) {
+  return join(
+    getDatasetDir(config),
+    config.get(DATASET_LIST, DEFAULT_DATASET_LIST)
+  );
 }
 
 /**

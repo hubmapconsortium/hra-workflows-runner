@@ -4,19 +4,21 @@ export const MAX_CONCURRENCY = 'MAX_CONCURRENCY';
 export const DATASET_HANDLERS = 'DATASET_HANDLERS';
 export const DATASET = 'DATASET';
 export const VERSION = 'VERSION';
+export const DATASETS_DIR = 'DATASETS_DIR';
 export const OUTPUT_DIR = 'OUTPUT_DIR';
 export const DATA_REPO_DIR = 'DATA_REPO_DIR';
 export const CACHE_DIR = 'CACHE_DIR';
 export const SRC_DIR = 'SRC_DIR';
+export const DATASET_LIST = 'DATASET_LIST';
 export const DATASET_LIST_URL = 'DATASET_LIST_URL';
 export const DATASET_COLUMN_ID = 'DATASET_COLUMN_ID';
 
 export const REQUIRED_ENV_VARIABLES = [
+  DATASET,
+  DATASETS_DIR,
   OUTPUT_DIR,
   DATA_REPO_DIR,
-  SRC_DIR,
-  DATASET_LIST_URL,
-  DATASET_COLUMN_ID,
+  SRC_DIR
 ];
 
 // File names
@@ -34,3 +36,4 @@ export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];
 export const DEFAULT_MAX_CONCURRENCY = 10;
 export const DEFAULT_CACHE_DIR = './tmp';
 export const DEFAULT_DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
+export const DEFAULT_DATASET_LIST = 'listing.csv';

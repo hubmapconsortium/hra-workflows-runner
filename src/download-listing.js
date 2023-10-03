@@ -1,8 +1,14 @@
+import { copyFile } from 'node:fs/promises';
 import { DatasetSummaries, DatasetSummary } from './dataset/summary.js';
 import { getConfig, loadListing } from './util/common.js';
-import { DATASET_LIST_URL, FORCE } from './util/constants.js';
-import { downloadFile, ensureDirsExist } from './util/fs.js';
 import {
+  DATASET_COLUMN_ID,
+  DATASET_LIST_URL,
+  FORCE,
+} from './util/constants.js';
+import { downloadFile, ensureDirsExist, fileExists } from './util/fs.js';
+import {
+  getDatasetListFilePath,
   getListingFilePath,
   getOutputDir,
   getSummariesFilePath,
@@ -24,9 +30,17 @@ function createSummaries(listing) {
 }
 
 async function main() {
-  const config = getConfig();
+  const config = getConfig().validate([DATASET_COLUMN_ID]);
   await ensureDirsExist(getOutputDir(config));
-  await downloadListing(config);
+
+  const listFilePath = getDatasetListFilePath(config);
+  const listingFilePath = getListingFilePath(config);
+  if (await fileExists(listFilePath)) {
+    await copyFile(listFilePath, listingFilePath);
+  } else {
+    config.validate([DATASET_LIST_URL]);
+    await downloadListing(config);
+  }
 
   const listing = await loadListing(config);
   const summaries = createSummaries(listing);
