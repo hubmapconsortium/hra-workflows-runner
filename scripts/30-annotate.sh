@@ -51,5 +51,5 @@ done
 
 if [[ $RUNNER == "slurm" ]]; then
   echo "Slurm requires some manual work. Exiting..."
-  exit 0
+  exit 1
 fi
