@@ -33,7 +33,7 @@ export const ALGORITHM_REPORT_FILE = 'report.json';
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];
 
 // Default values
-export const DEFAULT_MAX_CONCURRENCY = 10;
+export const DEFAULT_MAX_CONCURRENCY = 2;
 export const DEFAULT_CACHE_DIR = './tmp';
 export const DEFAULT_DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
 export const DEFAULT_DATASET_LIST = 'listing.csv';
