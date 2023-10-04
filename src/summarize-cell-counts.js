@@ -12,6 +12,7 @@ import {
   getOutputDir,
   getSummariesFilePath,
 } from './util/paths.js';
+import { ensureDirsExist } from './util/fs.js';
 
 async function readSummaryJsonLd(id, algorithm, config) {
   const path = getAlgorithmSummaryJsonLdFilePath(
@@ -64,8 +65,10 @@ async function main(algorithm) {
     fields: ['id', ...fields],
     data: countsWithIds,
   });
-  const outputFilePath = join(getOutputDir(config), algorithm, 'counts.csv');
+  const outputDir = join(getOutputDir(config), algorithm);
+  const outputFilePath = join(outputDir, 'counts.csv');
 
+  await ensureDirsExist(outputDir);
   await writeFile(outputFilePath, resultCsv, { encoding: 'utf8' });
 }
 
