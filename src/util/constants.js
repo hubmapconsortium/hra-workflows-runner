@@ -18,7 +18,7 @@ export const REQUIRED_ENV_VARIABLES = [
   DATASETS_DIR,
   OUTPUT_DIR,
   DATA_REPO_DIR,
-  SRC_DIR
+  SRC_DIR,
 ];
 
 // File names
@@ -28,6 +28,7 @@ export const DATASET_FILE = 'dataset.json';
 export const DATA_FILE = 'data.h5ad';
 export const JOB_FILE = 'job.json';
 export const ALGORITHM_REPORT_FILE = 'report.json';
+export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
 
 // Algorithms
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];

@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import { Config } from './config.js';
 import {
   ALGORITHM_REPORT_FILE,
+  ALGORITHM_SUMMARY_JSON_LD_FILE,
   CACHE_DIR,
   DATASET,
   DATASETS_DIR,
@@ -151,6 +152,21 @@ export function getJobFilePath(config, dir) {
  */
 export function getAlgorithmReportFilePath(config, dir, algorithm) {
   return join(getDataDir(config, dir), algorithm, ALGORITHM_REPORT_FILE);
+}
+
+/**
+ * Get the configured algorithm summary file path
+ *
+ * @param {Config} config Configuration
+ * @param {string} dir Dataset directory
+ * @param {string} algorithm Algorithm
+ */
+export function getAlgorithmSummaryJsonLdFilePath(config, dir, algorithm) {
+  return join(
+    getDataDir(config, dir),
+    algorithm,
+    ALGORITHM_SUMMARY_JSON_LD_FILE
+  );
 }
 
 /**
