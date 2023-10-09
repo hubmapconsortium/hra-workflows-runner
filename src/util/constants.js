@@ -22,6 +22,7 @@ export const REQUIRED_ENV_VARIABLES = [
 ];
 
 // File names
+export const ALL_DATASETS_LISTING_FILE = 'all-listing.csv';
 export const LISTING_FILE = 'listing.csv';
 export const SUMMARIES_FILE = 'summaries.csv';
 export const DATASET_FILE = 'dataset.json';

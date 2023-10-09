@@ -13,6 +13,7 @@ import {
   DEFAULT_CACHE_DIR,
   DEFAULT_DATASET_LIST,
   JOB_FILE,
+  ALL_DATASETS_LISTING_FILE,
   LISTING_FILE,
   OUTPUT_DIR,
   SRC_DIR,
@@ -93,6 +94,15 @@ export function getDatasetListFilePath(config) {
     getDatasetDir(config),
     config.get(DATASET_LIST, DEFAULT_DATASET_LIST)
   );
+}
+
+/**
+ * Get the configured listing file path
+ *
+ * @param {Config} config Configuration
+ */
+export function getAllDatasetsListingFilePath(config) {
+  return join(getOutputDir(config), ALL_DATASETS_LISTING_FILE);
 }
 
 /**

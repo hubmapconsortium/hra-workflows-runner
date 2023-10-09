@@ -140,3 +140,6 @@ env.sh
 
 # Raw data folder
 raw-data
+
+# DS Store
+.DS_Store
