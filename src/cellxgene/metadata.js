@@ -10,8 +10,8 @@ export function parseMetadataFromId(id) {
   const { pathname, hash } = new URL(id);
   const collection = basename(pathname);
   const decodedHash = decodeURIComponent(hash);
-  const [dataset, donor, tissue, sample = ''] = decodedHash.slice(1).split('$');
-  return { collection, dataset, donor, tissue, sample };
+  const [dataset, donor, tissue, type, sample = ''] = decodedHash.slice(1).split('$');
+  return { collection, dataset, donor, tissue, type, sample };
 }
 
 export class CollectionMetadata {
