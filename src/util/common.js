@@ -39,7 +39,7 @@ export const { get: getSummaryRef, set: setSummaryRef } =
  */
 export async function loadCsv(path) {
   const content = await readFile(path, { encoding: 'utf8' });
-  const { data } = Papa.parse(content, { header: true });
+  const { data } = Papa.parse(content, { header: true, skipEmptyLines: 'greedy' });
   return data;
 }
 
