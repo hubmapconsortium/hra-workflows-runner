@@ -49,6 +49,15 @@ export class DatasetSummary {
   }
 
   /**
+   * Get the property storing errors for a step
+   *
+   * @param {string} step
+   */
+  static getErrorPropertyForStep(step) {
+    return `errors:${step}`;
+  }
+
+  /**
    * Creates a new dataset summary item
    *
    * @param {string} id Dataset id
@@ -56,11 +65,10 @@ export class DatasetSummary {
   constructor(id) {
     /** @type {string} */
     this.id = id;
-    /** @type {string} */
-    this.errors = '';
 
     for (const step of STEPS) {
-      this[step] = Status.NOT_STARTED;
+      this.setStatus(step, Status.NOT_STARTED);
+      this.setError(step, '');
     }
   }
 
@@ -85,34 +93,39 @@ export class DatasetSummary {
   }
 
   /**
-   * Add an error
+   * Get any errors for a step
    *
-   * @param {any} message Error or error message
-   * @param {'replace' | 'merge'} resolve How to combine with existing error messages
+   * @param {string} step
+   * @returns {string}
    */
-  addError(message, resolve = 'replace') {
+  getError(step) {
+    const prop = DatasetSummary.getErrorPropertyForStep(step);
+    return this[prop];
+  }
+
+  /**
+   * Sets the error message for a step
+   *
+   * @param {string} step
+   * @param {any} message Error message
+   */
+  setError(step, message) {
+    const prop = DatasetSummary.getErrorPropertyForStep(step);
     const formattedMessage = JSON.stringify(message)
       .slice(1, -1)
       .replace(/\\"/g, '"');
 
-    if (resolve === 'merge' && this.errors) {
-      this.errors = `${this.errors}\\n${formattedMessage}`;
-    } else {
-      this.errors = formattedMessage;
-    }
+    this[prop] = formattedMessage;
   }
 
   /**
    * Sets success for step and optionally clear errors
    *
    * @param {string} step
-   * @param {boolean} [clearErrors=true]
    */
-  setSuccess(step, clearErrors = true) {
+  setSuccess(step) {
     this.setStatus(step, Status.SUCCESS);
-    if (clearErrors) {
-      this.errors = '';
-    }
+    this.setError(step, '');
   }
 
   /**
@@ -120,22 +133,20 @@ export class DatasetSummary {
    *
    * @param {DatasetSummary[]} summaries
    * @param {string} step
-   * @param {boolean} [clearErrors=true]
    */
-  static setSuccessMany(summaries, step, clearErrors) {
-    summaries.forEach((summary) => summary.setSuccess(step, clearErrors));
+  static setSuccessMany(summaries, step) {
+    summaries.forEach((summary) => summary.setSuccess(step));
   }
 
   /**
    * Sets failure for step and add an error message
    *
    * @param {string} step
-   * @param {any} msg
-   * @param {boolean} [mergeErrors=false]
+   * @param {any} message
    */
-  setFailure(step, msg, mergeErrors = false) {
+  setFailure(step, message) {
     this.setStatus(step, Status.FAILURE);
-    this.addError(msg, mergeErrors ? 'merge' : 'replace');
+    this.setError(step, message);
   }
 
   /**
@@ -157,6 +168,7 @@ export class DatasetSummary {
    */
   setNotSupported(step) {
     this.setStatus(step, Status.NOT_SUPPORTED);
+    this.setError(step, '');
   }
 
   /**
@@ -237,8 +249,9 @@ export class DatasetSummaries {
    * @param {string[]} [steps] Steps to serialize
    */
   async save(path, steps = STEPS) {
+    const errorProps = steps.map(DatasetSummary.getErrorPropertyForStep);
     const content = Papa.unparse({
-      fields: ['id', ...steps, 'errors'],
+      fields: ['id', ...steps, ...errorProps],
       data: this.summaries,
     });
     await writeFile(path, content);

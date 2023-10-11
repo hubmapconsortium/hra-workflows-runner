@@ -25,9 +25,9 @@ async function readReport(item, algorithm, directory, config) {
   try {
     const { status, cause } = await loadJson(filePath);
     if (status === 'success') {
-      item.setSuccess(algorithm, false);
+      item.setSuccess(algorithm);
     } else {
-      item.setFailure(algorithm, cause, true);
+      item.setFailure(algorithm, cause);
     }
   } catch {
     // Ignore failures to load report
