@@ -9,6 +9,8 @@ async function prepare([downloader, datasets]) {
   const newDatasets = await tryPrepare(downloader, datasets);
   if (newDatasets === undefined) {
     return datasets;
+  } else if (newDatasets === 'error') {
+    return [];
   }
 
   const notSupported = Array.from(diff(datasets, newDatasets));
@@ -21,7 +23,7 @@ async function tryPrepare(downloader, datasets) {
     return await downloader.prepareDownload(datasets);
   } catch (error) {
     markFailure(datasets, error);
-    return undefined;
+    return 'error';
   }
 }
 

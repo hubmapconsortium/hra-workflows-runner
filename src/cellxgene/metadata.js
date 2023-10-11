@@ -62,8 +62,8 @@ function partitionDatasetsByType(datasets) {
   );
 
   return {
-    primary: grouped.get('primary'),
-    secondary: grouped.get('secondary'),
+    primary: grouped.get('primary') ?? [],
+    secondary: grouped.get('secondary') ?? [],
   };
 }
 
