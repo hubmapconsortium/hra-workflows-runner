@@ -1,14 +1,21 @@
 import { execFile as callbackExecFile } from 'node:child_process';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { Dataset } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
-import { FORCE } from '../util/constants.js';
+import {
+  DEFAULT_MAX_CONCURRENCY,
+  FORCE,
+  MAX_CONCURRENCY,
+} from '../util/constants.js';
 import { checkFetchResponse, downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
+import { groupBy } from '../util/iter.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
-import { CollectionMetadata, parseMetadataFromId } from './metadata.js';
+import { downloadCollectionMetadata, parseMetadataFromId } from './metadata.js';
 import { getOrganLookup } from './organ-lookup.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
@@ -28,12 +35,16 @@ export class Downloader {
       CELLXGENE_API_ENDPOINT,
       DEFAULT_CELLXGENE_API_ENDPOINT
     );
-    /** @type {Cache<string, Promise<CollectionMetadata>>} */
+    /** @type {Map<string, Dataset[]>} */
+    this.datasetsByCollection = new Map();
+    /** @type {Cache<string, Promise<import('./metadata.js').CollectionMetadata>>} */
     this.collectionCache = new Cache();
-    /** @type {Cache<string, Promise<void>>} */
+    /** @type {Cache<string, Promise<string>>} */
     this.assetCache = new Cache();
+    /** @type {Cache<string, Promise<string>>} */
+    this.extractCache = new Cache();
     /** @type {string} */
-    this.extractScriptFile = 'extract_dataset.py';
+    this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
     this.extractScriptFilePath = getSrcFilePath(
       config,
@@ -43,72 +54,141 @@ export class Downloader {
   }
 
   async prepareDownload(datasets) {
-    await concurrentMap(datasets, async (dataset) => {
+    const maxConcurrency = this.config.get(
+      MAX_CONCURRENCY,
+      DEFAULT_MAX_CONCURRENCY
+    );
+    const attachMetadata = async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { dataset: datasetId, collection: collectionId, tissue } = metadata;
-      if (collectionId) {
-        const collection = await this.downloadCollection(collectionId);
-        const { id: tissueId } = collection.findTissueId(datasetId, tissue);
-        const { id: asset } = collection.findH5adAsset(datasetId) ?? {};
-        Object.assign(dataset, metadata, { tissueId, asset });
-      }
-    });
+      const { assets, tissueIdLookup } = await this.downloadCollection(
+        metadata.collection
+      );
+      const tissue = metadata.tissue.toLowerCase();
+      const tissueId = tissueIdLookup.get(tissue);
+      Object.assign(dataset, metadata, { assets, tissueId });
+    };
 
-    const tissueIds = datasets.map((dataset) => dataset.tissueId);
-    const uniqueTissueIds = new Set(tissueIds);
-    uniqueTissueIds.delete(undefined);
+    await concurrentMap(datasets, attachMetadata, { maxConcurrency });
+    datasets = datasets.filter(({ tissueId }) => !!tissueId);
 
-    const organLookup = await getOrganLookup(Array.from(uniqueTissueIds));
+    const uniqueTissueIds = Array.from(
+      new Set(datasets.map(({ tissueId }) => tissueId))
+    );
+    const organLookup = await getOrganLookup(uniqueTissueIds);
     for (const dataset of datasets) {
       dataset.organ = organLookup.get(dataset.tissueId);
     }
 
-    return datasets.filter((dataset) => dataset.organ);
+    datasets = datasets.filter(({ organ }) => !!organ);
+    this.datasetsByCollection = groupBy(
+      datasets,
+      ({ collection }) => collection
+    );
+
+    return datasets;
   }
 
   async download(dataset) {
-    if (!dataset.asset) {
+    if (dataset.assets.length === 0) {
       throw new Error(`Cannot find h5ad data file`);
     }
 
-    const assetDataFilePath = join(
-      getCacheDir(this.config),
-      `cellxgene-${dataset.asset}.h5ad`
+    const assetsFiles = await this.downloadAssets(dataset.assets);
+    const errors = await this.extractDatasets(
+      dataset.collection,
+      dataset.assets,
+      assetsFiles
     );
 
-    await this.downloadAsset(dataset.dataset, dataset.asset, assetDataFilePath);
-    await execFile('python3', [
-      this.extractScriptFilePath,
-      assetDataFilePath,
-      '--donor',
-      dataset.donor,
-      '--tissue',
-      dataset.tissue,
-      '--sample',
-      dataset.sample,
-      '--output',
-      dataset.dataFilePath,
-    ]);
+    this.checkDatasetExtractionError(dataset, errors);
   }
 
   async downloadCollection(collection) {
     const url = new URL(`${COLLECTIONS_PATH}${collection}`, this.endpoint);
     return this.collectionCache.setDefaultFn(collection, () =>
-      CollectionMetadata.download(url)
+      downloadCollectionMetadata(url)
     );
   }
 
-  async downloadAsset(dataset, asset, outputFile) {
-    const pathname = `${ASSETS_PATH}${dataset}/asset/${asset}`;
-    const url = new URL(pathname, this.endpoint);
-    return this.assetCache.setDefaultFn(asset, async () => {
-      const resp = await fetch(url, { method: 'POST' });
-      checkFetchResponse(resp, 'CellXGene asset download failed');
+  async downloadAssets(/** @type {any[]} */ assets) {
+    const downloadAsset = ({ id, dataset }) =>
+      this.assetCache.setDefaultFn(id, async () => {
+        const pathname = `${ASSETS_PATH}${dataset}/asset/${id}`;
+        const url = new URL(pathname, this.endpoint);
+        const resp = await fetch(url, { method: 'POST' });
+        checkFetchResponse(resp, 'CellXGene asset download failed');
 
-      const { presigned_url } = await resp.json();
-      await downloadFile(outputFile, presigned_url, {
-        overwrite: this.config.get(FORCE, false),
+        const { presigned_url } = await resp.json();
+        const outputFile = join(
+          getCacheDir(this.config),
+          `cellxgene-${id}.h5ad`
+        );
+
+        await downloadFile(outputFile, presigned_url, {
+          overwrite: this.config.get(FORCE, false),
+        });
+
+        return outputFile;
       });
+
+    const downloads = assets.map(downloadAsset);
+    return Promise.all(downloads);
+
+    // const pathname = `${ASSETS_PATH}${dataset}/asset/${asset}`;
+    // const url = new URL(pathname, this.endpoint);
+    // return this.assetCache.setDefaultFn(asset, async () => {
+    //   const resp = await fetch(url, { method: 'POST' });
+    //   checkFetchResponse(resp, 'CellXGene asset download failed');
+
+    //   const { presigned_url } = await resp.json();
+    //   await downloadFile(outputFile, presigned_url, {
+    //     overwrite: this.config.get(FORCE, false),
+    //   });
+    // });
+  }
+
+  async extractDatasets(collection, assets, assetFiles) {
+    return this.extractCache.setDefaultFn(collection, async () => {
+      const datasets = this.datasetsByCollection.get(collection);
+      const content = this.serializeExtractInfo(datasets, assets, assetFiles);
+      const extractInfoFilePath = join(
+        getCacheDir(this.config),
+        `cellxgene-extract-info-${collection}.json`
+      );
+
+      await writeFile(extractInfoFilePath, content);
+      const { stderr } = await execFile('python3', [
+        this.extractScriptFilePath,
+        extractInfoFilePath,
+      ]);
+
+      return stderr;
     });
+  }
+
+  serializeExtractInfo(datasets, assets, assetFiles) {
+    const content = {
+      assets,
+      assetFiles,
+      datasets: datasets.map((dataset) => ({
+        id: dataset.id,
+        donor: dataset.donor,
+        tissue: dataset.tissue,
+        outputFile: dataset.dataFilePath,
+      })),
+    };
+
+    return JSON.stringify(content, undefined, 4);
+  }
+
+  checkDatasetExtractionError(dataset, errors) {
+    const { id } = dataset;
+    const { length } = id;
+    const start = errors.indexOf(id);
+    if (start >= 0) {
+      const end = errors.indexOf('\n', start);
+      const msg = errors.slice(start + length + 2, end);
+      throw new Error(msg);
+    }
   }
 }

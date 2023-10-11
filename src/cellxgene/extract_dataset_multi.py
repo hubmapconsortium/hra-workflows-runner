@@ -1,6 +1,8 @@
 import argparse
+import json
 import os
 import re
+import sys
 import typing as t
 from pathlib import Path
 
@@ -43,23 +45,55 @@ def create_mask(matrix: anndata.AnnData, donor: str, tissue: str, sample: str):
 
 
 def main(args: argparse.Namespace):
-    data = anndata.read_h5ad(args.file)
-    mask = create_mask(data, args.donor, args.tissue, args.sample)
-    if mask is None:
-        raise ValueError("Could not filter data")
+    with open(args.info) as infoFile:
+        info = json.load(infoFile)
+        print('info loaded!', flush=True)
+    matrices = [anndata.read_h5ad(file) for file in info["assetFiles"]]
+    sources = [asset["dataset"] for asset in info["assets"]]
 
-    data[mask].write_h5ad(args.output)
+    for dataset in info["datasets"]:
+        result = _extract_single(matrices, dataset, sources)
+        if result is not None:
+            _save_matrix(result, Path(dataset["outputFile"]))
+
+
+def _extract_single(matrices: t.List[anndata.AnnData], dataset: dict, sources: t.List[str]):
+    try:
+        return _unsafe_extract_single(matrices, dataset, sources)
+    except Exception as error:
+        print(f"{dataset['id']}: Could not extract - {error}", file=sys.stderr)
+
+
+def _unsafe_extract_single(matrices: t.List[anndata.AnnData], dataset: dict, sources: t.List[str]):
+    donor = dataset["donor"]
+    tissue = dataset["tissue"]
+    sample = dataset.get("sample")
+    keys = []
+    subsets = []
+
+    for matrix, source in zip(matrices, sources):
+        mask = create_mask(matrix, donor, tissue, sample)
+        if mask is not None:
+            subsets.append(matrix[mask])
+            keys.append(source)
+    
+    if not subsets:
+        raise ValueError('Failed to subset matrices')
+    
+    return anndata.concat(subsets, join="outer", label="source", keys=keys)
+
+
+def _save_matrix(matrix: anndata.AnnData, filePath: Path):
+    parentDir = filePath.parent
+    parentDir.mkdir(parents=True, exist_ok=True)
+    matrix.write_h5ad(filePath)
 
 
 def _get_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Extract cellxgene datasets per sample or per donor and tissue from a single h5ad dataset"
     )
-    parser.add_argument("file", type=Path, help="Main data h5ad file")
-    parser.add_argument("--donor", help="Donor ID")
-    parser.add_argument("--tissue", help="Tissue")
-    parser.add_argument("--sample", help="Sample ID")
-    parser.add_argument("--output", type=Path, help="Output file")
+    parser.add_argument("info", type=Path, help="Extract information json")
 
     return parser
 
