@@ -71,9 +71,11 @@ export class Downloader {
     await concurrentMap(datasets, attachMetadata, { maxConcurrency });
     datasets = datasets.filter(({ tissueId }) => !!tissueId);
 
-    const uniqueTissueIds = Array.from(
-      new Set(datasets.map(({ tissueId }) => tissueId))
-    );
+    const tissueIds = datasets
+      .map(({ tissueId }) => tissueId)
+      .filter((id) => id.startsWith('UBERON:'))
+      .map((id) => id.slice(0, 14));
+    const uniqueTissueIds = Array.from(new Set(tissueIds));
     const organLookup = await getOrganLookup(uniqueTissueIds);
     for (const dataset of datasets) {
       dataset.organ = organLookup.get(dataset.tissueId);
