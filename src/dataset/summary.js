@@ -65,6 +65,8 @@ export class DatasetSummary {
   constructor(id) {
     /** @type {string} */
     this.id = id;
+    /** @type {string} */
+    this.info = ''
 
     for (const step of STEPS) {
       this.setStatus(step, Status.NOT_STARTED);
@@ -251,7 +253,7 @@ export class DatasetSummaries {
   async save(path, steps = STEPS) {
     const errorProps = steps.map(DatasetSummary.getErrorPropertyForStep);
     const content = Papa.unparse({
-      fields: ['id', ...steps, ...errorProps],
+      fields: ['id', ...steps, ...errorProps, 'info'],
       data: this.summaries,
     });
     await writeFile(path, content);

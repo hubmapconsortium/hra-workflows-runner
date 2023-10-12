@@ -22,6 +22,7 @@ const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
 const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
+const UBERON_ID_REGEX = /^UBERON:\d{7}$/;
 
 const execFile = promisify(callbackExecFile);
 
@@ -54,34 +55,8 @@ export class Downloader {
   }
 
   async prepareDownload(datasets) {
-    const maxConcurrency = this.config.get(
-      MAX_CONCURRENCY,
-      DEFAULT_MAX_CONCURRENCY
-    );
-    const attachMetadata = async (dataset) => {
-      const metadata = parseMetadataFromId(dataset.id);
-      const { assets, tissueIdLookup } = await this.downloadCollection(
-        metadata.collection
-      );
-      const tissue = metadata.tissue.toLowerCase();
-      const tissueId = tissueIdLookup.get(tissue);
-      Object.assign(dataset, metadata, { assets, tissueId });
-    };
-
-    await concurrentMap(datasets, attachMetadata, { maxConcurrency });
-    datasets = datasets.filter(({ tissueId }) => !!tissueId);
-
-    const tissueIds = datasets
-      .map(({ tissueId }) => tissueId)
-      .filter((id) => id.startsWith('UBERON:'))
-      .map((id) => id.slice(0, 14));
-    const uniqueTissueIds = Array.from(new Set(tissueIds));
-    const organLookup = await getOrganLookup(uniqueTissueIds);
-    for (const dataset of datasets) {
-      dataset.organ = organLookup.get(dataset.tissueId);
-    }
-
-    datasets = datasets.filter(({ organ }) => !!organ);
+    datasets = await this.attachMetadata(datasets);
+    datasets = await this.lookupOrgan(datasets);
     this.datasetsByCollection = groupBy(
       datasets,
       ({ collection }) => collection
@@ -147,6 +122,42 @@ export class Downloader {
     //     overwrite: this.config.get(FORCE, false),
     //   });
     // });
+  }
+
+  async attachMetadata(datasets) {
+    const maxConcurrency = this.config.get(
+      MAX_CONCURRENCY,
+      DEFAULT_MAX_CONCURRENCY
+    );
+    const attach = async (dataset) => {
+      const metadata = parseMetadataFromId(dataset.id);
+      const { assets, tissueIdLookup } = await this.downloadCollection(
+        metadata.collection
+      );
+      const tissue = metadata.tissue.toLowerCase();
+      const tissueId = tissueIdLookup.get(tissue);
+      Object.assign(dataset, metadata, { assets, tissueId });
+    };
+
+    await concurrentMap(datasets, attach, { maxConcurrency });
+    return datasets.filter(({ tissueId }) => !!tissueId);
+  }
+
+  async lookupOrgan(datasets) {
+    const tissueIds = datasets
+      .map(({ tissueId }) => tissueId)
+      .filter((id) => UBERON_ID_REGEX.test(id));
+    const uniqueTissueIds = Array.from(new Set(tissueIds));
+    const organLookup = await getOrganLookup(uniqueTissueIds);
+
+    for (const dataset of datasets) {
+      dataset.organ = organLookup.get(dataset.tissueId);
+      if (!dataset.organ) {
+        dataset.scratch.summary_ref.info = `Cannot determine organ for tissue '${dataset.tissue}'`;
+      }
+    }
+
+    return datasets.filter(({ organ }) => !!organ);
   }
 
   async extractDatasets(collection, assets, assetFiles) {
