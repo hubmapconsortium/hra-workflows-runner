@@ -42,6 +42,8 @@ const STEPS = Object.values({
   ...AlgorithmStep,
 });
 
+const MAX_ERROR_LENGTH = 150;
+
 export class DatasetSummary {
   /** @private */
   static fromRaw(data) {
@@ -66,7 +68,7 @@ export class DatasetSummary {
     /** @type {string} */
     this.id = id;
     /** @type {string} */
-    this.info = ''
+    this.info = '';
 
     for (const step of STEPS) {
       this.setStatus(step, Status.NOT_STARTED);
@@ -116,8 +118,12 @@ export class DatasetSummary {
     const formattedMessage = JSON.stringify(message)
       .slice(1, -1)
       .replace(/\\"/g, '"');
+    const truncatedMessage =
+      formattedMessage.length > MAX_ERROR_LENGTH
+        ? formattedMessage.slice(0, MAX_ERROR_LENGTH) + ' TRUNCATED...'
+        : formattedMessage;
 
-    this[prop] = formattedMessage;
+    this[prop] = truncatedMessage;
   }
 
   /**

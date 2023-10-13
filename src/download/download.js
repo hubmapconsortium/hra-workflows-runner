@@ -15,7 +15,10 @@ async function tryDownload(dataset) {
   await ensureDirsExist(dataset.dirPath);
   // This precheck could be moved to before prepareDownloads to reduce excess work even further
   if (!force && (await fileExists(dataset.dataFilePath))) {
-    await dataset.save(); // TODO do not overwrite existing
+    if (!(await fileExists(dataset.filePath))) {
+      await dataset.save();
+    }
+
     markSuccess(dataset);
     return;
   }
