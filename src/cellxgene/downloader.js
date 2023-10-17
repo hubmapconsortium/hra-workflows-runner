@@ -168,11 +168,17 @@ export class Downloader {
         getCacheDir(this.config),
         `cellxgene-extract-info-${collection}.json`
       );
+      const tempExtractDirPath = join(
+        getCacheDir(config),
+        `cellxgene-extract-${collection}`
+      );
 
       await writeFile(extractInfoFilePath, content);
       const { stderr } = await execFile('python3', [
         this.extractScriptFilePath,
         extractInfoFilePath,
+        '--tmp-dir',
+        tempExtractDirPath,
       ]);
 
       return stderr;
