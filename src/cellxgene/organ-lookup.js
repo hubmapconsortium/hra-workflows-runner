@@ -1,11 +1,16 @@
 import Papa from 'papaparse';
 import { checkFetchResponse } from '../util/fs.js';
 
+const REF_ORGANS_ENDPOINT =
+  'https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/ccf//ref-organ-terms';
 const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
-const SCENE_ENDPOINT = 'https://ccf-api.hubmapconsortium.org/v1/scene';
 
 async function getOrgans() {
-  const resp = await fetch(SCENE_ENDPOINT);
+  const resp = await fetch(REF_ORGANS_ENDPOINT, {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
   checkFetchResponse(resp, 'CellxGene organ lookup failed');
 
   const items = await resp.json();
@@ -28,7 +33,13 @@ async function getLookup(organs, ids) {
     WHERE {
       VALUES (?organ_id) { ${serializeIds(organs)} }
       VALUES (?as_id) { ${serializeIds(ids)} }
-      ?as_id part_of: ?organ_id .
+      {
+        ?as_id part_of: ?organ_id .
+      }
+      UNION
+      {
+        ?organ_id part_of: ?as_id .
+      }
 
       BIND(REPLACE(STR(?as_id), 'http://purl.obolibrary.org/obo/UBERON_', 'UBERON:') as ?as)
       BIND(REPLACE(STR(?organ_id), 'http://purl.obolibrary.org/obo/UBERON_', 'UBERON:') as ?organ)
