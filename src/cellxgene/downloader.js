@@ -1,7 +1,6 @@
-import { execFile as callbackExecFile } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { Dataset } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
@@ -24,8 +23,6 @@ const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
 const UBERON_ID_REGEX = /^UBERON:\d{7}$/;
 
-const execFile = promisify(callbackExecFile);
-
 /** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
@@ -42,7 +39,7 @@ export class Downloader {
     this.collectionCache = new Cache();
     /** @type {Cache<string, Promise<string>>} */
     this.assetCache = new Cache();
-    /** @type {Cache<string, Promise<string>>} */
+    /** @type {Cache<string, Promise<void>>} */
     this.extractCache = new Cache();
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset_multi.py';
@@ -71,13 +68,12 @@ export class Downloader {
     }
 
     const assetsFiles = await this.downloadAssets(dataset.assets);
-    const errors = await this.extractDatasets(
-      dataset.collection,
-      dataset.assets,
-      assetsFiles
-    );
+    await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
 
-    this.checkDatasetExtractionError(dataset, errors);
+    const error = dataset.scratch.extractError;
+    if (error) {
+      throw error;
+    }
   }
 
   async downloadCollection(collection) {
@@ -151,13 +147,14 @@ export class Downloader {
     const organLookup = await getOrganLookup(uniqueTissueIds);
 
     for (const dataset of datasets) {
-      dataset.organ = organLookup.get(dataset.tissueId);
-      if (!dataset.organ) {
-        dataset.scratch.summary_ref.info = `Cannot determine organ for tissue '${dataset.tissue}'`;
+      dataset.organ = organLookup.get(dataset.tissueId) ?? '';
+      if (dataset.organ === '') {
+        const msg = `Cannot determine organ for tissue '${dataset.tissue}' (${dataset.tissueId})`;
+        dataset.scratch.summary_ref.comments = msg;
       }
     }
 
-    return datasets.filter(({ organ }) => !!organ);
+    return datasets;
   }
 
   async extractDatasets(collection, assets, assetFiles) {
@@ -169,19 +166,49 @@ export class Downloader {
         `cellxgene-extract-info-${collection}.json`
       );
       const tempExtractDirPath = join(
-        getCacheDir(config),
+        getCacheDir(this.config),
         `cellxgene-extract-${collection}`
       );
 
       await writeFile(extractInfoFilePath, content);
-      const { stderr } = await execFile('python3', [
-        this.extractScriptFilePath,
-        extractInfoFilePath,
-        '--tmp-dir',
-        tempExtractDirPath,
-      ]);
+      try {
+        console.log('CellXGene:Extract:Start', collection);
+        await this.runExtractDatasetsScript(
+          datasets,
+          extractInfoFilePath,
+          tempExtractDirPath
+        );
+      } finally {
+        console.log('CellXGene:Extract:End', collection);
+      }
+    });
+  }
 
-      return stderr;
+  async runExtractDatasetsScript(
+    datasets,
+    extractInfoFilePath,
+    tempExtractDirPath
+  ) {
+    return new Promise((resolve, reject) => {
+      const process = spawn(
+        'python3',
+        [
+          this.extractScriptFilePath,
+          extractInfoFilePath,
+          '--tmp-dir',
+          tempExtractDirPath,
+        ],
+        { stdio: [null, 'inherit', 'pipe'] }
+      );
+
+      process.stderr.on('data', (data) => {
+        for (const dataset of datasets) {
+          this.checkDatasetExtractionError(dataset, data);
+        }
+      });
+
+      process.on('error', reject);
+      process.on('close', resolve);
     });
   }
 
@@ -207,7 +234,7 @@ export class Downloader {
     if (start >= 0) {
       const end = errors.indexOf('\n', start);
       const msg = errors.slice(start + length + 2, end);
-      throw new Error(msg);
+      dataset.scratch.extractError = new Error(msg);
     }
   }
 }

@@ -24,13 +24,17 @@ async function tryDownload(dataset) {
   }
 
   try {
+    console.log('Download:Start', dataset.id)
     const downloader = getDownloaderRef(dataset);
     await downloader.download(dataset);
     await dataset.save();
     markSuccess(dataset);
   } catch (error) {
+    console.log('Download:Failure', dataset.id)
     markFailure(dataset, error);
     await rm(dataset.dirPath, { recursive: true });
+  } finally {
+    console.log('Download:End', dataset.id)
   }
 }
 

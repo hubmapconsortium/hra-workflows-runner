@@ -75,11 +75,15 @@ def main(args: argparse.Namespace):
     assets = info["assets"]
     asset_files = info["assetFiles"]
     for asset, asset_file in zip(assets, asset_files):
+        print("CellXGene:Split:Start", asset["id"], flush=True)
         _split_asset(asset["id"], asset_file, datasets, args.tmp_dir)
+        print('CellXGene:Split:End', asset["id"], flush=True)
 
     sources = [asset["dataset"] for asset in info["assets"]]
     for dataset in datasets:
+        print("CellXGene:Combine:Start", dataset["id"], flush=True)
         _combine_assets(dataset, sources)
+        print("CellXGene:Combine:End", dataset["id"], flush=True)
 
 
 def _split_asset(asset_id: str, asset_file: str, datasets: t.List[Dataset], tmp_dir: Path):
@@ -89,8 +93,10 @@ def _split_asset(asset_id: str, asset_file: str, datasets: t.List[Dataset], tmp_
         tissue = dataset["tissue"]
         sample = dataset.get("sample")
         output_file = tmp_dir / asset_id / f"{donor}-{tissue}.h5ad"
+        if output_file.exists():
+            continue
+
         mask = create_mask(matrix, donor, tissue, sample)
-        
         if mask is not None:
             output_file.parent.mkdir(parents=True, exist_ok=True)
             matrix[mask].write_h5ad(output_file)
