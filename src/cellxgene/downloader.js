@@ -7,12 +7,15 @@ import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import {
   DEFAULT_MAX_CONCURRENCY,
+  DEFAULT_PYTHON_LOG_LEVEL,
   FORCE,
   MAX_CONCURRENCY,
+  PYTHON_LOG_LEVEL,
 } from '../util/constants.js';
 import { checkFetchResponse, downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { groupBy } from '../util/iter.js';
+import { logEvent } from '../util/logging.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { downloadCollectionMetadata, parseMetadataFromId } from './metadata.js';
 import { getOrganLookup } from './organ-lookup.js';
@@ -69,21 +72,22 @@ export class Downloader {
 
     const assetsFiles = await this.downloadAssets(dataset.assets);
     await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
-
-    const error = dataset.scratch.extractError;
-    if (error) {
-      throw error;
-    }
   }
 
   async downloadCollection(collection) {
     const url = new URL(`${COLLECTIONS_PATH}${collection}`, this.endpoint);
     return this.collectionCache.setDefaultFn(collection, () =>
-      downloadCollectionMetadata(url)
+      logEvent('CellXGene:DownloadCollection', collection, () =>
+        downloadCollectionMetadata(url)
+      )
     );
   }
 
   async downloadAssets(/** @type {any[]} */ assets) {
+    const maxConcurrency = this.config.get(
+      MAX_CONCURRENCY,
+      DEFAULT_MAX_CONCURRENCY
+    );
     const downloadAsset = ({ id, dataset }) =>
       this.assetCache.setDefaultFn(id, async () => {
         const pathname = `${ASSETS_PATH}${dataset}/asset/${id}`;
@@ -97,27 +101,18 @@ export class Downloader {
           `cellxgene-${id}.h5ad`
         );
 
-        await downloadFile(outputFile, presigned_url, {
-          overwrite: this.config.get(FORCE, false),
-        });
+        await logEvent('CellXGene:DownloadAsset', id, () =>
+          downloadFile(outputFile, presigned_url, {
+            overwrite: this.config.get(FORCE, false),
+          })
+        );
 
         return outputFile;
       });
 
-    const downloads = assets.map(downloadAsset);
-    return Promise.all(downloads);
-
-    // const pathname = `${ASSETS_PATH}${dataset}/asset/${asset}`;
-    // const url = new URL(pathname, this.endpoint);
-    // return this.assetCache.setDefaultFn(asset, async () => {
-    //   const resp = await fetch(url, { method: 'POST' });
-    //   checkFetchResponse(resp, 'CellXGene asset download failed');
-
-    //   const { presigned_url } = await resp.json();
-    //   await downloadFile(outputFile, presigned_url, {
-    //     overwrite: this.config.get(FORCE, false),
-    //   });
-    // });
+    return concurrentMap(assets, downloadAsset, {
+      maxConcurrency,
+    });
   }
 
   async attachMetadata(datasets) {
@@ -171,24 +166,13 @@ export class Downloader {
       );
 
       await writeFile(extractInfoFilePath, content);
-      try {
-        console.log('CellXGene:Extract:Start', collection);
-        await this.runExtractDatasetsScript(
-          datasets,
-          extractInfoFilePath,
-          tempExtractDirPath
-        );
-      } finally {
-        console.log('CellXGene:Extract:End', collection);
-      }
+      await logEvent('CellXGene:Extract', collection, () =>
+        this.runExtractDatasetsScript(extractInfoFilePath, tempExtractDirPath)
+      );
     });
   }
 
-  async runExtractDatasetsScript(
-    datasets,
-    extractInfoFilePath,
-    tempExtractDirPath
-  ) {
+  async runExtractDatasetsScript(extractInfoFilePath, tempExtractDirPath) {
     return new Promise((resolve, reject) => {
       const process = spawn(
         'python3',
@@ -197,18 +181,21 @@ export class Downloader {
           extractInfoFilePath,
           '--tmp-dir',
           tempExtractDirPath,
+          '--log-level',
+          this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
         ],
-        { stdio: [null, 'inherit', 'pipe'] }
+        { stdio: [null, 'inherit', 'inherit'] }
       );
 
-      process.stderr.on('data', (data) => {
-        for (const dataset of datasets) {
-          this.checkDatasetExtractionError(dataset, data);
+      process.on('error', reject);
+      process.on('exit', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          const msg = `Python exited with code ${code}`;
+          reject(new Error(msg));
         }
       });
-
-      process.on('error', reject);
-      process.on('close', resolve);
     });
   }
 
@@ -225,16 +212,5 @@ export class Downloader {
     };
 
     return JSON.stringify(content, undefined, 4);
-  }
-
-  checkDatasetExtractionError(dataset, errors) {
-    const { id } = dataset;
-    const { length } = id;
-    const start = errors.indexOf(id);
-    if (start >= 0) {
-      const end = errors.indexOf('\n', start);
-      const msg = errors.slice(start + length + 2, end);
-      dataset.scratch.extractError = new Error(msg);
-    }
   }
 }

@@ -8,6 +8,7 @@ import {
   MAX_CONCURRENCY,
 } from '../util/constants.js';
 import { ensureDirsExist, fileExists } from '../util/fs.js';
+import { logEvent } from '../util/logging.js';
 import { DOWNLOAD_STEP, getDownloaderRef, getSummaryRef } from './utils.js';
 
 async function tryDownload(dataset) {
@@ -24,17 +25,13 @@ async function tryDownload(dataset) {
   }
 
   try {
-    console.log('Download:Start', dataset.id)
     const downloader = getDownloaderRef(dataset);
-    await downloader.download(dataset);
+    await logEvent('Download', dataset.id, () => downloader.download(dataset));
     await dataset.save();
     markSuccess(dataset);
   } catch (error) {
-    console.log('Download:Failure', dataset.id)
     markFailure(dataset, error);
     await rm(dataset.dirPath, { recursive: true });
-  } finally {
-    console.log('Download:End', dataset.id)
   }
 }
 

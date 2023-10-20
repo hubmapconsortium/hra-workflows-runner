@@ -4,9 +4,11 @@ import {
   DATASET_HANDLERS,
   DATA_REPO_DIR,
   DEFAULT_MAX_CONCURRENCY,
+  DEFAULT_PYTHON_LOG_LEVEL,
   FORCE,
   MAX_CONCURRENCY,
   OUTPUT_DIR,
+  PYTHON_LOG_LEVEL,
   SRC_DIR,
 } from './constants.js';
 
@@ -18,6 +20,11 @@ export function defaultEnvReviver(key, value) {
     case MAX_CONCURRENCY: {
       const num = Number.parseInt(value);
       return num > 0 ? num : DEFAULT_MAX_CONCURRENCY;
+    }
+
+    case PYTHON_LOG_LEVEL: {
+      const num = Number.parseInt(value);
+      return num > 0 ? num : DEFAULT_PYTHON_LOG_LEVEL;
     }
 
     case DATASET_HANDLERS:
