@@ -8,12 +8,12 @@
 #SBATCH --mail-user=axbolin@iu.edu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=96:00:00
-#SBATCH --mem=128G
+#SBATCH --time=4:00:00
+#SBATCH --mem=32G
 #SBATCH -A r00355
 
 module load python
 module load singularity
 
 #Run your program
-srun singularity exec -H $PROJECT_DIR --bind $SIF_CACHE_DIR:$SIF_CACHE_DIR $PROJECT_DIR/ghcr.io_hubmapconsortium_hra-workflows-runner\:main.sif ./run.sh
+srun cwl-runner --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/download-models.cwl --outputDirectory $MODELS_DIR

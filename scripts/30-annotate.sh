@@ -5,16 +5,9 @@ set -ev
 
 CWL_PIPELINE="https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl"
 CWL_OPTS=()
+readarray -t DATASET_DIRS < <(node $SRC_DIR/list-downloaded-dirs.js)
 
-if [[ $RUNNER == "slurm" ]]; then
-  CWL_OPTS+=(--singularity)
-  SBATCH_FILE="$OUTPUT_DIR/sbatch.sh"
-
-  : >$SBATCH_FILE # Create/truncate the file
-  chmod +x $SBATCH_FILE
-  echo "#!/bin/bash" >>$SBATCH_FILE
-  echo "source constants.sh" >>$SBATCH_FILE
-elif [[ $RUNNER == "singularity" ]]; then
+if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
   CWL_OPTS+=(--singularity)
 fi
 
@@ -22,34 +15,26 @@ if [[ -n $TEMP ]]; then
   CWL_OPTS+=(--tmpdir-prefix $TEMP)
 fi
 
-if [[ -d $SIF_CACHE_DIR && ${CWL_OPTS[@]} =~ "singularity" ]]; then
-  LINK_SIF_CACHE=true
+if [[ ${CWL_OPTS[@]} =~ "singularity" ]]; then
+  for DIR in ${DATASET_DIRS[@]}; do
+    link_sif $DIR
+  done
 fi
 
-link_sif_cache() {
-  for SIF in $SIF_CACHE_DIR/*.sif; do
-    FILE=$(basename $SIF)
-    ln -sf $SIF "$1/$FILE"
-  done
-}
-
-for DIR in $(node $SRC_DIR/list-downloaded-dirs.js); do
-  if [[ -n $LINK_SIF_CACHE ]]; then
-    link_sif_cache $DIR
-  fi
-
-  if [[ $RUNNER == "slurm" ]]; then
-    echo "pushd $DIR" >>$SBATCH_FILE
-    echo "sbatch $PROJECT_DIR/src/slurm/slurm-annotate.sh" >>$SBATCH_FILE
-    echo "popd" >>$SBATCH_FILE
-  else
+# Main logic
+if [[ $RUNNER != "slurm" ]]; then
+  for DIR in ${DATASET_DIRS[@]}; do
     pushd $DIR
     cwl-runner ${CWL_OPTS[@]} $CWL_PIPELINE job.json
     popd
-  fi
-done
+  done
+else
+  SBATCH_FILE="$OUTPUT_DIR/sbatch.sh"
+  EXPORTS="ALL,DATASET_DIRS=\"${DATASET_DIRS[@]}\""
+  RANGE="0-$((${#DATASET_DIRS[@]} - 1))"
 
-if [[ $RUNNER == "slurm" ]]; then
-  echo "Slurm requires some manual work. Exiting..."
+  echo "sbatch --array $RANGE --export $EXPORTS $SRC_DIR/slurm/slurm-annotate.sh" >$SBATCH_FILE
+
+  echo "Generated sbatch commands. Use 30x-annotate.sh to run annotations. Exiting..."
   exit 1
 fi

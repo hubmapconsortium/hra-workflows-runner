@@ -21,6 +21,7 @@ export RAW_DATA_DIR=${RAW_DATA_DIR:-"./raw-data"}
 export OUTPUT_DIR="$RAW_DATA_DIR/$DATASET/$VERSION"
 export DATA_REPO_DIR="$RAW_DATA_DIR/data-repo"
 export CACHE_DIR="$RAW_DATA_DIR/tmp"
+export MODELS_DIR="$RAW_DATA_DIR/models"
 export SRC_DIR="./src"
 
 # Absolute path to project. Used when starting slurm jobs
@@ -32,3 +33,8 @@ source $DATASETS_DIR/$DATASET/config.sh
 
 # Check required dataset configuration
 _=${DATASET_COLUMN_ID:?"No dataset list identifier column set!"}
+
+# Load shared functions
+for SCRIPT in $SRC_DIR/shell_util/*.sh; do
+  source $SCRIPT
+done

@@ -3,8 +3,9 @@ source constants.sh
 shopt -s extglob
 set -ev
 
-for dir in $DATA_REPO_DIR/*/; do
-  pushd $dir
-  sbatch $PROJECT_DIR/src/slurm/slurm-annotate.sh
-  popd
-done
+if [[ ! -d $MODELS_DIR || -z $(ls -A $MODELS_DIR) ]]; then
+  echo "Annotation models are not downloaded. Run '05x-download-models.sh' to download"
+  exit 1
+fi
+
+$OUTPUT_DIR/sbatch.sh

@@ -2,8 +2,8 @@
 
 #SBATCH -J hra-workflows
 #SBATCH -p general
-#SBATCH -o hra-run_%j.txt
-#SBATCH -e hra-run_%j.err
+#SBATCH -o hra-run_%j_%a.txt
+#SBATCH -e hra-run_%j_%a.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=axbolin@iu.edu
 #SBATCH --nodes=1
@@ -15,5 +15,10 @@
 module load python
 module load singularity
 
+DATASET_DIRS_ARRAY=($DATASET_DIRS)
+DIR=${DATASET_DIRS_ARRAY[$SLURM_ARRAY_TASK_ID]}
+
 #Run your program
+pushd $DIR
 srun cwl-runner --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.json
+popd
