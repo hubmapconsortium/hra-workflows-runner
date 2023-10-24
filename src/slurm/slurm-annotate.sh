@@ -20,5 +20,5 @@ DIR=${DATASET_DIRS_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
 #Run your program
 pushd $DIR
-srun cwl-runner --debug --singularity --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/pipeline.cwl job.json
+srun cwl-runner --debug --singularity --tmpdir-prefix "$TEMP/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID/" https://cdn.jsdelivr.net/gh/hubmapconsortium/hra-workflows@main/pipeline.cwl job.json
 popd
