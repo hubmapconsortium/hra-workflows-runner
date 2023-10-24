@@ -2,8 +2,8 @@
 
 #SBATCH -J hra-workflows
 #SBATCH -p general
-#SBATCH -o hra-run_%j.txt
-#SBATCH -e hra-run_%j.err
+#SBATCH -o slurm-output/download-models/hra-run_%j.txt
+#SBATCH -e slurm-output/download-models/hra-run_%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=axbolin@iu.edu
 #SBATCH --nodes=1
