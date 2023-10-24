@@ -14,6 +14,7 @@ import {
   DEFAULT_DATASET_LIST,
   JOB_FILE,
   LISTING_FILE,
+  MODELS_DIR,
   OUTPUT_DIR,
   SRC_DIR,
   SUMMARIES_FILE,
@@ -72,6 +73,15 @@ export function getDataDir(config, dir) {
  */
 export function getCacheDir(config) {
   return config.get(CACHE_DIR, DEFAULT_CACHE_DIR);
+}
+
+/**
+ * Get the configured models directory
+ *
+ * @param {Config} config Configuration
+ */
+export function getModelsDir(config) {
+  return config.get(MODELS_DIR);
 }
 
 /**

@@ -1,4 +1,7 @@
+import { join } from 'node:path';
+
 import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
+import { getModelsDir } from '../util/paths.js';
 
 const ALGORITHM_CELL_COLUMN = {
   azimuth: 'azimuth_label',
@@ -6,9 +9,34 @@ const ALGORITHM_CELL_COLUMN = {
   popv: 'popv_prediction',
 };
 
-function createAlgorithmSpec(algorithm, metadata) {
+function getAlgorithmDefaults(config) {
   return {
-    [algorithm]: metadata[algorithm] ?? {},
+    azimuth: {
+      referenceDataDir: {
+        class: 'Directory',
+        path: join(getModelsDir(config), 'azimuth'),
+      },
+    },
+    celltypist: {},
+    popv: {
+      referenceDataDir: {
+        class: 'Directory',
+        path: join(getModelsDir(config), 'popv/reference-data'),
+      },
+      modelsDir: {
+        class: 'Directory',
+        path: join(getModelsDir(config), 'popv/models'),
+      },
+    },
+  };
+}
+
+function createAlgorithmSpec(algorithm, metadata, defaults) {
+  return {
+    [algorithm]: {
+      ...defaults[algorithm],
+      ...metadata[algorithm],
+    },
     extract: {
       annotationMethod: algorithm,
       cellLabelColumn: ALGORITHM_CELL_COLUMN[algorithm],
@@ -17,10 +45,11 @@ function createAlgorithmSpec(algorithm, metadata) {
   };
 }
 
-export function createSpec(metadata) {
+export function createSpec(metadata, config) {
+  const defaults = getAlgorithmDefaults(config);
   const algorithms = ALGORITHMS.filter(
     (algorithm) => metadata[algorithm] !== false
-  ).map((algorithm) => createAlgorithmSpec(algorithm, metadata));
+  ).map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults));
 
   return {
     organ: metadata.organ,

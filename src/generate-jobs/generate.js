@@ -9,7 +9,7 @@ import {
 import { createSpec } from './spec.js';
 import { getJobGeneratorRef } from './utils.js';
 
-async function tryGenerateJobs(dataset) {
+async function tryGenerateJobs(dataset, config) {
   const ref = getSummaryRef(dataset);
   try {
     const generator = getJobGeneratorRef(dataset);
@@ -20,7 +20,7 @@ async function tryGenerateJobs(dataset) {
       }
     });
 
-    const spec = createSpec(metadata);
+    const spec = createSpec(metadata, config);
     const specString = JSON.stringify(spec, undefined, 2);
     await writeFile(dataset.jobFilePath, specString, { encoding: 'utf8' });
   } catch (error) {
@@ -30,5 +30,7 @@ async function tryGenerateJobs(dataset) {
 
 export async function generateJobs(datasets, config) {
   const maxConcurrency = config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
-  await concurrentMap(datasets, tryGenerateJobs, { maxConcurrency });
+  await concurrentMap(datasets, (dataset) => tryGenerateJobs(dataset, config), {
+    maxConcurrency,
+  });
 }

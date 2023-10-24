@@ -9,6 +9,7 @@ export const DATASETS_DIR = 'DATASETS_DIR';
 export const OUTPUT_DIR = 'OUTPUT_DIR';
 export const DATA_REPO_DIR = 'DATA_REPO_DIR';
 export const CACHE_DIR = 'CACHE_DIR';
+export const MODELS_DIR = 'MODELS_DIR';
 export const SRC_DIR = 'SRC_DIR';
 export const DATASET_LIST = 'DATASET_LIST';
 export const DATASET_LIST_URL = 'DATASET_LIST_URL';
@@ -19,6 +20,7 @@ export const REQUIRED_ENV_VARIABLES = [
   DATASETS_DIR,
   OUTPUT_DIR,
   DATA_REPO_DIR,
+  MODELS_DIR,
   SRC_DIR,
 ];
 

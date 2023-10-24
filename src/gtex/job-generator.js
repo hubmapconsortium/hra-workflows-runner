@@ -45,7 +45,7 @@ export class JobGenerator {
       geneColumn: 'gene_name',
       azimuth: {},
       celltypist: {},
-      popv: false,
+      popv: {},
     };
   }
 }
