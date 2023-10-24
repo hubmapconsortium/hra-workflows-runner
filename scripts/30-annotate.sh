@@ -34,6 +34,7 @@ else
   RANGE="0-$((${#DATASET_DIRS[@]} - 1))"
 
   echo "sbatch --array $RANGE --export $EXPORTS $SRC_DIR/slurm/slurm-annotate.sh" >$SBATCH_FILE
+  chmod +x $SBATCH_FILE
 
   echo "Generated sbatch commands. Use 30x-annotate.sh to run annotations. Exiting..."
   exit 1
