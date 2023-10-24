@@ -140,3 +140,10 @@ env.sh
 
 # Raw data folder
 raw-data
+
+# Sif files and links
+*.sif
+
+# Slurm output
+hra-run*.txt
+hra-run*.err
