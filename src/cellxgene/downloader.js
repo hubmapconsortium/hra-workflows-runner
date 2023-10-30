@@ -12,7 +12,7 @@ import {
   MAX_CONCURRENCY,
   PYTHON_LOG_LEVEL,
 } from '../util/constants.js';
-import { checkFetchResponse, downloadFile } from '../util/fs.js';
+import { checkFetchResponse, downloadFile, fileExists } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { groupBy } from '../util/iter.js';
 import { logEvent } from '../util/logging.js';
@@ -72,6 +72,9 @@ export class Downloader {
 
     const assetsFiles = await this.downloadAssets(dataset.assets);
     await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
+    if (!(await fileExists(dataset.dataFilePath))) {
+      throw new Error('No data for donor-tissue combination');
+    }
   }
 
   async downloadCollection(collection) {

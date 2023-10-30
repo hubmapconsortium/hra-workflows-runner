@@ -80,7 +80,10 @@ class AssetSplitter:
             mask = self.create_mask(matrix, columns, values)
             out_path.parent.mkdir(parents=True, exist_ok=True)
             try:
-                matrix[mask].write_h5ad(out_path)
+                subset = matrix[mask]
+                if not subset:
+                    return None
+                subset.write_h5ad(out_path)
                 return out_path
             except:
                 # Don't leave partially written files
@@ -110,7 +113,7 @@ class AssetSplitter:
     
 
 class AssetCombiner:
-    def __init__(self, id: str, out_file: Path, sources: StrList, files: t.List[Path]):
+    def __init__(self, id: str, out_file: Path, sources: StrList, files: t.List[t.Optional[Path]]):
         self.id = id
         self.out_file = out_file
         self.sources = sources
@@ -118,8 +121,16 @@ class AssetCombiner:
 
     def combine(self):
         with _log_event("CellXGene:AssetCombiner:%s - %s", self.id):
-            matrices = [anndata.read_h5ad(file) for file in self.files]
-            combined = anndata.concat(matrices, join="outer", label="source", keys=self.sources)
+            if self.out_file.exists():
+                return
+
+            matrices = [anndata.read_h5ad(file) for file in self.files if file]
+            non_empty_matrices = [matrix for matrix in matrices if matrix]
+            if not non_empty_matrices:
+                _logger.warning(f"Subset {self.id} has zero rows")
+                return
+
+            combined = anndata.concat(non_empty_matrices, join="outer", label="source", keys=self.sources)
             self.out_file.parent.mkdir(parents=True, exist_ok=True)
             combined.write_h5ad(self.out_file)
 
