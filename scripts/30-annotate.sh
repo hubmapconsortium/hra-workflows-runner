@@ -29,13 +29,9 @@ if [[ $RUNNER != "slurm" ]]; then
     popd
   done
 else
-  SBATCH_FILE="$OUTPUT_DIR/sbatch.sh"
-  EXPORTS="ALL,DATASET_DIRS=\"${DATASET_DIRS[@]}\""
-  RANGE="0-$((${#DATASET_DIRS[@]} - 1))"
+  DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
+  printf "%s\n" "${DATASET_DIRS[@]}" >$DIRS_FILE
 
-  echo "sbatch --array $RANGE --export $EXPORTS $SRC_DIR/slurm/slurm-annotate.sh" >$SBATCH_FILE
-  chmod +x $SBATCH_FILE
-
-  echo "Generated sbatch commands. Use 30x-annotate.sh to run annotations. Exiting..."
+  echo "Use 30x-annotate.sh to run annotations. Exiting..."
   exit 1
 fi
