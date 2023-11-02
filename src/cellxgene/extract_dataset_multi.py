@@ -126,13 +126,21 @@ class AssetCombiner:
 
             matrices = [anndata.read_h5ad(file) for file in self.files if file]
             non_empty_matrices = [matrix for matrix in matrices if matrix]
-            if not non_empty_matrices:
-                _logger.warning(f"Subset {self.id} has zero rows")
-                return
+            if non_empty_matrices:
+                combined = anndata.concat(
+                    non_empty_matrices,
+                    join="outer",
+                    label="source",
+                    keys=self.sources
+                )
 
-            combined = anndata.concat(non_empty_matrices, join="outer", label="source", keys=self.sources)
-            self.out_file.parent.mkdir(parents=True, exist_ok=True)
-            combined.write_h5ad(self.out_file)
+                if combined:
+                    self.out_file.parent.mkdir(parents=True, exist_ok=True)
+                    combined.write_h5ad(self.out_file)
+                    return
+
+            _logger.warning(f"Subset {self.id} has zero rows")
+
 
 
 def main(args: argparse.Namespace):
