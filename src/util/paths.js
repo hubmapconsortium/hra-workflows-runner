@@ -154,6 +154,19 @@ export function getJobFilePath(config, dir) {
 }
 
 /**
+ * Get the configured job file path with added suffix
+ *
+ * @param {Config} config Configuration
+ * @param {string} dir Dataset directory
+ * @param {string} suffix Suffix
+ */
+export function getJobFilePathWithSuffix(config, dir, suffix) {
+  const [name, ext] = JOB_FILE.split('.', 2);
+  const file = `${name}-${suffix}.${ext}`;
+  return join(getDataDir(config, dir), file);
+}
+
+/**
  * Get the configured algorithm report file path
  *
  * @param {Config} config Configuration

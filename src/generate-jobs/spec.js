@@ -9,6 +9,11 @@ const ALGORITHM_CELL_COLUMN = {
   popv: 'popv_prediction',
 };
 
+const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
+  (metadata, algorithm) => ({ ...metadata, [algorithm]: false }),
+  {}
+);
+
 function getAlgorithmDefaults(config) {
   return {
     azimuth: {
@@ -31,6 +36,10 @@ function getAlgorithmDefaults(config) {
   };
 }
 
+function getEnabledAlgorithms(metadata) {
+  return ALGORITHMS.filter((algorithm) => metadata[algorithm] !== false);
+}
+
 function createAlgorithmSpec(algorithm, metadata, defaults) {
   return {
     [algorithm]: {
@@ -47,9 +56,10 @@ function createAlgorithmSpec(algorithm, metadata, defaults) {
 
 export function createSpec(metadata, config) {
   const defaults = getAlgorithmDefaults(config);
-  const algorithms = ALGORITHMS.filter(
-    (algorithm) => metadata[algorithm] !== false
-  ).map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults));
+  const algorithms = getEnabledAlgorithms(metadata);
+  const algorithmSpecs = algorithms.map((algorithm) =>
+    createAlgorithmSpec(algorithm, metadata, defaults)
+  );
 
   return {
     organ: metadata.organ,
@@ -60,6 +70,20 @@ export function createSpec(metadata, config) {
     preprocessing: {
       geneColumn: metadata.geneColumn,
     },
-    algorithms,
+    algorithms: algorithmSpecs,
   };
+}
+
+export function createSpecs(metadata, config) {
+  const result = {};
+  for (const algorithm of getEnabledAlgorithms(metadata)) {
+    const newMetadata = {
+      ...metadata,
+      ...ALL_DISABLED_METADATA,
+      [algorithm]: metadata[algorithm],
+    };
+    result[algorithm] = createSpec(newMetadata, config);
+  }
+
+  return result;
 }

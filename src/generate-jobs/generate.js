@@ -6,7 +6,7 @@ import {
   DEFAULT_MAX_CONCURRENCY,
   MAX_CONCURRENCY,
 } from '../util/constants.js';
-import { createSpec } from './spec.js';
+import { createSpecs } from './spec.js';
 import { getJobGeneratorRef } from './utils.js';
 
 async function tryGenerateJobs(dataset, config) {
@@ -20,9 +20,13 @@ async function tryGenerateJobs(dataset, config) {
       }
     });
 
-    const spec = createSpec(metadata, config);
-    const specString = JSON.stringify(spec, undefined, 2);
-    await writeFile(dataset.jobFilePath, specString, { encoding: 'utf8' });
+    const specs = createSpecs(metadata, config);
+    for (const algorithm in specs) {
+      const spec = specs[algorithm];
+      const specString = JSON.stringify(spec, undefined, 2);
+      const filePath = dataset.jobFilePathWithSuffix(algorithm);
+      await writeFile(filePath, specString, { encoding: 'utf8' });
+    }
   } catch (error) {
     ALGORITHMS.forEach((step) => ref.setFailure(step, error.message ?? error));
   }

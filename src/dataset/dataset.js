@@ -6,6 +6,7 @@ import {
   getDatasetFilePath,
   getDirForId,
   getJobFilePath,
+  getJobFilePathWithSuffix,
 } from '../util/paths.js';
 
 const CONFIG = Symbol('Configuration reference');
@@ -74,6 +75,15 @@ export class Dataset {
 
   get jobFilePath() {
     return getJobFilePath(this.config, this.dir);
+  }
+
+  /**
+   * Get the job file path with an added suffix
+   *
+   * @param {string} suffix Suffix
+   */
+  jobFilePathWithSuffix(suffix) {
+    return getJobFilePathWithSuffix(this.config, this.dir, suffix);
   }
 
   /**
