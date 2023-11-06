@@ -1,3 +1,6 @@
+import { execFile as callbackExecFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { getSrcFilePath } from '../util/paths.js';
 import { Config } from '../util/config.js';
 import { FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
@@ -11,6 +14,8 @@ const DEFAULT_HUBMAP_SEARCH_URL =
   'https://search.api.hubmapconsortium.org/v3/portal/search';
 const DEFAULT_HUBMAP_ASSETS_URL = 'https://assets.hubmapconsortium.org/';
 
+const execFile = promisify(callbackExecFile);
+
 /** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
@@ -22,6 +27,13 @@ export class Downloader {
     this.searchUrl = config.get(HUBMAP_SEARCH_URL, DEFAULT_HUBMAP_SEARCH_URL);
     /** @type {string} */
     this.assetsUrl = config.get(HUBMAP_ASSETS_URL, DEFAULT_HUBMAP_ASSETS_URL);
+    this.exprAdjustScript = 'expr_h5ad_adjust.py';
+    /** @type {string} */
+    this.exprAdjustScriptFilePath = getSrcFilePath(
+      config,
+      'hubmap',
+      this.exprAdjustScript
+    );
   }
 
   async prepareDownload(datasets) {
@@ -38,7 +50,7 @@ export class Downloader {
       throw new Error('Missing uuid - Dataset might have been deleted');
     }
 
-    const url = new URL(`${dataset.uuid}/raw_expr.h5ad`, this.assetsUrl);
+    const url = new URL(`${dataset.uuid}/expr.h5ad`, this.assetsUrl);
     url.searchParams.set('token', this.token);
     await downloadFile(dataset.dataFilePath, url, {
       headers: {
@@ -46,5 +58,15 @@ export class Downloader {
       },
       overwrite: this.config.get(FORCE, false),
     });
+    
+    const { stdout } = await execFile('python3', [
+      this.exprAdjustScriptFilePath,
+      dataset.dataFilePath,
+      '--assay',
+      dataset.assay_type,
+      '--output',
+      dataset.dataFilePath,
+    ]);
   }
+  
 }

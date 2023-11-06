@@ -16,7 +16,7 @@ function getBody(ids) {
       },
     },
     _source: {
-      includes: ['uuid', 'hubmap_id', 'origin_samples.organ'],
+      includes: ['uuid', 'hubmap_id', 'origin_samples.organ', 'data_types'],
     },
   };
 }
@@ -30,7 +30,7 @@ function checkResponse(response) {
 }
 
 function toLookup(result) {
-  /** @type {Map<string, { uuid: string; organ: string }>} */
+  /** @type {Map<string, { uuid: string; organ: string; assay_type: string; }>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
     const {
@@ -38,10 +38,11 @@ function toLookup(result) {
         hubmap_id,
         uuid,
         origin_samples: [{ organ }],
+        data_types: [ assay_type ],
       },
     } = hit;
 
-    lookup.set(hubmap_id, { uuid, organ });
+    lookup.set(hubmap_id, { uuid, organ, assay_type });
   }
 
   return lookup;
