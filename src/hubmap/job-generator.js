@@ -58,7 +58,9 @@ export class JobGenerator {
       geneColumn: 'hugo_symbol',
       azimuth: {},
       celltypist: {},
-      popv: {},
+      popv: {
+        queryLayersKey: 'X'
+      },
     };
   }
 }
