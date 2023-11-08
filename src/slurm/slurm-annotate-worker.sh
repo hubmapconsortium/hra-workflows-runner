@@ -192,7 +192,7 @@ run_jobs() {
     file=$(basename "$job")
 
     pushd "$dir"
-    srun cwl-runner --singularity --no-doc-cache --tmpdir-prefix "$TMP_DIR_PREFIX$counter/" "$CWL_OPTIONS" "$CWL_PIPELINE" "$file" &
+    echo srun cwl-runner --singularity --tmpdir-prefix "$TMP_DIR_PREFIX$counter/" "$CWL_OPTIONS" "$CWL_PIPELINE" "$file" | bash &
     pids+=("$!")
     popd
 

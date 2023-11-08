@@ -25,7 +25,9 @@ fi
 if [[ $RUNNER != "slurm" ]]; then
   for DIR in ${DATASET_DIRS[@]}; do
     pushd $DIR
-    cwl-runner ${CWL_OPTS[@]} $CWL_PIPELINE job.json
+    for ALGORITHM in azimuth celltypist popv; do
+      cwl-runner ${CWL_OPTS[@]} $CWL_PIPELINE "job-$ALGORITHM.json"
+    done
     popd
   done
 else

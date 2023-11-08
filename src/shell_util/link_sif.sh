@@ -9,7 +9,9 @@ link_sif() {
 
     for SIF in $SIF_CACHE_DIR/*.sif; do
       FILE=$(basename $SIF)
-      ln -sf $SIF "$DIR/$FILE"
+      if [[ ! -e "$DIR/$FILE" ]]; then
+        ln -sf $SIF "$DIR/$FILE"
+      fi
     done
   fi
 }
