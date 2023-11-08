@@ -3,12 +3,6 @@ import { join } from 'node:path';
 import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
 import { getModelsDir } from '../util/paths.js';
 
-const ALGORITHM_CELL_COLUMN = {
-  azimuth: 'azimuth_label',
-  celltypist: 'predicted_labels',
-  popv: 'popv_prediction',
-};
-
 const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
   (metadata, algorithm) => ({ ...metadata, [algorithm]: false }),
   {}
@@ -45,11 +39,6 @@ function createAlgorithmSpec(algorithm, metadata, defaults) {
     [algorithm]: {
       ...defaults[algorithm],
       ...metadata[algorithm],
-    },
-    extract: {
-      annotationMethod: algorithm,
-      cellLabelColumn: ALGORITHM_CELL_COLUMN[algorithm],
-      geneLabelColumn: 'gene',
     },
   };
 }
