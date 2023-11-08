@@ -5,7 +5,6 @@
 #SBATCH -o slurm-output/run/hra-run_%j.txt
 #SBATCH -e slurm-output/run/hra-run_%j.err
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=axbolin@iu.edu
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=96:00:00

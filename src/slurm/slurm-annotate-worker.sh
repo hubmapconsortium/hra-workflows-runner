@@ -5,8 +5,7 @@
 #SBATCH -p general
 #SBATCH -o slurm-output/annotate-worker/hra-run_%j.txt
 #SBATCH -e slurm-output/annotate-worker/hra-run_%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=axbolin@iu.edu
+#SBATCH --mail-type=FAIL
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-core=1
 #SBATCH --time=1:00:00
@@ -193,7 +192,7 @@ run_jobs() {
     file=$(basename "$job")
 
     pushd "$dir"
-    srun cwl-runner --singularity --tmpdir-prefix "$TMP_DIR_PREFIX$counter/" "$CWL_OPTIONS" "$CWL_PIPELINE" "$file" &
+    srun cwl-runner --singularity --no-doc-cache --tmpdir-prefix "$TMP_DIR_PREFIX$counter/" "$CWL_OPTIONS" "$CWL_PIPELINE" "$file" &
     pids+=("$!")
     popd
 
