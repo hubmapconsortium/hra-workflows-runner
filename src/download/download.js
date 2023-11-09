@@ -16,10 +16,8 @@ async function tryDownload(dataset) {
   await ensureDirsExist(dataset.dirPath);
   // This precheck could be moved to before prepareDownloads to reduce excess work even further
   if (!force && (await fileExists(dataset.dataFilePath))) {
-    if (!(await fileExists(dataset.filePath))) {
-      await dataset.save();
-    }
-
+    await mergeExistingDataset(dataset);
+    await dataset.save();
     markSuccess(dataset);
     return;
   }
@@ -41,6 +39,17 @@ function markSuccess(dataset) {
 
 function markFailure(dataset, error) {
   getSummaryRef(dataset).setFailure(DOWNLOAD_STEP, error.message ?? error);
+}
+
+async function mergeExistingDataset(dataset) {
+  try {
+    const existing = await Dataset.load(dataset.filePath, dataset.config);
+    for (const key of Object.keys(existing)) {
+      dataset[key] = dataset[key] || existing[key];
+    }
+  } catch {
+    // Do nothing if there is no existing dataset.json file
+  }
 }
 
 /**
