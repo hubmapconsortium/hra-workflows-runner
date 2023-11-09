@@ -25,8 +25,8 @@ export MODELS_DIR="$RAW_DATA_DIR/models"
 export SRC_DIR="./src"
 
 # Absolute path to project. Used when starting slurm jobs
-export PROJECT_DIR="/N/project/hra/hra-workflows-runner"
-export SIF_CACHE_DIR="/N/project/hra/sif-cache"
+export PROJECT_DIR=${PROJECT_DIR:-"/N/project/hra/hra-workflows-runner"}
+export SIF_CACHE_DIR=${SIF_CACHE_DIR:-"/N/project/hra/sif-cache"}
 
 # Load dataset configuration
 source $DATASETS_DIR/$DATASET/config.sh
