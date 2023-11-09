@@ -1,3 +1,17 @@
+/**
+ * @typedef {object} HubmapMetadata
+ * @property {string} uuid
+ * @property {string} organ
+ * @property {string} assay_type
+ * @property {string} dataset_iri
+ * @property {string} donor_sex
+ * @property {string} donor_race
+ * @property {string} donor_age
+ */
+
+const HUBMAP_ENTITY_ENDPOINT =
+  'https://entity.api.hubmapconsortium.org/entities/';
+
 function getHeaders(token) {
   return {
     'Content-type': 'application/json',
@@ -39,7 +53,7 @@ function checkResponse(response) {
 }
 
 function toLookup(result) {
-  /** @type {Map<string, { uuid: string; organ: string; assay_type: string; dataset_iri: string, donor_sex: string, donor_race: string, donor_age: string}>} */
+  /** @type {Map<string, HubmapMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
     const {
@@ -58,18 +72,15 @@ function toLookup(result) {
         },
       },
     } = hit;
-    const HUBMAP_ENTITY_ENDPOINT =
-      'https://entity.api.hubmapconsortium.org/entities/';
-    const dataset_iri = HUBMAP_ENTITY_ENDPOINT.concat(uuid);
-    const donor_age = age_value + ' '.concat(age_unit);
+
     lookup.set(hubmap_id, {
       uuid,
       organ,
       assay_type,
-      dataset_iri,
+      dataset_iri: `${HUBMAP_ENTITY_ENDPOINT}${uuid}`,
       donor_sex,
       donor_race,
-      donor_age,
+      donor_age: `${age_value} ${age_unit}`,
     });
   }
 
