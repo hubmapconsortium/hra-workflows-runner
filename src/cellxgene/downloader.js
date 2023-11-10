@@ -51,12 +51,12 @@ export class Downloader {
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
-    (this.extractScriptFilePath = getSrcFilePath(
+    this.extractScriptFilePath = getSrcFilePath(
       config,
       'cellxgene',
       this.extractScriptFile
-    )),
-      (this.extractMetdataScriptFile = 'extract_donor_metadata.py');
+    );
+    this.extractMetdataScriptFile = 'extract_donor_metadata.py';
     /** @type {string} */
     this.extractMetdataScriptFilePath = getSrcFilePath(
       config,
