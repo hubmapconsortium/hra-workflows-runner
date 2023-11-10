@@ -105,5 +105,5 @@ function getTissueIdLookup(datasets) {
 function getPublicationDOI(raw) {
   const { links } = raw;
   const doiLink = links.find((link) => link.link_type === 'DOI');
-  return doiLink.link_url;
+  return doiLink?.link_url ?? '';
 }
