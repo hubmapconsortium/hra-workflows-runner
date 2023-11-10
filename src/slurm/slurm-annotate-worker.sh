@@ -9,7 +9,7 @@
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-core=1
 #SBATCH --time=1:00:00
-#SBATCH --mem=32G
+#SBATCH --mem=128G
 
 module load python
 module load singularity
