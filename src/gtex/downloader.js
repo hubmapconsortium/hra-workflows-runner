@@ -11,6 +11,7 @@ import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 const GTEX_FULL_DATA_URL = 'GTEX_FULL_DATA_URL';
 const DEFAULT_GTEX_FULL_DATA_URL =
   'https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad';
+const GTEX_DOI_URL = 'https://doi.org/10.1126/science.abl4290';
 
 const execFile = promisify(callbackExecFile);
 
@@ -41,6 +42,11 @@ export class Downloader {
     await downloadFile(this.dataFilePath, this.dataUrl, {
       overwrite: this.config.get(FORCE, false),
     });
+
+    for (const dataset of _datasets) {
+      const id = dataset.id;
+      dataset.dataset_iri = `${GTEX_DOI_URL}#${id}`;
+    }
   }
 
   async download(dataset) {
@@ -54,7 +60,15 @@ export class Downloader {
     ]);
 
     // Parse organ line. Format: `organ: X\n`
-    const match = /organ:(.+)\n/i.exec(stdout);
-    dataset.organ = match?.[1].trim() ?? '';
+    const organ_match = /organ:(.+)\n/i.exec(stdout);
+    dataset.organ = organ_match?.[1].trim() ?? '';
+
+    // Parse sex line. Format: `sex: X\n`
+    const sex_match = /sex:(.+)\n/i.exec(stdout);
+    dataset.donor_sex = sex_match?.[1].trim() ?? '';
+
+    // Parse age line. Format: `age: X\n`
+    const age_match = /age:(.+)\n/i.exec(stdout);
+    dataset.donor_age = age_match?.[1].trim() ?? '';
   }
 }
