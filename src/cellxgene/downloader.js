@@ -1,3 +1,5 @@
+import { execFile as callbackExecFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { spawn } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -26,6 +28,8 @@ const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
 const UBERON_ID_REGEX = /^UBERON:\d{7}$/;
 
+const execFile = promisify(callbackExecFile);
+
 /** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
@@ -47,10 +51,17 @@ export class Downloader {
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
-    this.extractScriptFilePath = getSrcFilePath(
+    (this.extractScriptFilePath = getSrcFilePath(
       config,
       'cellxgene',
       this.extractScriptFile
+    )),
+      (this.extractMetdataScriptFile = 'extract_donor_metadata.py');
+    /** @type {string} */
+    this.extractMetdataScriptFilePath = getSrcFilePath(
+      config,
+      'cellxgene',
+      this.extractMetdataScriptFile
     );
   }
 
@@ -75,6 +86,23 @@ export class Downloader {
     if (!(await fileExists(dataset.dataFilePath))) {
       throw new Error('No data for donor-tissue combination');
     }
+
+    const { stdout } = await execFile('python3', [
+      this.extractMetdataScriptFilePath,
+      dataset.dataFilePath,
+    ]);
+
+    // Parse sex line. Format: `sex: X\n`
+    const sex_match = /sex:(.+)\n/i.exec(stdout);
+    dataset.donor_sex = sex_match?.[1].trim() ?? '';
+
+    // Parse age line. Format: `age: X\n`
+    const age_match = /age:(.+)\n/i.exec(stdout);
+    dataset.donor_age = age_match?.[1].trim() ?? '';
+
+    // Parse age line. Format: `age: X\n`
+    const ethnicity_match = /ethnicity:(.+)\n/i.exec(stdout);
+    dataset.donor_race = ethnicity_match?.[1].trim() ?? '';
   }
 
   async downloadCollection(collection) {
@@ -125,12 +153,11 @@ export class Downloader {
     );
     const attach = async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { assets, tissueIdLookup } = await this.downloadCollection(
-        metadata.collection
-      );
+      const { assets, tissueIdLookup, publicationDOI } =
+        await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
-      Object.assign(dataset, metadata, { assets, tissueId });
+      Object.assign(dataset, metadata, { assets, tissueId, publicationDOI });
     };
 
     await concurrentMap(datasets, attach, { maxConcurrency });
