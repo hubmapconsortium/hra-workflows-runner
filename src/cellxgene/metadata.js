@@ -9,6 +9,7 @@ import { groupBy } from '../util/iter.js';
  * @property {{ id: string; dataset: string }[]} assets
  * @property {[string, string][]} donorTissuePairs
  * @property {Map<string, string>} tissueIdLookup
+ * @property {string} publicationDOI
  */
 
 /**
@@ -36,12 +37,12 @@ export function parseCollectionMetadata(raw) {
   const validDatasets = filterNonDiseasedHumanDatasets(datasets);
   const { primary, secondary } = partitionDatasetsByType(validDatasets);
   const selectedDatasets = selectDatasetUsingCellCount(primary, secondary);
-
   return /** @type {CollectionMetadata} */ ({
     id,
     assets: getAssets(selectedDatasets),
     donorTissuePairs: getDonorTissuePairs(selectedDatasets),
     tissueIdLookup: getTissueIdLookup(selectedDatasets),
+    publicationDOI: getPublicationDOI(raw),
   });
 }
 
@@ -99,4 +100,10 @@ function getTissueIdLookup(datasets) {
     ]);
 
   return new Map(items);
+}
+
+function getPublicationDOI(raw) {
+  const { links } = raw;
+  const doiLink = links.find((link) => link.link_type === 'DOI');
+  return doiLink?.link_url ?? '';
 }
