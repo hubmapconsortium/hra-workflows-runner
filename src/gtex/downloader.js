@@ -13,6 +13,28 @@ const DEFAULT_GTEX_FULL_DATA_URL =
   'https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad';
 const GTEX_DOI_URL = 'https://doi.org/10.1126/science.abl4290';
 
+const ORGAN_MAPPING = {
+  bladder: 'UBERON:0001255',
+  blood: 'UBERON:0000178',
+  bone_marrow: 'UBERON:0002371',
+  eye: 'UBERON:0000970',
+  heart: 'UBERON:0000948',
+  large_intestine: 'UBERON:0000059',
+  liver: 'UBERON:0002107',
+  lung: 'UBERON:0002048',
+  lymph_node: 'UBERON:0000029',
+  mammary: 'UBERON:0001911',
+  pancreas: 'UBERON:0001264',
+  prostate: 'UBERON:0002367',
+  skin: 'UBERON:0002097',
+  small_intestine: 'UBERON:0002108',
+  spleen: 'UBERON:0002106',
+  thymus: 'UBERON:0002370',
+  trachea: 'UBERON:0003126',
+  uterus: 'UBERON:0000995',
+  vasculature: 'UBERON:0004537',
+};
+
 const execFile = promisify(callbackExecFile);
 
 /** @implements {IDownloader} */
@@ -61,7 +83,15 @@ export class Downloader {
 
     // Parse organ line. Format: `organ: X\n`
     const organ_match = /organ:(.+)\n/i.exec(stdout);
-    dataset.organ = organ_match?.[1].trim() ?? '';
+    dataset.organ_source = organ_match?.[1].trim() ?? '';
+
+    const organ = dataset.organ_source.toLowerCase();
+    const uberon = ORGAN_MAPPING[organ];
+    if (uberon === undefined) {
+      const msg = `Unknown organ code '${dataset.organ}'`;
+      throw new Error(msg);
+    }
+    dataset.organ = uberon;
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
