@@ -60,14 +60,13 @@ export class Downloader {
     );
   }
 
-  async prepareDownload(_datasets) {
+  async prepareDownload(datasets) {
     await downloadFile(this.dataFilePath, this.dataUrl, {
       overwrite: this.config.get(FORCE, false),
     });
 
-    for (const dataset of _datasets) {
-      const id = dataset.id;
-      dataset.dataset_iri = `${GTEX_DOI_URL}#${id}`;
+    for (const dataset of datasets) {
+      dataset.dataset_iri = `${GTEX_DOI_URL}#${dataset.id}`;
     }
   }
 
@@ -86,12 +85,7 @@ export class Downloader {
     dataset.organ_source = organ_match?.[1].trim() ?? '';
 
     const organ = dataset.organ_source.toLowerCase();
-    const uberon = ORGAN_MAPPING[organ];
-    if (uberon === undefined) {
-      const msg = `Unknown organ code '${dataset.organ}'`;
-      throw new Error(msg);
-    }
-    dataset.organ = uberon;
+    dataset.organ = ORGAN_MAPPING[organ];
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);

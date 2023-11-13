@@ -109,16 +109,10 @@ function toLookup(result) {
       },
     } = hit;
 
-    const uberon = ORGAN_MAPPING[organ.toUpperCase()];
-    if (uberon === undefined) {
-      const msg = `Unknown organ code '${organ}'`;
-      throw new Error(msg);
-    }
-
     lookup.set(hubmap_id, {
       uuid,
       organ_source: organ,
-      organ: uberon,
+      organ: ORGAN_MAPPING[organ.toUpperCase()],
       assay_type,
       dataset_iri: `${HUBMAP_ENTITY_ENDPOINT}${uuid}`,
       donor_sex,

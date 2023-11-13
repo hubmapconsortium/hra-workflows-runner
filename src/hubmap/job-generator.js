@@ -11,6 +11,11 @@ export class JobGenerator {
   async prepareJobs(datasets) {}
 
   createJob(dataset) {
+    if (!dataset.organ) {
+      const msg = `Unknown organ code '${dataset.organ_source}'`;
+      throw new Error(msg);
+    }
+
     return {
       organ: dataset.organ,
       geneColumn: 'hugo_symbol',

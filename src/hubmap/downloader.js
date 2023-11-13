@@ -58,7 +58,7 @@ export class Downloader {
       },
       overwrite: this.config.get(FORCE, false),
     });
-    
+
     const { stdout } = await execFile('python3', [
       this.exprAdjustScriptFilePath,
       dataset.dataFilePath,
@@ -68,5 +68,4 @@ export class Downloader {
       dataset.dataFilePath,
     ]);
   }
-  
 }
