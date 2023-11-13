@@ -2,6 +2,7 @@ import { DatasetSummaries } from './dataset/summary.js';
 import { createDatasets } from './download/create-datasets.js';
 import { download } from './download/download.js';
 import { prepareDownloads } from './download/prepare-downloads.js';
+import { getSummaryRef } from './download/utils.js';
 import { getConfig } from './util/common.js';
 import { ensureDirsExist } from './util/fs.js';
 import {
@@ -19,6 +20,9 @@ async function main() {
   const datasets = await createDatasets(summaries, config);
   const preparedDatasets = await prepareDownloads(datasets, config);
   await download(preparedDatasets, config);
+  for (const dataset of datasets) {
+    getSummaryRef(dataset).organ = dataset.organ;
+  }
 
   await summaries.save(summariesFilePath);
 }

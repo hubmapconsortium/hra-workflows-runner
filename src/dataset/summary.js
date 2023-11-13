@@ -69,6 +69,8 @@ export class DatasetSummary {
     this.id = id;
     /** @type {string} */
     this.comments = '';
+    /** @type {string} */
+    this.organ = '';
 
     for (const step of STEPS) {
       this.setStatus(step, Status.NOT_STARTED);
