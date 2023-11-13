@@ -1,4 +1,5 @@
 import { Config } from '../util/config.js';
+import { UnknownOrganError } from '../util/errors.js';
 import { IJobGenerator } from '../util/handler.js';
 
 /** @implements {IJobGenerator} */
@@ -12,8 +13,7 @@ export class JobGenerator {
 
   createJob(dataset) {
     if (!dataset.organ) {
-      const msg = `Unknown organ code '${dataset.organ_source}'`;
-      throw new Error(msg);
+      throw new UnknownOrganError(dataset.organ_source);
     }
 
     return {

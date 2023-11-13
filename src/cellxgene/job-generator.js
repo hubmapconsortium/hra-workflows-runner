@@ -1,4 +1,5 @@
 import { Config } from '../util/config.js';
+import { UnknownOrganError } from '../util/errors.js';
 import { IJobGenerator } from '../util/handler.js';
 
 /** @implements {IJobGenerator} */
@@ -11,6 +12,10 @@ export class JobGenerator {
   async prepareJobs(datasets) {}
 
   createJob(dataset) {
+    if (!dataset.organ) {
+      throw new UnknownOrganError(dataset.tissue);
+    }
+
     return {
       organ: dataset.organ,
       geneColumn: 'feature_name',
