@@ -8,6 +8,7 @@ import {
 } from '../util/constants.js';
 import { createSpecs } from './spec.js';
 import { getJobGeneratorRef } from './utils.js';
+import { UnknownOrganError } from '../util/errors.js';
 
 async function tryGenerateJobs(dataset, config) {
   const ref = getSummaryRef(dataset);
@@ -28,7 +29,12 @@ async function tryGenerateJobs(dataset, config) {
       await writeFile(filePath, specString, { encoding: 'utf8' });
     }
   } catch (error) {
-    ALGORITHMS.forEach((step) => ref.setFailure(step, error.message ?? error));
+    if (error instanceof UnknownOrganError) {
+      ALGORITHMS.forEach((step) => ref.setNotSupported(step));
+      ref.comments = error.message;
+    } else {
+      ALGORITHMS.forEach((step) => ref.setFailure(step, error.message ?? error));
+    }
   }
 }
 

@@ -147,3 +147,6 @@ raw-data
 # Slurm output
 hra-run*.txt
 hra-run*.err
+
+# Temporary data folder
+tmp
