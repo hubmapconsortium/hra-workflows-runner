@@ -153,7 +153,7 @@ export class Downloader {
     );
     const attach = async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { assets, tissueIdLookup, publicationDOI, donorTissuePairs } =
+      const { assets, tissueIdLookup, publicationDOI } =
         await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
@@ -161,7 +161,6 @@ export class Downloader {
         assets,
         tissueId,
         publicationDOI,
-        donorTissuePairs,
       });
     };
 

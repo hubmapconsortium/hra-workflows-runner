@@ -7,7 +7,7 @@ import { groupBy } from '../util/iter.js';
  * @type {object}
  * @property {string} id
  * @property {{ id: string; dataset: string }[]} assets
- * @property {[string, string][]} donorTissuePairs
+ * @property {{ donor_id: string; tissue: string }[]} donorTissuePairs
  * @property {Map<string, string>} tissueIdLookup
  * @property {string} publicationDOI
  */
