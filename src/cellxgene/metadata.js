@@ -86,8 +86,23 @@ function getAssets(datasets) {
 }
 
 function getDonorTissuePairs(datasets) {
-  // TODO
-  return [];
+  const pairsArray = datasets.map((dataset) =>
+    dataset.donor_id.flatMap((donor_id) =>
+      dataset.tissue.map((tissue) => ({
+        donor_id: donor_id,
+        tissue: tissue.label,
+      }))
+    )
+  );
+
+  const flattenedPairs = pairsArray.flat();
+
+  const uniquePairs = Array.from(
+    new Set(flattenedPairs.map(JSON.stringify)),
+    JSON.parse
+  );
+
+  return uniquePairs;
 }
 
 function getTissueIdLookup(datasets) {
