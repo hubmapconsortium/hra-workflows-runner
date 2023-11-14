@@ -75,6 +75,7 @@ function getBody(ids) {
         'donor.mapped_metadata.sex',
         'donor.mapped_metadata.age_value',
         'donor.mapped_metadata.age_unit',
+        'ancestors',
       ],
     },
   };
@@ -86,6 +87,17 @@ function checkResponse(response) {
     const message = `Failed to fetch metadata: ${status}:${statusText}`;
     throw new Error(message);
   }
+}
+
+function getSampleIri(ancestors, type) {
+  for (const ancestor of ancestors) {
+    if (ancestor['entity_type'].toLowerCase() == 'sample') {
+      if (ancestor['sample_category'].toLowerCase() == type) {
+        return `${HUBMAP_ENTITY_ENDPOINT}${ancestor['uuid']}`;
+      }
+    }
+  }
+  return '';
 }
 
 function toLookup(result) {
@@ -106,6 +118,7 @@ function toLookup(result) {
             age_unit: [age_unit],
           },
         },
+        ancestors,
       },
     } = hit;
 
@@ -118,6 +131,8 @@ function toLookup(result) {
       donor_sex,
       donor_race,
       donor_age: `${age_value} ${age_unit}`,
+      sample_block_iri: getSampleIri(ancestors, 'block'),
+      sample_section_iri: getSampleIri(ancestors, 'section'),
     });
   }
 
