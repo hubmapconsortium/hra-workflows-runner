@@ -11,12 +11,29 @@ import { getSrcFilePath } from './paths.js';
  * @property {function(Dataset): boolean} supports
  * Method to test whether this handler supports a specific dataset
  *
+ * @property {function(new: IListing, Config)} Listing
+ * Class implementing the listing interface
+ *
  * @property {function(new:IDownloader, Config)} Downloader
  * Class implementing the data downloading interface
  *
  * @property {function(new:IJobGenerator, Config)} JobGenerator
  * Class implementing the job generator interface
  */
+
+/**
+ * Listing interface implemented by handlers
+ *
+ * @interface
+ */
+export class IListing {
+  /**
+   * Get the listing dataset ids.
+   *
+   * @returns {Promise<string[]>} Array of dataset ids
+   */
+  async getDatasets() {}
+}
 
 /**
  * Downloading interface implemented by handlers
@@ -134,9 +151,10 @@ function verifyDatasetHandler(maybeHandler) {
 
   const [name, module] = maybeHandler;
   const hasSupports = typeof module.supports === 'function';
+  const hasListing = typeof module.Listing === 'function';
   const hasDownloader = typeof module.Downloader === 'function';
   const hasGenerator = typeof module.JobGenerator === 'function';
-  if (!hasSupports || !hasDownloader || !hasGenerator) {
+  if (!hasSupports || !hasListing || !hasDownloader || !hasGenerator) {
     const msg = `Dataset handler '${name}' does not implement the required interfaces`;
     console.warn(msg);
     return false;
