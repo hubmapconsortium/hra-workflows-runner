@@ -23,7 +23,7 @@ export class Listing {
     const resp = await fetch(this.searchUrl, {
       method: 'POST',
       headers: getHeaders(this.token),
-      body: JSON.stringify(await this.getBody()),
+      body: JSON.stringify(this.getBody()),
     });
     checkFetchResponse(resp, 'HuBMAP: Failed to fetch list of collections');
 
@@ -33,7 +33,7 @@ export class Listing {
     return hits.map(({ _source: { hubmap_id } }) => hubmap_id);
   }
 
-  async getBody() {
+  getBody() {
     return {
       version: true,
       from: 0,
