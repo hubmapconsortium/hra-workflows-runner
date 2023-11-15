@@ -17,227 +17,145 @@ module load singularity
 # ---------------------------------------
 # Constants
 # ---------------------------------------
-readonly ALGORITHMS=(azimuth celltypist popv)
-readonly CWL_PIPELINE="https://cdn.jsdelivr.net/gh/hubmapconsortium/hra-workflows@main/pipeline.cwl"
-readonly DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
-readonly MAX_JOBS=4 # Keep in sync with --ntasks
-readonly TMP_DIR_PREFIX="$TEMP/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID-"
+readonly NUM_TASKS=4 # Keep in sync with --ntasks
+readonly HORIZONTAL_LINE='------------------------------------------------'
+
+readonly CWL_PIPELINE_URL="https://cdn.jsdelivr.net/gh/hubmapconsortium/hra-workflows@main/pipeline.cwl"
+readonly CWL_TMP_DIR="${TEMP%'/'}/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID"
+readonly CWL_OPTIONS="${CWL_OPTIONS:-}"
 
 # ---------------------------------------
 # Inputs
 # ---------------------------------------
-declare -i index
-
-readonly FORCE="${FORCE:-"false"}"
-readonly RERUN_FAILED="${RERUN_FAILED:-"false"}"
-readonly CWL_OPTIONS="${CWL_OPTIONS:-}"
-index="${INDEX:-0}"
-
-# ---------------------------------------
-# Variables
-# ---------------------------------------
-declare -a dirs
-declare -a locks
-declare -a jobs
-reschedule="false"
+readonly CONTROL_FILE="${1:?"Missing control file"}"
 
 # ----------------------------------------
 # Functions
 # ----------------------------------------
 
 #######################################
-# Cleanup lock files
+# Perform cleanup
 # Globals:
-#   locks
-# Arguments:
-#   None
+#   CWL_TMP_DIR
+#   pids
 #######################################
 cleanup() {
-  local lock
-  for lock in "${locks[@]}"; do
-    rm -rf "$lock"
-  done
+  # Stop any annotation tools still running
+  if [[ -n "$pids" ]]; then
+    kill -s TERM --timeout 10000 KILL "${pids[@]}" &>/dev/null
+  fi
+
+  # Clean up after cwl in case it failed to do so properly itself
+  rm -rf "$CWL_TMP_DIR"
 }
 
 #######################################
-# Tries to create a lock for a job file
+# Finds available jobs
 # Globals:
-#   locks
-# Arguments:
-#   Directory of dataset, a path
-#   Algorithm, a string
-# Returns:
-#   0 if the lock was acquired, non-zero otherwise
+#   SRC_DIR
+#   NUM_TASKS
+#   CONTROL_FILE
 #######################################
-try_lock_job() {
-  local -r dir="$1" algorithm="$2"
-  local -r file="$dir/job-$algorithm.json.lock"
-  local fd
-
-  exec {fd}>"$file"
-  if ! flock --nonblock "$fd"; then
-    # Make sure to close file descriptor on failure
-    exec {fd}>&-
-    return 1
-  fi
-
-  locks+=("$file")
+find_jobs() {
+  exec "$SRC_DIR/slurm/util/find-jobs.sh" "$CONTROL_FILE" "$NUM_TASKS"
 }
 
 #######################################
 # Checks whether a job has run
 # Globals:
-#   None
-# Arguments:
-#   Directory of dataset, a path
-#   Algorithm, a string
-# Outputs:
-#   Status of the job if it has run ["success" or "failure"]
-# Returns:
-#   0 if the job has run, non-zero otherwise
-#######################################
-check_job_status() {
-  local -r dir="$1" algorithm="$2"
-  local -r job_dir="$dir/$algorithm"
-  local -r report_file="$job_dir/report.json"
-
-  if [[ ! -e "$report_file" ]]; then
-    return 1
-  fi
-
-  if grep -s success <"$report_file" >/dev/null; then
-    echo "success"
-  else
-    echo "failure"
-  fi
-}
-
-#######################################
-# Checks whether a job should be run based on it's status and global config
-# Globals:
-#   FORCE
-#   RERUN_FAILED
-# Arguments:
-#   Directory of dataset, a path
-#   Algorithm, a string
-# Returns:
-#   0 if the job should be run, non-zero otherwise
-#######################################
-check_should_run_job() {
-  local status
-
-  if [[ "$FORCE" != "false" ]]; then
-    return 0
-  fi
-
-  status=$(check_job_status "$1" "$2")
-  if [[ "$?" == 0 && ("$status" == "success" || "$RERUN_FAILED" == "false") ]]; then
-    return 1
-  fi
-}
-
-#######################################
-# Finds jobs to run
-# Globals:
-#   ALGORITHMS
-#   FORCE
-#   MAX_JOBS
-#   RERUN_FAILED
-#   dirs
-#   locks
-#   index [Modified]
-#   jobs [Modified]
-#   reschedule [Modified]
-#######################################
-find_jobs() {
-  local -i count=0 max="$MAX_JOBS"
-  local dir algorithm
-
-  for dir in "${dirs[@]}"; do
-    for algorithm in "${ALGORITHMS[@]}"; do
-      if (("$count" >= "$max")); then
-        reschedule="true"
-        return 0
-      fi
-
-      if ! check_should_run_job "$dir" "$algorithm"; then
-        continue
-      fi
-
-      if try_lock_job "$dir" "$algorithm"; then
-        jobs+=("$dir/job-$algorithm.json")
-        count+=1
-      fi
-    done
-
-    index+=1
-  done
-}
-
-#######################################
-# Run jobs and wait for them to complete
-# Globals:
+#   CWL_PIPELINE_URL
+#   CWL_TMP_DIR
 #   CWL_OPTIONS
-#   CWL_PIPELINE
-#   TMP_DIR_PREFIX
-#   jobs
+# Arguments:
+#   Job file path, a string
+#   Job index, an integer
 #######################################
-run_jobs() {
-  local -a pids
-  local -i counter=1
-  local job dir file
+run_job() {
+  local -r job="$1" index="$2"
+  local -a args
 
-  for job in "${jobs[@]}"; do
-    dir=$(dirname "$job")
-    file=$(basename "$job")
+  # Remove the job file path and index
+  shift 2
 
-    pushd "$dir"
-    echo srun cwl-runner --singularity --no-doc-cache --tmpdir-prefix "$TMP_DIR_PREFIX$counter/" "$CWL_OPTIONS" "$CWL_PIPELINE" "$file" | bash &
-    pids+=("$!")
-    popd
+  # Build cwl-runner command arguments
+  args+=(--singularity --no-doc-cache)
+  args+=(--tmpdir-prefix "$CWL_TMP_DIR/$index/")
+  args+=("$@")
+  args+=("$CWL_PIPELINE_URL")
+  args+=("$(basename "$job")")
 
-    counter+=1
-  done
+  # Run command
+  pushd "$(dirname "$job")" >/dev/null || exit
+  srun time cwl-runner "${args[@]}"
+  popd >/dev/null || exit
+}
 
-  wait "${pids[@]}"
+#######################################
+# Reschedule another worker
+# Globals:
+#   SRC_DIR
+# Arguments:
+#   The same arguments that was passed to this script
+#######################################
+reschedule_worker() {
+  printf 'Rescheduling more work\n'
+  sbatch "$SRC_DIR/slurm/slurm-annotate-worker.sh" "$@"
 }
 
 # ----------------------------------------
 # Main logic
 # ----------------------------------------
 
-# Print some useful info
-printf 'Worker started\n'
-printf 'FORCE=%s\n' "$FORCE"
-printf 'RERUN_FAILED=%s\n' "$RERUN_FAILED"
-printf 'CWL_OPTIONS=%s\n' "$CWL_OPTIONS"
-printf 'INDEX=%s\n' "$index"
-printf '\n'
+declare -a pids
+declare -i counter=0
+declare job
 
-# Install cleanup
-trap cleanup EXIT
+# Install traps
+trap cleanup EXIT TERM
 
-# Read directories
-mapfile -t dirs < <(tail -n "+$index" <"$DIRS_FILE")
+# Remove control file from argument list
+shift 1
 
-# Find jobs
-find_jobs
+cat <<EOF
+$HORIZONTAL_LINE
+  Worker started!
+  $(date)
+  DATASET: $DATASET - $VERSION
+  CONTROL_FILE=$CONTROL_FILE
+  ARGS=$@
+  FORCE=${FORCE:-false}
+  SKIP_FAILED=${SKIP_FAILED:-false}
+$HORIZONTAL_LINE
+EOF
 
-# Check if we found any jobs to run
-if [[ "${#jobs[@]}" == 0 ]]; then
+# Find and start jobs
+for job in $(find_jobs); do
+  printf 'Starting job: %s\n' "$job"
+  run_job "$job" "$counter" "$@" &
+  pids+=("$!")
+  ((counter += 1))
+done
+
+if [[ "${#pids[@]}" == 0 ]]; then
   printf 'No more jobs. Exiting...\n'
   exit 0
 fi
 
-# Run jobs
-printf 'Running jobs:\n'
-printf '  %s\n' "${jobs[@]}"
-run_jobs
-printf '\n---------------------\nJobs done!\n---------------------\n'
+# Wait for jobs to finish
+wait "${pids[@]}"
 
-# Reschedule if there is more work
-if [[ "$reschedule" == "true" ]]; then
-  # Ensure the latest value of index is exported to the next worker
-  readonly sbatch_export="ALL,INDEX=$index"
-  sbatch --export "$sbatch_export" "$PROJECT_DIR/src/slurm/slurm-annotate-worker.sh"
+# Check if wait terminated due to a signal
+if (("$?" > 128)); then
+  printf 'Terminated by signal!'
+  exit 0
 fi
+
+cat <<EOF
+$HORIZONTAL_LINE
+  Jobs done!
+  $(date)
+$HORIZONTAL_LINE
+EOF
+
+# Reschedule another worker
+reschedule_worker "$CONTROL_FILE" "$@"
