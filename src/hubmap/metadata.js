@@ -8,6 +8,9 @@
  * @property {string} donor_sex
  * @property {string} donor_race
  * @property {string} donor_age
+ * @property {string} block_sample_iri
+ * @property {string} section_sample_iri
+ * @property {string} donor_iri
  */
 
 const HUBMAP_ENTITY_ENDPOINT =
@@ -76,6 +79,7 @@ function getBody(ids) {
         'donor.mapped_metadata.age_value',
         'donor.mapped_metadata.age_unit',
         'ancestors',
+        'donor.uuid',
       ],
     },
   };
@@ -119,6 +123,7 @@ function toLookup(result) {
           },
         },
         ancestors,
+        donor: { uuid: donor_uuid },
       },
     } = hit;
 
@@ -133,6 +138,7 @@ function toLookup(result) {
       donor_age: `${age_value} ${age_unit}`,
       sample_block_iri: getSampleIri(ancestors, 'block'),
       sample_section_iri: getSampleIri(ancestors, 'section'),
+      donor_iri: `${HUBMAP_ENTITY_ENDPOINT}${donor_uuid}`,
     });
   }
 
