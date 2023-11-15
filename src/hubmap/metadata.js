@@ -48,7 +48,7 @@ const ORGAN_MAPPING = {
   UT: 'UBERON:0000995',
 };
 
-function getHeaders(token) {
+export function getHeaders(token) {
   return {
     'Content-type': 'application/json',
     Authorization: `Bearer ${token}`,

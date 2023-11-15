@@ -1,7 +1,14 @@
-import { IDownloader, IJobGenerator } from '../util/handler.js';
+import { IDownloader, IJobGenerator, IListing } from '../util/handler.js';
 
 export function supports(_dataset) {
   return true;
+}
+
+/** @implements {IListing} */
+export class Listing {
+  async getDatasets() {
+    return [];
+  }
 }
 
 /** @implements {IDownloader} */
