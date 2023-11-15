@@ -157,7 +157,11 @@ export class Downloader {
         await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
-      Object.assign(dataset, metadata, { assets, tissueId, publicationDOI });
+      Object.assign(dataset, metadata, {
+        assets,
+        tissueId,
+        publicationDOI,
+      });
     };
 
     await concurrentMap(datasets, attach, { maxConcurrency });

@@ -7,7 +7,7 @@ import { groupBy } from '../util/iter.js';
  * @type {object}
  * @property {string} id
  * @property {{ id: string; dataset: string }[]} assets
- * @property {[string, string][]} donorTissuePairs
+ * @property {{ donor_id: string; tissue: string }[]} donorTissuePairs
  * @property {Map<string, string>} tissueIdLookup
  * @property {string} publicationDOI
  */
@@ -86,8 +86,21 @@ function getAssets(datasets) {
 }
 
 function getDonorTissuePairs(datasets) {
-  // TODO
-  return [];
+  const pairsArray = datasets.flatMap((dataset) =>
+    dataset.donor_id.flatMap((donor_id) =>
+      dataset.tissue.map((tissue) => ({
+        donor_id: donor_id,
+        tissue: tissue.label,
+      }))
+    )
+  );
+
+  const uniquePairs = Array.from(
+    new Set(pairsArray.map(JSON.stringify)),
+    JSON.parse
+  );
+
+  return uniquePairs;
 }
 
 function getTissueIdLookup(datasets) {
