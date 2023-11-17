@@ -31,6 +31,7 @@ class ExtractInfo(t.TypedDict):
     datasets: t.List[Dataset]
 
 
+_FORCE = os.environ.get('FORCE', '').lower() not in ['', 'false']
 _logger = logging.getLogger(__name__)
 
 
@@ -74,7 +75,7 @@ class AssetSplitter:
         with _log_event(f"CellXGene:AssetSplitter:Splitting:{':'.join(values)}:%s"):
             file_name = "-".join(values) + ".h5ad"
             out_path = out_dir / self.id / file_name
-            if out_path.exists():
+            if not _FORCE and out_path.exists():
                 return out_path
             
             mask = self.create_mask(matrix, columns, values)
@@ -121,7 +122,7 @@ class AssetCombiner:
 
     def combine(self):
         with _log_event("CellXGene:AssetCombiner:%s - %s", self.id):
-            if self.out_file.exists():
+            if not _FORCE and self.out_file.exists():
                 return
 
             matrices = [anndata.read_h5ad(file) for file in self.files if file]
