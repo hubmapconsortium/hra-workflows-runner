@@ -40,5 +40,5 @@ export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'];
 export const DEFAULT_MAX_CONCURRENCY = 2;
 export const DEFAULT_PYTHON_LOG_LEVEL = 40; // Error level
 export const DEFAULT_CACHE_DIR = './tmp';
-export const DEFAULT_DATASET_HANDLERS = ['gtex', 'hubmap', 'cellxgene'];
+export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'gtex', 'cellxgene'];
 export const DEFAULT_DATASET_LIST = 'listing.csv';
