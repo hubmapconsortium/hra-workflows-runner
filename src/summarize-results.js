@@ -1,4 +1,4 @@
-import { DatasetSummaries, Status } from './dataset/summary.js';
+import { DatasetSummaries } from './dataset/summary.js';
 import { getConfig, loadJson } from './util/common.js';
 import { concurrentMap } from './util/concurrent-map.js';
 import {
@@ -9,8 +9,7 @@ import {
 import {
   getAlgorithmReportFilePath,
   getDirForId,
-  getSummariesFilePath,
-  getDatasetFilePath,
+  getSummariesFilePath
 } from './util/paths.js';
 
 async function updateAlgorithmStatus(item, config) {
@@ -39,12 +38,9 @@ async function main() {
   const config = getConfig();
   const maxConcurrency = config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
-  const downloadedItems = Array.from(summaries.values()).filter(
-    (item) => item.downloaded === Status.SUCCESS
-  );
 
   await concurrentMap(
-    downloadedItems,
+    Array.from(summaries.values()),
     (item) => updateAlgorithmStatus(item, config),
     { maxConcurrency }
   );
