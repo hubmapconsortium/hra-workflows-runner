@@ -145,12 +145,34 @@ function toLookup(result) {
   return lookup;
 }
 
+/**
+ * Handles 303 responses from the search api.
+ * A 303 response is returned when the resulting query is to large for the
+ * search api. Instead it returns a temporary url from which to download the result.
+ *
+ * @param {Response} resp
+ * @returns {Promise<Response>}
+ */
+async function handle303Response(resp) {
+  const text = await resp.text();
+  if (text.startsWith('https')) {
+    return await fetch(text);
+  }
+
+  return resp;
+}
+
 export async function getMetadataLookup(ids, url, token) {
-  const resp = await fetch(url, {
+  let resp = await fetch(url, {
     method: 'POST',
     headers: getHeaders(token),
     body: JSON.stringify(getBody(ids)),
   });
+
+  if (resp.status === 303) {
+    resp = await handle303Response(resp);
+  }
+
   checkResponse(resp);
 
   const result = await resp.json();
