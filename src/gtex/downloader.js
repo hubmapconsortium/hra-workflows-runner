@@ -12,6 +12,9 @@ const GTEX_FULL_DATA_URL = 'GTEX_FULL_DATA_URL';
 const DEFAULT_GTEX_FULL_DATA_URL =
   'https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad';
 const GTEX_DOI_URL = 'https://doi.org/10.1126/science.abl4290';
+const GTEX_PUBLICATION_NAME =
+  'Single-nucleus cross-tissue molecular reference maps toward understanding disease gene function';
+const GTEX_PUBLICATION_LEAD_AUTHOR = 'GÖKCEN ERASLAN';
 
 const ORGAN_MAPPING = {
   bladder: 'UBERON:0001255',
@@ -66,7 +69,10 @@ export class Downloader {
     });
 
     for (const dataset of datasets) {
-      dataset.dataset_iri = `${GTEX_DOI_URL}#${dataset.id}`;
+      dataset.dataset_id = `${GTEX_DOI_URL}#${dataset.id}`;
+      dataset.publication = GTEX_DOI_URL;
+      dataset.publication_name = GTEX_PUBLICATION_NAME;
+      dataset.publication_lead_author = GTEX_PUBLICATION_LEAD_AUTHOR;
     }
   }
 
@@ -93,6 +99,14 @@ export class Downloader {
 
     // Parse age line. Format: `age: X\n`
     const age_match = /age:(.+)\n/i.exec(stdout);
-    dataset.donor_age = age_match?.[1].trim() ?? '';
+    dataset.donor_age_bin = age_match?.[1].trim() ?? '';
+
+    // Parse donor_id line. Format: `donor_id: X\n`
+    const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
+    dataset.donor_id = donor_id_match?.[1].trim() ?? '';
+
+    dataset.organ_id = `http://purl.obolibrary.org/obo/UBERON_${
+      dataset.organ.split(':')[1]
+    }`;
   }
 }
