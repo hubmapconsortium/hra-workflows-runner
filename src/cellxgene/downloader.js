@@ -103,6 +103,10 @@ export class Downloader {
     // Parse age line. Format: `age: X\n`
     const ethnicity_match = /ethnicity:(.+)\n/i.exec(stdout);
     dataset.donor_race = ethnicity_match?.[1].trim() ?? '';
+
+    dataset.organ_id = `http://purl.obolibrary.org/obo/UBERON_${
+      dataset.organ.split(':')[1]
+    }`;
   }
 
   async downloadCollection(collection) {
@@ -153,14 +157,14 @@ export class Downloader {
     );
     const attach = async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { assets, tissueIdLookup, publicationDOI } =
+      const { assets, tissueIdLookup, publication } =
         await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
       Object.assign(dataset, metadata, {
         assets,
         tissueId,
-        publicationDOI,
+        publication,
       });
     };
 
