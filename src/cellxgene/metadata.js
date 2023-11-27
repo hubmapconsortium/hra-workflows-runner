@@ -9,7 +9,11 @@ import { groupBy } from '../util/iter.js';
  * @property {{ id: string; dataset: string }[]} assets
  * @property {{ donor_id: string; tissue: string }[]} donorTissuePairs
  * @property {Map<string, string>} tissueIdLookup
- * @property {string} publicationDOI
+ * @property {string} publication
+ * @property {string} publication_name
+ * @property {string} publication_lead_author
+ * @property {string[]} consortium_name
+ * @property {string} provider_name
  */
 
 /**
@@ -33,7 +37,7 @@ export async function downloadCollectionMetadata(url) {
 }
 
 export function parseCollectionMetadata(raw) {
-  const { id, datasets } = raw;
+  const { id, datasets, name, consortia, curator_name } = raw;
   const validDatasets = filterNonDiseasedHumanDatasets(datasets);
   const { primary, secondary } = partitionDatasetsByType(validDatasets);
   const selectedDatasets = selectDatasetUsingCellCount(primary, secondary);
@@ -42,7 +46,12 @@ export function parseCollectionMetadata(raw) {
     assets: getAssets(selectedDatasets),
     donorTissuePairs: getDonorTissuePairs(selectedDatasets),
     tissueIdLookup: getTissueIdLookup(selectedDatasets),
-    publicationDOI: getPublicationDOI(raw),
+    publication: getPublicationDOI(raw),
+    publication_title: name,
+    publication_lead_author: getPublicationLeadAuthor(raw),
+    consortium_name: consortia,
+    provider_name: curator_name,
+    assay_type: getAssayType(selectedDatasets),
   });
 }
 
@@ -119,4 +128,16 @@ function getPublicationDOI(raw) {
   const { links } = raw;
   const doiLink = links.find((link) => link.link_type === 'DOI');
   return doiLink?.link_url ?? '';
+}
+
+function getPublicationLeadAuthor(raw) {
+  const {
+    publisher_metadata: { authors: publication_authors },
+  } = raw;
+  return `${publication_authors[0].given} ${publication_authors[0].family}`;
+}
+
+function getAssayType(datasets) {
+  const assayTypesArray = datasets.map(({ assay }) => assay).flat();
+  return Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse);Vi
 }

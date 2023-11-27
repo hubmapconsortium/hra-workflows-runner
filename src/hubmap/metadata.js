@@ -74,11 +74,14 @@ function getBody(ids) {
         'hubmap_id',
         'origin_samples.organ',
         'data_types',
+        'mapped_consortium',
+        'group_name',
+        'group_uuid',
         'donor.mapped_metadata.race',
         'donor.mapped_metadata.sex',
         'donor.mapped_metadata.age_value',
-        'donor.mapped_metadata.age_unit',
         'ancestors',
+        'descendants',
         'donor.uuid',
       ],
     },
@@ -114,31 +117,43 @@ function toLookup(result) {
         uuid,
         origin_samples: [{ organ }],
         data_types: [assay_type],
+        mapped_consortium,
+        group_name,
+        group_uuid,
         donor: {
           mapped_metadata: {
-            sex: [donor_sex],
+            age_value: [donor_age],
             race: [donor_race],
-            age_value: [age_value],
-            age_unit: [age_unit],
+            sex: [donor_sex],
           },
         },
         ancestors,
         donor: { uuid: donor_uuid },
+        descendants,
       },
     } = hit;
 
+    const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()];
+
     lookup.set(hubmap_id, {
-      uuid,
+      organ: mapped_organ,
       organ_source: organ,
-      organ: ORGAN_MAPPING[organ.toUpperCase()],
+      uuid,
       assay_type,
-      dataset_iri: `${HUBMAP_ENTITY_ENDPOINT}${uuid}`,
-      donor_sex,
-      donor_race,
-      donor_age: `${age_value} ${age_unit}`,
-      sample_block_iri: getSampleIri(ancestors, 'block'),
-      sample_section_iri: getSampleIri(ancestors, 'section'),
-      donor_iri: `${HUBMAP_ENTITY_ENDPOINT}${donor_uuid}`,
+      dataset_id: `${HUBMAP_ENTITY_ENDPOINT}${uuid}`,
+      consortium_name: mapped_consortium,
+      provider_name: group_name,
+      provider_uuid: group_uuid,
+      donor_id: `${HUBMAP_ENTITY_ENDPOINT}${donor_uuid}`,
+      donor_age: donor_age ?? '',
+      donor_sex: donor_sex ?? '',
+      donor_race: donor_race ?? '',
+      organ_id: `http://purl.obolibrary.org/obo/UBERON_${
+        mapped_organ.split(':')[1]
+      }`,
+      block_id: getSampleIri(ancestors, 'block'),
+      section_id: getSampleIri(ancestors, 'section'),
+      descendants,
     });
   }
 
