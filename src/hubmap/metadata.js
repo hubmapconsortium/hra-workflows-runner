@@ -145,9 +145,9 @@ function toLookup(result) {
       provider_name: group_name,
       provider_uuid: group_uuid,
       donor_id: `${HUBMAP_ENTITY_ENDPOINT}${donor_uuid}`,
-      donor_age,
-      donor_sex,
-      donor_race,
+      donor_age: donor_age ?? '',
+      donor_sex: donor_sex ?? '',
+      donor_race: donor_race ?? '',
       organ_id: `http://purl.obolibrary.org/obo/UBERON_${
         mapped_organ.split(':')[1]
       }`,

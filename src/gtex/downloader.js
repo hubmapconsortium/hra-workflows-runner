@@ -15,6 +15,7 @@ const GTEX_DOI_URL = 'https://doi.org/10.1126/science.abl4290';
 const GTEX_PUBLICATION_NAME =
   'Single-nucleus cross-tissue molecular reference maps toward understanding disease gene function';
 const GTEX_PUBLICATION_LEAD_AUTHOR = 'GÖKCEN ERASLAN';
+const GTEX_BLOCK_URL = 'https://gtexportal.org/home/tissue/';
 
 const ORGAN_MAPPING = {
   bladder: 'UBERON:0001255',
@@ -108,5 +109,13 @@ export class Downloader {
     dataset.organ_id = `http://purl.obolibrary.org/obo/UBERON_${
       dataset.organ.split(':')[1]
     }`;
+
+    // Parse tissue_site line. Format: `donor_id: X\n`
+    const tissue_site_match = /tissue_site:(.+)\n/i.exec(stdout);
+    dataset.block_id =
+      `${GTEX_BLOCK_URL}${tissue_site_match?.[1]
+        .trim()
+        .replace(/[^a-zA-Z]+/g, '_')
+        .replace(/_$/, '')}` ?? '';
   }
 }

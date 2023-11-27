@@ -9,6 +9,7 @@ ORGAN_COLUMN = os.environ.get("GTEX_COLUMN_ORGAN", "Tissue")
 SEX_COLUMN = os.environ.get("GTEX_COLUMN_SEX", "Sex")
 AGE_COLUMN = os.environ.get("GTEX_COLUMN_AGE", "Age_bin")
 DONOR_ID_COLUMN = os.environ.get("GTEX_COLUMN_DONOR", "participant_id")
+TISSUE_SITE_COLUMN = os.environ.get("GTEX_COLUMN_DONOR", "Tissue Site Detail")
 
 
 def main(args: argparse.Namespace):
@@ -20,6 +21,7 @@ def main(args: argparse.Namespace):
     print("sex:", subset.obs[SEX_COLUMN][0], flush=True)
     print("age:", subset.obs[AGE_COLUMN][0], flush=True)
     print("donor_id:", subset.obs[DONOR_ID_COLUMN][0], flush=True)
+    print("tissue_site:", subset.obs[TISSUE_SITE_COLUMN][0], flush=True)
 
 
 def _get_arg_parser() -> argparse.ArgumentParser:
