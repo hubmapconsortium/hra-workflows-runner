@@ -16,6 +16,7 @@ const GTEX_PUBLICATION_NAME =
   'Single-nucleus cross-tissue molecular reference maps toward understanding disease gene function';
 const GTEX_PUBLICATION_LEAD_AUTHOR = 'GÖKCEN ERASLAN';
 const GTEX_BLOCK_URL = 'https://gtexportal.org/home/tissue/';
+const GTEX_PORTAL_LINK = 'https://gtexportal.org/home/singleCellOverviewPage';
 
 const ORGAN_MAPPING = {
   bladder: 'UBERON:0001255',
@@ -74,6 +75,11 @@ export class Downloader {
       dataset.publication = GTEX_DOI_URL;
       dataset.publication_name = GTEX_PUBLICATION_NAME;
       dataset.publication_lead_author = GTEX_PUBLICATION_LEAD_AUTHOR;
+      dataset.consortium_name = 'GTEx';
+      dataset.provider_name = 'GTEx';
+      dataset.provider_uuid = '083882bb-6cc6-4c12-a205-eac37c1a2640';
+      dataset.dataset_link = GTEX_PORTAL_LINK;
+      dataset.dataset_technology = 'OTHER';
     }
   }
 
@@ -92,7 +98,7 @@ export class Downloader {
     dataset.organ_source = organ_match?.[1].trim() ?? '';
 
     const organ = dataset.organ_source.toLowerCase();
-    dataset.organ = ORGAN_MAPPING[organ];
+    dataset.organ = ORGAN_MAPPING[organ] ?? '';
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
@@ -106,11 +112,11 @@ export class Downloader {
     const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
     dataset.donor_id = donor_id_match?.[1].trim() ?? '';
 
-    dataset.organ_id = `http://purl.obolibrary.org/obo/UBERON_${
-      dataset.organ.split(':')[1]
-    }`;
+    dataset.organ_id = dataset.organ
+      ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}`
+      : '';
 
-    // Parse tissue_site line. Format: `donor_id: X\n`
+    // Parse tissue_site line. Format: `tissue_site: X\n`
     const tissue_site_match = /tissue_site:(.+)\n/i.exec(stdout);
     dataset.block_id =
       `${GTEX_BLOCK_URL}${tissue_site_match?.[1]

@@ -8,8 +8,8 @@ ID_COLUMN = os.environ.get("GTEX_COLUMN_ID", "Sample ID")
 ORGAN_COLUMN = os.environ.get("GTEX_COLUMN_ORGAN", "Tissue")
 SEX_COLUMN = os.environ.get("GTEX_COLUMN_SEX", "Sex")
 AGE_COLUMN = os.environ.get("GTEX_COLUMN_AGE", "Age_bin")
-DONOR_ID_COLUMN = os.environ.get("GTEX_COLUMN_DONOR", "participant_id")
-TISSUE_SITE_COLUMN = os.environ.get("GTEX_COLUMN_DONOR", "Tissue Site Detail")
+DONOR_ID_COLUMN = os.environ.get("GTEX_COLUMN_DONOR", "Participant ID")
+TISSUE_SITE_COLUMN = os.environ.get("GTEX_COLUMN_TISSUE_SITE", "Tissue Site Detail")
 
 
 def main(args: argparse.Namespace):
