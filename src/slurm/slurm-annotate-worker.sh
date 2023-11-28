@@ -11,6 +11,7 @@
 #SBATCH --time=1:00:00
 #SBATCH --mem=128G
 
+module load nodejs
 module load python
 module load singularity
 

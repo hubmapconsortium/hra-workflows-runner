@@ -11,6 +11,7 @@
 #SBATCH --mem=32G
 #SBATCH -A r00355
 
+module load nodejs
 module load python
 module load singularity
 
