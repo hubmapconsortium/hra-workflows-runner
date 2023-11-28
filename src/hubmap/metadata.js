@@ -8,6 +8,7 @@
  * @property {string} donor_sex
  * @property {string} donor_race
  * @property {string} donor_age
+ * @property {string} donor_bmi
  * @property {string} block_sample_iri
  * @property {string} section_sample_iri
  * @property {string} donor_iri
@@ -15,6 +16,8 @@
 
 const HUBMAP_ENTITY_ENDPOINT =
   'https://entity.api.hubmapconsortium.org/entities/';
+const HUBMAP_PORTAL_ENDPOINT =
+  'https://portal.hubmapconsortium.org/browse/dataset/';
 
 const ORGAN_MAPPING = {
   AO: 'UBERON:0000948',
@@ -80,8 +83,8 @@ function getBody(ids) {
         'donor.mapped_metadata.race',
         'donor.mapped_metadata.sex',
         'donor.mapped_metadata.age_value',
+        'donor.mapped_metadata.body_mass_index_value',
         'ancestors',
-        'descendants',
         'donor.uuid',
       ],
     },
@@ -125,11 +128,11 @@ function toLookup(result) {
             age_value: [donor_age],
             race: [donor_race],
             sex: [donor_sex],
+            body_mass_index_value: [donor_bmi],
           },
         },
         ancestors,
         donor: { uuid: donor_uuid },
-        descendants,
       },
     } = hit;
 
@@ -141,19 +144,21 @@ function toLookup(result) {
       uuid,
       assay_type,
       dataset_id: `${HUBMAP_ENTITY_ENDPOINT}${uuid}`,
+      dataset_link: `${HUBMAP_PORTAL_ENDPOINT}${uuid}`,
+      dataset_technology: 'OTHER',
       consortium_name: mapped_consortium,
       provider_name: group_name,
       provider_uuid: group_uuid,
       donor_id: `${HUBMAP_ENTITY_ENDPOINT}${donor_uuid}`,
       donor_age: donor_age ?? '',
       donor_sex: donor_sex ?? '',
+      donor_bmi: donor_bmi ?? '',
       donor_race: donor_race ?? '',
       organ_id: `http://purl.obolibrary.org/obo/UBERON_${
         mapped_organ.split(':')[1]
       }`,
       block_id: getSampleIri(ancestors, 'block'),
       section_id: getSampleIri(ancestors, 'section'),
-      descendants,
     });
   }
 
