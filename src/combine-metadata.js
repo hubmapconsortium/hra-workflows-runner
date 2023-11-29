@@ -40,6 +40,8 @@ const METADATA_FIELDS = [
   'organ_id',
   'block_id',
   'section_id',
+
+  'rui_location',
 ];
 
 async function readMetadata(item, config) {
