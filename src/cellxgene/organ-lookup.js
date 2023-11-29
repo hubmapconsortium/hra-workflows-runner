@@ -5,6 +5,12 @@ const REF_ORGANS_ENDPOINT =
   'https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/ccf//ref-organ-terms';
 const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
 
+const EXTRA_ORGANS = {
+  blood: 'UBERON:0000178',
+  bone_marrow: 'UBERON:0002371',
+  adipose_tissue: 'UBERON:0001013',
+};
+
 async function getOrgans() {
   const resp = await fetch(REF_ORGANS_ENDPOINT, {
     headers: {
@@ -69,7 +75,15 @@ export async function getOrganLookup(ids) {
   const organs = await getOrgans();
   const tissueIds = ids.filter((id) => !organs.includes(id));
   const organToOrganPairs = organs.map((organ) => [organ, organ]);
+  const extraOrganPairs = Object.values(EXTRA_ORGANS).map((organ) => [
+    organ,
+    organ,
+  ]);
   const tissueToOrganPairs = await getLookup(organs, tissueIds);
 
-  return new Map([...organToOrganPairs, ...tissueToOrganPairs]);
+  return new Map([
+    ...organToOrganPairs,
+    ...extraOrganPairs,
+    ...tissueToOrganPairs,
+  ]);
 }
