@@ -14,9 +14,11 @@ const DEFAULT_GTEX_FULL_DATA_URL =
 const GTEX_DOI_URL = 'https://doi.org/10.1126/science.abl4290';
 const GTEX_PUBLICATION_NAME =
   'Single-nucleus cross-tissue molecular reference maps toward understanding disease gene function';
-const GTEX_PUBLICATION_LEAD_AUTHOR = 'GÖKCEN ERASLAN';
+const GTEX_PUBLICATION_LEAD_AUTHOR = 'Gökcen Eraslan';
 const GTEX_BLOCK_URL = 'https://gtexportal.org/home/tissue/';
 const GTEX_PORTAL_LINK = 'https://gtexportal.org/home/singleCellOverviewPage';
+const GTEX_EXTRACTION_SITES =
+  'https://hubmapconsortium.github.io/hra-registrations/gtex-pan-eraslan-2022/rui_locations.jsonld';
 
 const ORGAN_MAPPING = {
   bladder: 'UBERON:0001255',
@@ -38,6 +40,7 @@ const ORGAN_MAPPING = {
   trachea: 'UBERON:0003126',
   uterus: 'UBERON:0000995',
   vasculature: 'UBERON:0004537',
+  breast: 'UBERON:0001911',
 };
 
 const execFile = promisify(callbackExecFile);
@@ -65,6 +68,20 @@ export class Downloader {
     );
   }
 
+  async fetchExtractionSiteLookup() {
+    const req = await fetch(GTEX_EXTRACTION_SITES);
+    const donors = await req.json();
+    const lookup = {};
+    for (const donor of donors['@graph']) {
+      for (const block of donor.samples) {
+        const tissueSite = block.link;
+        const extractionSite = JSON.stringify(block.rui_location);
+        lookup[tissueSite] = extractionSite;
+      }
+    }
+    return lookup;
+  }
+
   async prepareDownload(datasets) {
     await downloadFile(this.dataFilePath, this.dataUrl, {
       overwrite: this.config.get(FORCE, false),
@@ -73,7 +90,7 @@ export class Downloader {
     for (const dataset of datasets) {
       dataset.dataset_id = `${GTEX_DOI_URL}#${dataset.id}`;
       dataset.publication = GTEX_DOI_URL;
-      dataset.publication_name = GTEX_PUBLICATION_NAME;
+      dataset.publication_title = GTEX_PUBLICATION_NAME;
       dataset.publication_lead_author = GTEX_PUBLICATION_LEAD_AUTHOR;
       dataset.consortium_name = 'GTEx';
       dataset.provider_name = 'GTEx';
@@ -81,6 +98,8 @@ export class Downloader {
       dataset.dataset_link = GTEX_PORTAL_LINK;
       dataset.dataset_technology = 'OTHER';
     }
+
+    this.extractionSiteLookup = await this.fetchExtractionSiteLookup();
   }
 
   async download(dataset) {
@@ -110,7 +129,7 @@ export class Downloader {
 
     // Parse donor_id line. Format: `donor_id: X\n`
     const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
-    dataset.donor_id = donor_id_match?.[1].trim() ?? '';
+    dataset.donor_id = `${GTEX_DOI_URL}#${donor_id_match?.[1].trim()}` ?? '';
 
     dataset.organ_id = dataset.organ
       ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}`
@@ -118,10 +137,14 @@ export class Downloader {
 
     // Parse tissue_site line. Format: `tissue_site: X\n`
     const tissue_site_match = /tissue_site:(.+)\n/i.exec(stdout);
-    dataset.block_id =
+    const tissueSite =
       `${GTEX_BLOCK_URL}${tissue_site_match?.[1]
         .trim()
         .replace(/[^a-zA-Z]+/g, '_')
         .replace(/_$/, '')}` ?? '';
+
+    dataset.rui_location = this.extractionSiteLookup[tissueSite] ?? '';
+
+    dataset.block_id = `${dataset.dataset_id}_TissueBlock`;
   }
 }
