@@ -16,6 +16,9 @@ import { groupBy } from '../util/iter.js';
  * @property {string} provider_name
  */
 
+const CELLXGENE_PORTAL_ENDPOINT =
+  'https://cellxgene.cziscience.com/collections/';
+
 /**
  * Parses metadata from an id
  *
@@ -37,7 +40,7 @@ export async function downloadCollectionMetadata(url) {
 }
 
 export function parseCollectionMetadata(raw) {
-  const { id, datasets, name, consortia, curator_name } = raw;
+  const { id, datasets, name } = raw;
   const validDatasets = filterNonDiseasedHumanDatasets(datasets);
   const { primary, secondary } = partitionDatasetsByType(validDatasets);
   const selectedDatasets = selectDatasetUsingCellCount(primary, secondary);
@@ -46,11 +49,14 @@ export function parseCollectionMetadata(raw) {
     assets: getAssets(selectedDatasets),
     donorTissuePairs: getDonorTissuePairs(selectedDatasets),
     tissueIdLookup: getTissueIdLookup(selectedDatasets),
+    dataset_link: `${CELLXGENE_PORTAL_ENDPOINT}${id}`,
+    dataset_technology: 'OTHER',
     publication: getPublicationDOI(raw),
     publication_title: name,
     publication_lead_author: getPublicationLeadAuthor(raw),
-    consortium_name: consortia,
-    provider_name: curator_name,
+    consortium_name: 'CxG', //alternate: consortia from raw
+    provider_name: 'CxG', //alternate: curator_name from raw
+    provider_uuid: 'f6841a8a-cef2-4421-b632-fc34ff5c27d8',
     assay_type: getAssayType(selectedDatasets),
   });
 }
@@ -131,13 +137,21 @@ function getPublicationDOI(raw) {
 }
 
 function getPublicationLeadAuthor(raw) {
-  const {
-    publisher_metadata: { authors: publication_authors },
-  } = raw;
-  return `${publication_authors[0].given} ${publication_authors[0].family}`;
+  try {
+    const {
+      publisher_metadata: { authors: publication_authors },
+    } = raw;
+    return (
+      `${publication_authors[0].given} ${publication_authors[0].family}` ?? ''
+    );
+  } catch {
+    return '';
+  }
 }
 
 function getAssayType(datasets) {
   const assayTypesArray = datasets.map(({ assay }) => assay).flat();
-  return Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse);Vi
+  return JSON.stringify(
+    Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse)
+  );
 }

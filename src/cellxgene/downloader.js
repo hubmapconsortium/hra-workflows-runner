@@ -36,10 +36,7 @@ export class Downloader {
     /** @type {Config} */
     this.config = config;
     /** @type {string} */
-    this.endpoint = config.get(
-      CELLXGENE_API_ENDPOINT,
-      DEFAULT_CELLXGENE_API_ENDPOINT
-    );
+    this.endpoint = config.get(CELLXGENE_API_ENDPOINT, DEFAULT_CELLXGENE_API_ENDPOINT);
     /** @type {Map<string, Dataset[]>} */
     this.datasetsByCollection = new Map();
     /** @type {Cache<string, Promise<import('./metadata.js').CollectionMetadata>>} */
@@ -51,27 +48,16 @@ export class Downloader {
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
-    this.extractScriptFilePath = getSrcFilePath(
-      config,
-      'cellxgene',
-      this.extractScriptFile
-    );
+    this.extractScriptFilePath = getSrcFilePath(config, 'cellxgene', this.extractScriptFile);
     this.extractMetdataScriptFile = 'extract_donor_metadata.py';
     /** @type {string} */
-    this.extractMetdataScriptFilePath = getSrcFilePath(
-      config,
-      'cellxgene',
-      this.extractMetdataScriptFile
-    );
+    this.extractMetdataScriptFilePath = getSrcFilePath(config, 'cellxgene', this.extractMetdataScriptFile);
   }
 
   async prepareDownload(datasets) {
     datasets = await this.attachMetadata(datasets);
     datasets = await this.lookupOrgan(datasets);
-    this.datasetsByCollection = groupBy(
-      datasets,
-      ({ collection }) => collection
-    );
+    this.datasetsByCollection = groupBy(datasets, ({ collection }) => collection);
 
     return datasets;
   }
@@ -87,10 +73,7 @@ export class Downloader {
       throw new Error('No data for donor-tissue combination');
     }
 
-    const { stdout } = await execFile('python3', [
-      this.extractMetdataScriptFilePath,
-      dataset.dataFilePath,
-    ]);
+    const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
@@ -98,31 +81,27 @@ export class Downloader {
 
     // Parse age line. Format: `age: X\n`
     const age_match = /age:(.+)\n/i.exec(stdout);
-    dataset.donor_age = age_match?.[1].trim() ?? '';
+    dataset.donor_development_stage = age_match?.[1].trim() ?? '';
 
     // Parse age line. Format: `age: X\n`
     const ethnicity_match = /ethnicity:(.+)\n/i.exec(stdout);
     dataset.donor_race = ethnicity_match?.[1].trim() ?? '';
 
-    dataset.organ_id = `http://purl.obolibrary.org/obo/UBERON_${
-      dataset.organ.split(':')[1]
-    }`;
+    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
+
+    dataset.block_id = `${dataset.id}_Block`;
+    dataset.dataset_id = dataset.id;
   }
 
   async downloadCollection(collection) {
     const url = new URL(`${COLLECTIONS_PATH}${collection}`, this.endpoint);
     return this.collectionCache.setDefaultFn(collection, () =>
-      logEvent('CellXGene:DownloadCollection', collection, () =>
-        downloadCollectionMetadata(url)
-      )
+      logEvent('CellXGene:DownloadCollection', collection, () => downloadCollectionMetadata(url))
     );
   }
 
   async downloadAssets(/** @type {any[]} */ assets) {
-    const maxConcurrency = this.config.get(
-      MAX_CONCURRENCY,
-      DEFAULT_MAX_CONCURRENCY
-    );
+    const maxConcurrency = this.config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
     const downloadAsset = ({ id, dataset }) =>
       this.assetCache.setDefaultFn(id, async () => {
         const pathname = `${ASSETS_PATH}${dataset}/asset/${id}`;
@@ -131,10 +110,7 @@ export class Downloader {
         checkFetchResponse(resp, 'CellXGene asset download failed');
 
         const { presigned_url } = await resp.json();
-        const outputFile = join(
-          getCacheDir(this.config),
-          `cellxgene-${id}.h5ad`
-        );
+        const outputFile = join(getCacheDir(this.config), `cellxgene-${id}.h5ad`);
 
         await logEvent('CellXGene:DownloadAsset', id, () =>
           downloadFile(outputFile, presigned_url, {
@@ -151,20 +127,36 @@ export class Downloader {
   }
 
   async attachMetadata(datasets) {
-    const maxConcurrency = this.config.get(
-      MAX_CONCURRENCY,
-      DEFAULT_MAX_CONCURRENCY
-    );
+    const maxConcurrency = this.config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
     const attach = async (dataset) => {
       const metadata = parseMetadataFromId(dataset.id);
-      const { assets, tissueIdLookup, publication } =
-        await this.downloadCollection(metadata.collection);
+      const {
+        assets,
+        tissueIdLookup,
+        dataset_link,
+        dataset_technology,
+        publication,
+        publication_title,
+        publication_lead_author,
+        consortium_name,
+        provider_name,
+        provider_uuid,
+        assay_type,
+      } = await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
       Object.assign(dataset, metadata, {
         assets,
         tissueId,
+        dataset_link,
+        dataset_technology,
         publication,
+        publication_title,
+        publication_lead_author,
+        consortium_name,
+        provider_name,
+        provider_uuid,
+        assay_type,
       });
     };
 
@@ -173,9 +165,7 @@ export class Downloader {
   }
 
   async lookupOrgan(datasets) {
-    const tissueIds = datasets
-      .map(({ tissueId }) => tissueId)
-      .filter((id) => UBERON_ID_REGEX.test(id));
+    const tissueIds = datasets.map(({ tissueId }) => tissueId).filter((id) => UBERON_ID_REGEX.test(id));
     const uniqueTissueIds = Array.from(new Set(tissueIds));
     const organLookup = await getOrganLookup(uniqueTissueIds);
 
@@ -194,14 +184,8 @@ export class Downloader {
     return this.extractCache.setDefaultFn(collection, async () => {
       const datasets = this.datasetsByCollection.get(collection);
       const content = this.serializeExtractInfo(datasets, assets, assetFiles);
-      const extractInfoFilePath = join(
-        getCacheDir(this.config),
-        `cellxgene-extract-info-${collection}.json`
-      );
-      const tempExtractDirPath = join(
-        getCacheDir(this.config),
-        `cellxgene-extract-${collection}`
-      );
+      const extractInfoFilePath = join(getCacheDir(this.config), `cellxgene-extract-info-${collection}.json`);
+      const tempExtractDirPath = join(getCacheDir(this.config), `cellxgene-extract-${collection}`);
 
       await writeFile(extractInfoFilePath, content);
       await logEvent('CellXGene:Extract', collection, () =>
