@@ -86,6 +86,7 @@ function getBody(ids) {
         'donor.mapped_metadata.body_mass_index_value',
         'ancestors',
         'donor.uuid',
+        'source_samples',
       ],
     },
   };
@@ -99,12 +100,28 @@ function checkResponse(response) {
   }
 }
 
-function getSampleIri(ancestors, type) {
+function getSampleBlockId(ancestors) {
   for (const ancestor of ancestors) {
-    if (ancestor['entity_type'].toLowerCase() == 'sample') {
-      if (ancestor['sample_category'].toLowerCase() == type) {
-        return `${HUBMAP_ENTITY_ENDPOINT}${ancestor['uuid']}`;
-      }
+    if (
+      ancestor['entity_type'].toLowerCase() == 'sample' &&
+      ancestor['sample_category'].toLowerCase() == 'block'
+    ) {
+      return {
+        block_id: `${HUBMAP_ENTITY_ENDPOINT}${ancestor['uuid']}`,
+        rui_location: ancestor['rui_location'] ?? '',
+      };
+    }
+  }
+  return '';
+}
+
+function getSampleSectionId(ancestors, type) {
+  for (const ancestor of ancestors) {
+    if (
+      ancestor['entity_type'].toLowerCase() == 'sample' &&
+      ancestor['sample_category'].toLowerCase() == 'section'
+    ) {
+      return `${HUBMAP_ENTITY_ENDPOINT}${ancestor['uuid']}`;
     }
   }
   return '';
@@ -125,19 +142,23 @@ function toLookup(result) {
         group_uuid,
         donor: {
           mapped_metadata: {
-            age_value: [donor_age],
-            race: [donor_race],
-            sex: [donor_sex],
-            body_mass_index_value: [donor_bmi],
+            age_value: [donor_age] = [null],
+            race: [donor_race] = [null],
+            sex: [donor_sex] = [null],
+            body_mass_index_value: [donor_bmi] = [null],
+          } = {
+            age_value: [null],
+            race: [null],
+            sex: [null],
+            body_mass_index_value: [null],
           },
+          uuid: donor_uuid,
         },
         ancestors,
-        donor: { uuid: donor_uuid },
       },
     } = hit;
-
     const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()];
-
+    const { block_id, rui_location } = getSampleBlockId(ancestors);
     lookup.set(hubmap_id, {
       organ: mapped_organ,
       organ_source: organ,
@@ -157,8 +178,9 @@ function toLookup(result) {
       organ_id: `http://purl.obolibrary.org/obo/UBERON_${
         mapped_organ.split(':')[1]
       }`,
-      block_id: getSampleIri(ancestors, 'block'),
-      section_id: getSampleIri(ancestors, 'section'),
+      block_id,
+      section_id: getSampleSectionId(ancestors),
+      rui_location,
     });
   }
 
