@@ -3,10 +3,7 @@ import { join } from 'node:path';
 import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
 import { getModelsDir } from '../util/paths.js';
 
-const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
-  (metadata, algorithm) => ({ ...metadata, [algorithm]: false }),
-  {}
-);
+const ALL_DISABLED_METADATA = ALGORITHMS.reduce((metadata, algorithm) => ({ ...metadata, [algorithm]: false }), {});
 
 function getAlgorithmDefaults(config) {
   return {
@@ -46,18 +43,27 @@ function createAlgorithmSpec(algorithm, metadata, defaults) {
 export function createSpec(metadata, config) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
-  const algorithmSpecs = algorithms.map((algorithm) =>
-    createAlgorithmSpec(algorithm, metadata, defaults)
-  );
+  const algorithmSpecs = algorithms
+    .map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults))
+    .concat([
+      {
+        summarize: {
+          annotationMethod: algorithms[0],
+          cellSource: metadata.cellSource,
+        },
+      },
+    ])
+    .concat([
+      {
+        directory: algorithms[0],
+      },
+    ]);
 
   return {
     organ: metadata.organ,
     matrix: {
       class: 'File',
       path: DATA_FILE,
-    },
-    preprocessing: {
-      geneColumn: metadata.geneColumn,
     },
     algorithms: algorithmSpecs,
   };

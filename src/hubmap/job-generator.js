@@ -24,6 +24,7 @@ export class JobGenerator {
       popv: {
         queryLayersKey: 'X',
       },
+      cellSource: dataset.dataset_id,
     };
   }
 }
