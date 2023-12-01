@@ -3,10 +3,10 @@ import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { Config } from '../util/config.js';
-import { downloadFile } from '../util/fs.js';
+import { downloadFile, ensureDirsExist } from '../util/fs.js';
 import { IListing } from '../util/handler.js';
 import { FORCE } from '../util/constants.js';
-import { getCacheDir, getSrcFilePath } from '../util/paths.js';
+import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 
 const GTEX_FULL_DATA_URL = 'GTEX_FULL_DATA_URL';
 const DEFAULT_GTEX_FULL_DATA_URL =
@@ -38,6 +38,9 @@ export class Listing {
   }
 
   async getDatasets() {
+    const config = this.config;
+    await ensureDirsExist(getDataRepoDir(config), getCacheDir(config));
+  
     await downloadFile(this.dataFilePath, this.dataUrl, {
       overwrite: this.config.get(FORCE, false),
     });
