@@ -37,27 +37,18 @@ function createAlgorithmSpec(algorithm, metadata, defaults) {
       ...defaults[algorithm],
       ...metadata[algorithm],
     },
+    summarize: {
+      annotationMethod: algorithm,
+      cellSource: metadata.cellSource,
+    },
+    directory: algorithm,
   };
 }
 
 export function createSpec(metadata, config) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
-  const algorithmSpecs = algorithms
-    .map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults))
-    .concat([
-      {
-        summarize: {
-          annotationMethod: algorithms[0],
-          cellSource: metadata.cellSource,
-        },
-      },
-    ])
-    .concat([
-      {
-        directory: algorithms[0],
-      },
-    ]);
+  const algorithmSpecs = algorithms.map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults));
 
   return {
     organ: metadata.organ,
