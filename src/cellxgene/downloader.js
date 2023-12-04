@@ -75,6 +75,8 @@ export class Downloader {
 
     const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
 
+    dataset.donor_id = dataset.id.split('$')[0];
+
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
     dataset.donor_sex = sex_match?.[1].trim() ?? '';

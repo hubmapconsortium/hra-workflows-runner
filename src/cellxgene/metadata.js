@@ -16,8 +16,7 @@ import { groupBy } from '../util/iter.js';
  * @property {string} provider_name
  */
 
-const CELLXGENE_PORTAL_ENDPOINT =
-  'https://cellxgene.cziscience.com/collections/';
+const CELLXGENE_PORTAL_ENDPOINT = 'https://cellxgene.cziscience.com/collections/';
 
 /**
  * Parses metadata from an id
@@ -62,20 +61,16 @@ export function parseCollectionMetadata(raw) {
 }
 
 function filterNonDiseasedHumanDatasets(datasets) {
-  const someLabelMatchesICase = (items, value) =>
-    items.some(({ label }) => label.toLowerCase() === value);
+  const someLabelMatchesICase = (items, value) => items.some(({ label }) => label.toLowerCase() === value);
 
   return datasets.filter(
     ({ disease, organism }) =>
-      someLabelMatchesICase(disease, 'normal') &&
-      someLabelMatchesICase(organism, 'homo sapiens')
+      someLabelMatchesICase(disease, 'normal') && someLabelMatchesICase(organism, 'homo sapiens')
   );
 }
 
 function partitionDatasetsByType(datasets) {
-  const grouped = groupBy(datasets, ({ is_primary_data }) =>
-    is_primary_data.toLowerCase()
-  );
+  const grouped = groupBy(datasets, ({ is_primary_data }) => is_primary_data.toLowerCase());
 
   return {
     primary: grouped.get('primary') ?? [],
@@ -84,8 +79,7 @@ function partitionDatasetsByType(datasets) {
 }
 
 function selectDatasetUsingCellCount(primary, secondary) {
-  const sumCellCounts = (items) =>
-    items.reduce((acc, { cell_count }) => acc + cell_count, 0);
+  const sumCellCounts = (items) => items.reduce((acc, { cell_count }) => acc + cell_count, 0);
 
   const primaryCount = sumCellCounts(primary);
   const secondaryCount = sumCellCounts(secondary);
@@ -110,10 +104,7 @@ function getDonorTissuePairs(datasets) {
     )
   );
 
-  const uniquePairs = Array.from(
-    new Set(pairsArray.map(JSON.stringify)),
-    JSON.parse
-  );
+  const uniquePairs = Array.from(new Set(pairsArray.map(JSON.stringify)), JSON.parse);
 
   return uniquePairs;
 }
@@ -122,10 +113,7 @@ function getTissueIdLookup(datasets) {
   const items = datasets
     .map(({ tissue }) => tissue)
     .flat()
-    .map(({ label, ontology_term_id }) => [
-      label.toLowerCase(),
-      ontology_term_id,
-    ]);
+    .map(({ label, ontology_term_id }) => [label.toLowerCase(), ontology_term_id]);
 
   return new Map(items);
 }
@@ -141,9 +129,7 @@ function getPublicationLeadAuthor(raw) {
     const {
       publisher_metadata: { authors: publication_authors },
     } = raw;
-    return (
-      `${publication_authors[0].given} ${publication_authors[0].family}` ?? ''
-    );
+    return `${publication_authors[0].given} ${publication_authors[0].family}` ?? '';
   } catch {
     return '';
   }
@@ -151,7 +137,5 @@ function getPublicationLeadAuthor(raw) {
 
 function getAssayType(datasets) {
   const assayTypesArray = datasets.map(({ assay }) => assay).flat();
-  return JSON.stringify(
-    Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse)
-  );
+  return JSON.stringify(Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse));
 }
