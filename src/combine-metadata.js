@@ -5,12 +5,7 @@ import { DatasetSummaries } from './dataset/summary.js';
 import { getConfig, loadJson } from './util/common.js';
 import { concurrentMap } from './util/concurrent-map.js';
 import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from './util/constants.js';
-import {
-  getDatasetFilePath,
-  getDirForId,
-  getOutputDir,
-  getSummariesFilePath,
-} from './util/paths.js';
+import { getDatasetFilePath, getDirForId, getOutputDir, getSummariesFilePath } from './util/paths.js';
 
 const METADATA_FIELDS = [
   'id',
@@ -59,14 +54,12 @@ async function main() {
   const config = getConfig();
   const maxConcurrency = config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
-  const metadata = await concurrentMap(
-    Array.from(summaries.values()),
-    (item) => readMetadata(item, config),
-    { maxConcurrency }
-  );
+  const metadata = await concurrentMap(Array.from(summaries.values()), (item) => readMetadata(item, config), {
+    maxConcurrency,
+  });
   const items = metadata.filter((item) => !!item);
 
-  const outputFile = join(getOutputDir(config), 'metadata.csv');
+  const outputFile = join(getOutputDir(config), 'bulk-dataset-metadata.csv');
   const content = Papa.unparse({
     data: items,
     fields: METADATA_FIELDS,
