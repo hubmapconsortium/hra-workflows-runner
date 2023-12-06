@@ -3,9 +3,10 @@ import os
 from pathlib import Path
 import anndata
 
-SEX_COLUMN = os.environ.get("GTEX_COLUMN_SEX", "sex")
-AGE_COLUMN = os.environ.get("GTEX_COLUMN_AGE", "development_stage")
-ETHNICITY_COLUMN = os.environ.get("GTEX_COLUMN_AGE", "self_reported_ethnicity")
+SEX_COLUMN = os.environ.get("CELLXGENE_COLUMN_SEX", "sex")
+AGE_COLUMN = os.environ.get("CELLXGENE_COLUMN_AGE", "development_stage")
+ETHNICITY_COLUMN = os.environ.get("CELLXGENE_COLUMN_AGE", "self_reported_ethnicity")
+
 
 def main(args: argparse.Namespace):
     data = anndata.read_h5ad(args.file)
