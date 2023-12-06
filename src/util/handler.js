@@ -111,9 +111,7 @@ export async function loadDatasetHandlers(config) {
   const fallbackHandlerName = 'default-dataset-handler';
   const handlerNames = config.get(DATASET_HANDLERS, DEFAULT_DATASET_HANDLERS);
   const handlerNamesWithFallback = [...handlerNames, fallbackHandlerName];
-  const handlerModules = await concurrentMap(handlerNamesWithFallback, (name) =>
-    loadDatasetHandler(name, config)
-  );
+  const handlerModules = await concurrentMap(handlerNamesWithFallback, (name) => loadDatasetHandler(name, config));
   const handlers = handlerModules.filter(verifyDatasetHandler);
 
   return new Map(handlers);
@@ -131,8 +129,8 @@ async function loadDatasetHandler(name, config) {
 
   try {
     return [name, await import(path)];
-  } catch {
-    const msg = `Failed to load dataset handler '${name}' using path '${path}'`;
+  } catch (error) {
+    const msg = `Failed to load dataset handler '${name}' using path '${path}'. Cause: ${error.message}`;
     console.warn(msg);
     return undefined;
   }

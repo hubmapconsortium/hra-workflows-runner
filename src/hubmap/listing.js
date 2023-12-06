@@ -1,36 +1,14 @@
-import { Config } from '../util/config.js';
-import { checkFetchResponse } from '../util/fs.js';
 import { IListing } from '../util/handler.js';
-import { getHeaders } from './metadata.js';
+import { XConsortiaListing } from '../xconsortia/listing.js';
 
 const HUBMAP_TOKEN = 'HUBMAP_TOKEN';
 const HUBMAP_SEARCH_URL = 'HUBMAP_SEARCH_URL';
-const DEFAULT_HUBMAP_SEARCH_URL =
-  'https://search.api.hubmapconsortium.org/v3/portal/search';
+const DEFAULT_HUBMAP_SEARCH_URL = 'https://search.api.hubmapconsortium.org/v3/portal/search';
 
 /** @implements {IListing} */
-export class Listing {
+export class Listing extends XConsortiaListing {
   constructor(config) {
-    /** @type {Config} */
-    this.config = config;
-    /** @type {string} */
-    this.token = config.get(HUBMAP_TOKEN);
-    /** @type {string} */
-    this.searchUrl = config.get(HUBMAP_SEARCH_URL, DEFAULT_HUBMAP_SEARCH_URL);
-  }
-
-  async getDatasets() {
-    const resp = await fetch(this.searchUrl, {
-      method: 'POST',
-      headers: getHeaders(this.token),
-      body: JSON.stringify(this.getBody()),
-    });
-    checkFetchResponse(resp, 'HuBMAP: Failed to fetch list of collections');
-
-    const {
-      hits: { hits },
-    } = await resp.json();
-    return hits.map(({ _source: { hubmap_id } }) => hubmap_id);
+    super(config, config.get(HUBMAP_TOKEN), config.get(HUBMAP_SEARCH_URL, DEFAULT_HUBMAP_SEARCH_URL), 'hubmap_id');
   }
 
   getBody() {
@@ -44,7 +22,7 @@ export class Listing {
         },
       },
       _source: {
-        includes: ['hubmap_id'],
+        includes: [this.idKeyword],
       },
     };
   }
