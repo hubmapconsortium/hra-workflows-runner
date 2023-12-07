@@ -3,4 +3,6 @@ source constants.sh
 shopt -s extglob
 set -ev
 
-node src/create-initial-listing.js
+if [[ ! -e "$DATASETS_DIR/$DATASET/listing.csv" || "$FORCE" == true ]]; then
+  node src/create-initial-listing.js
+fi
