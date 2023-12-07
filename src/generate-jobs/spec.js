@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
-import { getModelsDir } from '../util/paths.js';
+import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
 const ALL_DISABLED_METADATA = ALGORITHMS.reduce((metadata, algorithm) => ({ ...metadata, [algorithm]: false }), {});
 
@@ -31,12 +31,23 @@ function getEnabledAlgorithms(metadata) {
   return ALGORITHMS.filter((algorithm) => metadata[algorithm] !== false);
 }
 
-function createAlgorithmSpec(algorithm, metadata, defaults) {
+function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExists) {
   return {
     [algorithm]: {
       ...defaults[algorithm],
       ...metadata[algorithm],
     },
+    ...(crosswalkExists && {
+      crosswalk: {
+        table: {
+          class: 'File',
+          path: getCrosswalkingFilePath(config, algorithm),
+        },
+        tableLabelColumn: `${algorithm.charAt(0).toUpperCase() + algorithm.slice(1)}_Label`,
+        tableClidColumn: 'CL_ID',
+        tableMatchColumn: 'CL_Match',
+      },
+    }),
     summarize: {
       annotationMethod: algorithm,
       cellSource: metadata.cellSource,
@@ -45,10 +56,12 @@ function createAlgorithmSpec(algorithm, metadata, defaults) {
   };
 }
 
-export function createSpec(metadata, config) {
+export function createSpec(metadata, config, crosswalks) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
-  const algorithmSpecs = algorithms.map((algorithm) => createAlgorithmSpec(algorithm, metadata, defaults));
+  const algorithmSpecs = algorithms.map((algorithm) =>
+    createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalks[algorithm])
+  );
 
   return {
     organ: metadata.organ,
@@ -60,7 +73,7 @@ export function createSpec(metadata, config) {
   };
 }
 
-export function createSpecs(metadata, config) {
+export function createSpecs(metadata, config, crosswalks) {
   const result = {};
   for (const algorithm of getEnabledAlgorithms(metadata)) {
     const newMetadata = {
@@ -68,7 +81,7 @@ export function createSpecs(metadata, config) {
       ...ALL_DISABLED_METADATA,
       [algorithm]: metadata[algorithm],
     };
-    result[algorithm] = createSpec(newMetadata, config);
+    result[algorithm] = createSpec(newMetadata, config, crosswalks);
   }
 
   return result;

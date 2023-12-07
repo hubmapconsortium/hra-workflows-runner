@@ -6,6 +6,7 @@ export const DATASET_HANDLERS = 'DATASET_HANDLERS';
 export const DATASET = 'DATASET';
 export const VERSION = 'VERSION';
 export const DATASETS_DIR = 'DATASETS_DIR';
+export const CROSSWALKING_TABLES_DIR = 'CROSSWALKING_TABLES_DIR';
 export const OUTPUT_DIR = 'OUTPUT_DIR';
 export const DATA_REPO_DIR = 'DATA_REPO_DIR';
 export const CACHE_DIR = 'CACHE_DIR';

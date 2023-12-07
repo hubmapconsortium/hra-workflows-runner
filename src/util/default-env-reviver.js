@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import {
   CACHE_DIR,
+  CROSSWALKING_TABLES_DIR,
   DATASETS_DIR,
   DATASET_HANDLERS,
   DATA_REPO_DIR,
@@ -37,6 +38,7 @@ export function defaultEnvReviver(key, value) {
     case DATA_REPO_DIR:
     case CACHE_DIR:
     case MODELS_DIR:
+    case CROSSWALKING_TABLES_DIR:
     case SRC_DIR:
       return resolve(value);
 

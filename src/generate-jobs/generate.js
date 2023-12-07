@@ -1,14 +1,22 @@
 import { writeFile } from 'node:fs/promises';
 import { getSummaryRef } from '../util/common.js';
 import { concurrentMap } from '../util/concurrent-map.js';
-import {
-  ALGORITHMS,
-  DEFAULT_MAX_CONCURRENCY,
-  MAX_CONCURRENCY,
-} from '../util/constants.js';
+import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
 import { createSpecs } from './spec.js';
 import { getJobGeneratorRef } from './utils.js';
 import { UnknownOrganError } from '../util/errors.js';
+import { getCrosswalkingFilePath } from '../util/paths.js';
+import { fileExists } from '../util/fs.js';
+
+async function crosswalkExists(config) {
+  const result = {};
+  await concurrentMap(ALGORITHMS, async (algorithm) => {
+    const path = getCrosswalkingFilePath(config, algorithm);
+    result[algorithm] = await fileExists(path);
+  });
+
+  return result;
+}
 
 async function tryGenerateJobs(dataset, config) {
   const ref = getSummaryRef(dataset);
@@ -21,7 +29,8 @@ async function tryGenerateJobs(dataset, config) {
       }
     });
 
-    const specs = createSpecs(metadata, config);
+    const crosswalks = await crosswalkExists(config);
+    const specs = createSpecs(metadata, config, crosswalks);
     for (const algorithm in specs) {
       const spec = specs[algorithm];
       const specString = JSON.stringify(spec, undefined, 2);

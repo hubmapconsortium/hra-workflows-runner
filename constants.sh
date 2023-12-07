@@ -17,6 +17,7 @@ _=${VERSION:?"No version selected!"}
 # Shorthands and configuration options
 export RUNNER=${RUNNER:-"docker"}
 export DATASETS_DIR=${DATASETS_DIR:-"./datasets"}
+export CROSSWALKING_TABLES_DIR=${CROSSWALKING_TABLES_DIR:-"./crosswalking-tables"}
 export RAW_DATA_DIR=${RAW_DATA_DIR:-"./raw-data"}
 export OUTPUT_DIR="$RAW_DATA_DIR/$DATASET/$VERSION"
 export DATA_REPO_DIR="$RAW_DATA_DIR/data-repo"

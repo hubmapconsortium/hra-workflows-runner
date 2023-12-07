@@ -6,6 +6,7 @@ import {
   CACHE_DIR,
   DATASET,
   DATASETS_DIR,
+  CROSSWALKING_TABLES_DIR,
   DATASET_FILE,
   DATASET_LIST,
   DATA_FILE,
@@ -99,10 +100,7 @@ export function getSrcDir(config) {
  * @param {Config} config Configuration
  */
 export function getDatasetListFilePath(config) {
-  return join(
-    getDatasetDir(config),
-    config.get(DATASET_LIST, DEFAULT_DATASET_LIST)
-  );
+  return join(getDatasetDir(config), config.get(DATASET_LIST, DEFAULT_DATASET_LIST));
 }
 
 /**
@@ -185,11 +183,7 @@ export function getAlgorithmReportFilePath(config, dir, algorithm) {
  * @param {string} algorithm Algorithm
  */
 export function getAlgorithmSummaryJsonLdFilePath(config, dir, algorithm) {
-  return join(
-    getDataDir(config, dir),
-    algorithm,
-    ALGORITHM_SUMMARY_JSON_LD_FILE
-  );
+  return join(getDataDir(config, dir), algorithm, ALGORITHM_SUMMARY_JSON_LD_FILE);
 }
 
 /**
@@ -200,4 +194,14 @@ export function getAlgorithmSummaryJsonLdFilePath(config, dir, algorithm) {
  */
 export function getSrcFilePath(config, ...paths) {
   return join(getSrcDir(config), ...paths);
+}
+
+/**
+ * Get the Crosswalking Table file
+ *
+ * @param {Config} config Configuration
+ * @param {string} algorithm Algorithm
+ */
+export function getCrosswalkingFilePath(config, algorithm) {
+  return join(config.get(CROSSWALKING_TABLES_DIR), `${algorithm}.csv`);
 }
