@@ -1,16 +1,23 @@
 import Papa from 'papaparse';
 import { checkFetchResponse } from '../util/fs.js';
 
-const REF_ORGANS_ENDPOINT =
-  'https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/ccf//ref-organ-terms';
+/** Endpoint to get available organs */
+const REF_ORGANS_ENDPOINT = 'https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/ccf//ref-organ-terms';
+/** Endpoint to do tissue to organ query */
 const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
 
+/** Extra organs not returned by getOrgans() */
 const EXTRA_ORGANS = {
   blood: 'UBERON:0000178',
   bone_marrow: 'UBERON:0002371',
   adipose_tissue: 'UBERON:0001013',
 };
 
+/**
+ * Gets available organs
+ *
+ * @returns {Promise<string[]>}
+ */
 async function getOrgans() {
   const resp = await fetch(REF_ORGANS_ENDPOINT, {
     headers: {
@@ -28,6 +35,13 @@ async function getOrgans() {
     .filter((id) => id.startsWith('UBERON'));
 }
 
+/**
+ * Get tissue to organ lookup pairs
+ *
+ * @param {string[]} organs Available organs
+ * @param {string[]} ids Tissue ids
+ * @returns {Promise<[string, string][]>}
+ */
 async function getLookup(organs, ids) {
   const serializeIds = (ids) => ids.map((id) => `(${id})`).join(' ');
   const query = `
@@ -71,19 +85,18 @@ async function getLookup(organs, ids) {
   return tissueToOrganPairs;
 }
 
+/**
+ * Creates a mapping from tissue id to organ id
+ *
+ * @param {string[]} ids Tissue ids
+ * @returns {Promise<Map<string, string>>}
+ */
 export async function getOrganLookup(ids) {
   const organs = await getOrgans();
   const tissueIds = ids.filter((id) => !organs.includes(id));
   const organToOrganPairs = organs.map((organ) => [organ, organ]);
-  const extraOrganPairs = Object.values(EXTRA_ORGANS).map((organ) => [
-    organ,
-    organ,
-  ]);
+  const extraOrganPairs = Object.values(EXTRA_ORGANS).map((organ) => [organ, organ]);
   const tissueToOrganPairs = await getLookup(organs, tissueIds);
 
-  return new Map([
-    ...organToOrganPairs,
-    ...extraOrganPairs,
-    ...tissueToOrganPairs,
-  ]);
+  return new Map([...organToOrganPairs, ...extraOrganPairs, ...tissueToOrganPairs]);
 }

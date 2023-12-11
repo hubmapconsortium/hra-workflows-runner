@@ -68,10 +68,15 @@ export class Downloader {
     );
   }
 
+  /**
+   * Creates a lookup for extraction site
+   *
+   * @returns Lookup object
+   */
   async fetchExtractionSiteLookup() {
     const req = await fetch(GTEX_EXTRACTION_SITES);
     const donors = await req.json();
-    const lookup = {};
+    const lookup = /** @type {{ [tissueSite: string]: string }} */ ({});
     for (const donor of donors['@graph']) {
       for (const block of donor.samples) {
         const tissueSite = block.link;

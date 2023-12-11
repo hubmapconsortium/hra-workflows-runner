@@ -1,7 +1,9 @@
 import { env } from 'node:process';
 
+/** Indicator that a configuration value is required */
 export const REQUIRED = Symbol('Required config value');
 
+/** Manage global/environment configuration */
 export class Config {
   constructor() {
     /** @type {Map<string, any>} */

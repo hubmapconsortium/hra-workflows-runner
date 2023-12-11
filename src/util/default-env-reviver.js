@@ -15,6 +15,13 @@ import {
   SRC_DIR,
 } from './constants.js';
 
+/**
+ * Default environment reviver used in Config#loadEnv
+ *
+ * @param {string} key Environment variable name
+ * @param {string} value Environment variable value
+ * @returns {any} The parsed value
+ */
 export function defaultEnvReviver(key, value) {
   switch (key) {
     case FORCE:

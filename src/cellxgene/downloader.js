@@ -1,8 +1,8 @@
-import { execFile as callbackExecFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import { spawn } from 'node:child_process';
+import { execFile as callbackExecFile, spawn } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
+
 import { Dataset } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
@@ -49,6 +49,7 @@ export class Downloader {
     this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
     this.extractScriptFilePath = getSrcFilePath(config, 'cellxgene', this.extractScriptFile);
+    /** @type {string} */
     this.extractMetdataScriptFile = 'extract_donor_metadata.py';
     /** @type {string} */
     this.extractMetdataScriptFilePath = getSrcFilePath(config, 'cellxgene', this.extractMetdataScriptFile);
@@ -76,6 +77,9 @@ export class Downloader {
     const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
 
     dataset.donor_id = dataset.id.split('$')[0];
+    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
+    dataset.block_id = `${dataset.id}_Block`;
+    dataset.dataset_id = dataset.id;
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
@@ -88,13 +92,14 @@ export class Downloader {
     // Parse age line. Format: `age: X\n`
     const ethnicity_match = /ethnicity:(.+)\n/i.exec(stdout);
     dataset.donor_race = ethnicity_match?.[1].trim() ?? '';
-
-    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
-
-    dataset.block_id = `${dataset.id}_Block`;
-    dataset.dataset_id = dataset.id;
   }
 
+  /**
+   * Downloads and caches a collection metadata
+   *
+   * @param {string} collection Collection id
+   * @returns Collection metadata
+   */
   async downloadCollection(collection) {
     const url = new URL(`${COLLECTIONS_PATH}${collection}`, this.endpoint);
     return this.collectionCache.setDefaultFn(collection, () =>
@@ -102,7 +107,13 @@ export class Downloader {
     );
   }
 
-  async downloadAssets(/** @type {any[]} */ assets) {
+  /**
+   * Downloads and caches asset files
+   *
+   * @param {{id: string, dataset: string}[]} assets Assets to download
+   * @returns Array of file paths to the assets
+   */
+  async downloadAssets(assets) {
     const maxConcurrency = this.config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
     const downloadAsset = ({ id, dataset }) =>
       this.assetCache.setDefaultFn(id, async () => {
@@ -128,6 +139,12 @@ export class Downloader {
     });
   }
 
+  /**
+   * Attached metadata from collections to each dataset
+   *
+   * @param {Dataset[]} datasets Datasets
+   * @returns Datasets which has proper metadata
+   */
   async attachMetadata(datasets) {
     const maxConcurrency = this.config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
     const attach = async (dataset) => {
@@ -166,6 +183,12 @@ export class Downloader {
     return datasets.filter(({ tissueId }) => !!tissueId);
   }
 
+  /**
+   * Find and adds the organ associated with the datasets tissue
+   *
+   * @param {Dataset[]} datasets Datasets to determine organ for
+   * @returns The datasets
+   */
   async lookupOrgan(datasets) {
     const tissueIds = datasets.map(({ tissueId }) => tissueId).filter((id) => UBERON_ID_REGEX.test(id));
     const uniqueTissueIds = Array.from(new Set(tissueIds));
@@ -182,6 +205,13 @@ export class Downloader {
     return datasets;
   }
 
+  /**
+   * Extract all datasets from a collection
+   *
+   * @param {string} collection Collection id
+   * @param {{id: string, dataset: string}[]} assets
+   * @param {string[]} assetFiles Asset file paths
+   */
   async extractDatasets(collection, assets, assetFiles) {
     return this.extractCache.setDefaultFn(collection, async () => {
       const datasets = this.datasetsByCollection.get(collection);
@@ -196,6 +226,14 @@ export class Downloader {
     });
   }
 
+  /**
+   * Extract dataset h5ad from a set of asset h5ad files.
+   * Forwards stdout and stderr from the extract python process.
+   *
+   * @param {string} extractInfoFilePath Path to extract info file
+   * @param {string} tempExtractDirPath Path to a temp directory
+   * @returns Promise resolving when the extraction is done
+   */
   async runExtractDatasetsScript(extractInfoFilePath, tempExtractDirPath) {
     return new Promise((resolve, reject) => {
       const process = spawn(
@@ -223,6 +261,14 @@ export class Downloader {
     });
   }
 
+  /**
+   * Serializes extraction information as a json formatted document
+   *
+   * @param {Dataset[]} datasets Datasets
+   * @param {any[]} assets Assets
+   * @param {string[]} assetFiles Paths to asset files
+   * @returns Json serialized string
+   */
   serializeExtractInfo(datasets, assets, assetFiles) {
     const content = {
       assets,

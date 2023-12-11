@@ -1,29 +1,19 @@
 import { readFile } from 'node:fs/promises';
 import Papa from 'papaparse';
-import { Dataset, createScratchGetSet } from '../dataset/dataset.js';
+
+import { createScratchGetSet, Dataset } from '../dataset/dataset.js';
 import { DatasetSummaries, DatasetSummary } from '../dataset/summary.js';
 import { concurrentMap } from './concurrent-map.js';
 import { Config } from './config.js';
-import {
-  DEFAULT_MAX_CONCURRENCY,
-  MAX_CONCURRENCY,
-  REQUIRED_ENV_VARIABLES,
-} from './constants.js';
+import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY, REQUIRED_ENV_VARIABLES } from './constants.js';
 import { defaultEnvReviver } from './default-env-reviver.js';
-import {
-  getDatasetFilePath,
-  getDirForId,
-  getListingFilePath,
-  getSummariesFilePath,
-} from './paths.js';
+import { getDatasetFilePath, getDirForId, getListingFilePath, getSummariesFilePath } from './paths.js';
 
 /**
  * Gets a new configuration object with the environment loaded and validated
  */
 export function getConfig() {
-  return new Config()
-    .loadEnv(defaultEnvReviver)
-    .validate(REQUIRED_ENV_VARIABLES);
+  return new Config().loadEnv(defaultEnvReviver).validate(REQUIRED_ENV_VARIABLES);
 }
 
 export const { get: getSummaryRef, set: setSummaryRef } =
@@ -71,6 +61,14 @@ export async function loadListing(config) {
   return listing.map((row) => parseListingRow(row, columns, props));
 }
 
+/**
+ * Parse a single listing row
+ *
+ * @param {any} row Single csv row
+ * @param {string[]} columns Column names
+ * @param {string[]} props Property names
+ * @returns {object}
+ */
 function parseListingRow(row, columns, props) {
   return columns.reduce(
     (res, col, index) => ({
@@ -134,11 +132,15 @@ export async function saveDatasets(datasets, config) {
   });
 }
 
+/**
+ * Loads a dataset from file from either a directory or using summary id
+ *
+ * @param {string | DatasetSummary} dirOrSummary Directory or summary
+ * @param {Config} config Configuration
+ */
 async function loadDataset(dirOrSummary, config) {
   const [summary, directory] =
-    typeof dirOrSummary === 'string'
-      ? [undefined, dirOrSummary]
-      : [dirOrSummary, getDirForId(dirOrSummary.id)];
+    typeof dirOrSummary === 'string' ? [undefined, dirOrSummary] : [dirOrSummary, getDirForId(dirOrSummary.id)];
   const path = getDatasetFilePath(config, directory);
   const dataset = await Dataset.load(path, config);
 

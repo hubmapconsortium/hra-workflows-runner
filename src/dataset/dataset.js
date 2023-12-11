@@ -9,7 +9,9 @@ import {
   getJobFilePathWithSuffix,
 } from '../util/paths.js';
 
+/** Non-serialized config property */
 const CONFIG = Symbol('Configuration reference');
+/** Non-serialized scratch data property */
 const SCRATCH = Symbol('Non-serialized data');
 
 /**
@@ -33,6 +35,7 @@ export function createScratchGetSet(key) {
   };
 }
 
+/** Dataset metadata class */
 export class Dataset {
   constructor(id, config, extra = {}) {
     /** @type {string} */
@@ -49,30 +52,37 @@ export class Dataset {
     Object.assign(this, extra);
   }
 
+  /** Reference to the global configuration */
   get config() {
     return this[CONFIG];
   }
 
+  /** Reference to non-serialized scratch object */
   get scratch() {
     return this[SCRATCH];
   }
 
+  /** Directory name for this dataset */
   get dir() {
     return getDirForId(this.id);
   }
 
+  /** Directory path for this dataset */
   get dirPath() {
     return getDataDir(this.config, this.dir);
   }
 
+  /** File path to dataset file */
   get filePath() {
     return getDatasetFilePath(this.config, this.dir);
   }
 
+  /** File path to data file */
   get dataFilePath() {
     return getDataFilePath(this.config, this.dir);
   }
 
+  /** File path to job file */
   get jobFilePath() {
     return getJobFilePath(this.config, this.dir);
   }

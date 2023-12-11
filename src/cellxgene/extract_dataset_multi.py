@@ -37,6 +37,14 @@ _logger = logging.getLogger(__name__)
 
 @contextlib.contextmanager
 def _log_event(format: str, *args):
+    """Logs the start, end, and any error from code run inside a with statement.
+
+    The event is always passed before the additional arguments to the logger.
+
+    Args:
+        format (str): Formatting string passed to the logger
+        *args (Any): Additional arguments passed to the logger
+    """
     try:
         _logger.info(format, "Start", *args)
         yield None
@@ -47,6 +55,22 @@ def _log_event(format: str, *args):
 
 
 def _get_env_list(key: str, default: StrList) -> StrList:
+    """Parses an environment variable into a list.
+
+    The parser splits the value using the separators ",", ";", and spaces.
+    Multiple consecutive separators are treated as a single one.
+
+    Args:
+        key (str): Environment variable name
+        default (StrList): Default value returned when the environment variable is not set
+
+    Returns:
+        StrList: The parsed list
+
+    Examples:
+        "a,b;c d" -> ["a", "b", "c", "d"]
+        "a,;,b" -> ["a", "b"]
+    """
     raw = os.environ.get(key)
     return re.split("[\s,;]+", raw) if raw else default
 
@@ -56,12 +80,31 @@ TISSUE_COLUMNS = _get_env_list("CELLXGENE_COLUMNS_TISSUE", ["tissue"])
 
 
 class AssetSplitter:
+    """Splits an asset h5ad into multiple smaller file each containing
+    the rows matching specific column value combinations.
+
+    Attributes:
+        id (str): Id of asset
+        file (Path): Path to asset file
+        column_candidates (t.List[StrList]): Possible column names to search for in the asset file
+    """
+
     def __init__(self, id: str, file: Path, *column_candidates: StrList):
         self.id = id
         self.file = file
         self.column_candidates = column_candidates
 
     def split(self, splits: t.Iterable[StrList], out_dir: Path):
+        """Splits the asset file.
+
+        Args:
+            splits (t.Iterable[StrList]): Combinations of values to mask each split from
+            out_dir (Path): Output directory to store split files in
+
+        Returns:
+            t.List[t.Optional[Path]]: A path for each split referencing the smaller h5ad,
+                None for splits that would result in empty h5ad files.
+        """
         with _log_event("CellXGene:AssetSplitter:%s - %s", self.id):
             with _log_event("CellXGene:AssetSplitter:DataLoading:%s - %s", self.file):
                 matrix = anndata.read_h5ad(self.file)
@@ -72,6 +115,17 @@ class AssetSplitter:
             ]
 
     def __split_single(self, matrix: AnnData, columns: StrList, values: StrList, out_dir: Path):
+        """Perform a single split.
+
+        Args:
+            matrix (AnnData): In memory h5ad data
+            columns (StrList): Columns to match split values on
+            values (StrList): Split values to filter rows on
+            out_dir (Path): Output directory
+
+        Returns:
+            t.Optional[Path]: The path to the resulting h5ad file or None if the subset is empty
+        """
         with _log_event(f"CellXGene:AssetSplitter:Splitting:{':'.join(values)}:%s"):
             file_name = "-".join(values) + ".h5ad"
             out_path = out_dir / self.id / file_name
@@ -92,12 +146,32 @@ class AssetSplitter:
                 raise
 
     def get_columns(self, matrix: AnnData):
+        """Find columns to use during splitting from a set of candidates
+
+        Args:
+            matrix (AnnData): In memory h5ad data
+
+        Returns:
+            t.List[str]: The matching columns
+        """
         return [
             self.find_column(matrix, candidates)
             for candidates in self.column_candidates
         ]
 
     def find_column(self, matrix: AnnData, candidates: StrList):
+        """Find a column which exists within the data from a list of candidate columns.
+
+        Args:
+            matrix (AnnData): In memory h5ad data
+            candidates (StrList): Candidate column names
+
+        Raises:
+            ValueError: If none of the candidates exists in the data object.
+
+        Returns:
+            str: The first matching column
+        """
         for column in candidates:
             if column in matrix.obs.columns:
                 return column
@@ -106,6 +180,16 @@ class AssetSplitter:
         raise ValueError(msg)
     
     def create_mask(self, matrix: AnnData, columns: StrList, values: StrList):
+        """Create a mask which selects the rows for whose column values matches the provided values.
+
+        Args:
+            matrix (AnnData): In memory h5ad data
+            columns (StrList): Columns to match on
+            values (StrList): Values to match agains
+
+        Returns:
+            Any: A mask for subsetting the data matrix
+        """
         result = None
         for column, value in zip(columns, values):
             mask = matrix.obs[column] == value
@@ -114,6 +198,15 @@ class AssetSplitter:
     
 
 class AssetCombiner:
+    """Read and combine multiple smaller h5ad into a single h5ad.
+
+    Attributes:
+        id (str): Dataset id
+        out_file (Path): Path to write combined h5ad to
+        sources (StrList): Ids of each asset from which the smaller h5ad was extracted
+        files (t.List[t.Optional[Path]]): Path to each small h5ad or None when it should be skipped
+    """
+
     def __init__(self, id: str, out_file: Path, sources: StrList, files: t.List[t.Optional[Path]]):
         self.id = id
         self.out_file = out_file
@@ -121,6 +214,8 @@ class AssetCombiner:
         self.files = files
 
     def combine(self):
+        """Combine split asset pieces into a single h5ad.
+        """
         with _log_event("CellXGene:AssetCombiner:%s - %s", self.id):
             if not _FORCE and self.out_file.exists():
                 return
@@ -145,6 +240,14 @@ class AssetCombiner:
 
 
 def main(args: argparse.Namespace):
+    """Splits and recombines assets into a h5ad for each dataset.
+    
+    The assets and datasets are read from an info json file.
+    The info file must be in the format of ExtractInfo.
+
+    Args:
+        args (argparse.Namespace): CLI arguments, must contain "info" and "tmp_dir"
+    """
     with open(args.info) as info_file:
         info: ExtractInfo = json.load(info_file)
 

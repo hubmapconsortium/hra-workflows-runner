@@ -1,19 +1,16 @@
 import { copyFile } from 'node:fs/promises';
 import { DatasetSummaries, DatasetSummary } from './dataset/summary.js';
 import { getConfig, loadListing } from './util/common.js';
-import {
-  DATASET_COLUMN_ID,
-  DATASET_LIST_URL,
-  FORCE,
-} from './util/constants.js';
+import { Config } from './util/config.js';
+import { DATASET_COLUMN_ID, DATASET_LIST_URL, FORCE } from './util/constants.js';
 import { downloadFile, ensureDirsExist, fileExists } from './util/fs.js';
-import {
-  getDatasetListFilePath,
-  getListingFilePath,
-  getOutputDir,
-  getSummariesFilePath,
-} from './util/paths.js';
+import { getDatasetListFilePath, getListingFilePath, getOutputDir, getSummariesFilePath } from './util/paths.js';
 
+/**
+ * Downloads listing from a remote source
+ *
+ * @param {Config} config Configuration
+ */
 async function downloadListing(config) {
   const forceDownload = config.get(FORCE, false);
   const url = config.get(DATASET_LIST_URL);
@@ -22,6 +19,11 @@ async function downloadListing(config) {
   });
 }
 
+/**
+ * Creates summary objects from listing rows
+ *
+ * @param {any[]} listing Listing rows
+ */
 function createSummaries(listing) {
   const items = listing.map((row) => new DatasetSummary(row.id));
   const summaries = new DatasetSummaries();

@@ -14,16 +14,31 @@ export async function concurrentMap(array, mapper, options = {}) {
   return executor.result;
 }
 
+/**
+ * Class implementing the concurrentMap logic
+ *
+ * @template T Input value type
+ * @template R Result value type
+ */
 class ConcurrentMapExecutor {
   constructor(array, mapper, options) {
+    /** @type {T[]} */
     this.array = array;
+    /** @type {function(T, number, T[]): R | PromiseLike<R>} */
     this.mapper = mapper;
+    /** @type {{maxConcurrency?: number}} */
     this.options = options;
+    /** @type {number} */
     this.index = 0;
+    /** @type {boolean} */
     this.errored = false;
+    /** @type {R[]} */
     this.result = Array(array.length).fill(undefined);
   }
 
+  /**
+   * Asynchrously execute the mapper function over all the values
+   */
   async run() {
     const {
       array: { length },
@@ -37,6 +52,9 @@ class ConcurrentMapExecutor {
     await Promise.all(executors);
   }
 
+  /**
+   * Maps a single value at a time until all values have been mapped or an error is thrown
+   */
   async execute() {
     const { array, mapper, result } = this;
     while (this.index < array.length && !this.errored) {

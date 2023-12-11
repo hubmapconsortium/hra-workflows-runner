@@ -1,4 +1,4 @@
-import { getMetadata, getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
+import { getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
 
 /**
  * @typedef {object} HubmapMetadata
@@ -35,6 +35,11 @@ export const METADATA_FIELDS = [
   'donor.uuid',
 ];
 
+/**
+ * Creates a metadata lookup from the raw metadata
+ *
+ * @param {object} result Raw metadata
+ */
 export function metadataToLookup(result) {
   /** @type {Map<string, HubmapMetadata>} */
   const lookup = new Map();

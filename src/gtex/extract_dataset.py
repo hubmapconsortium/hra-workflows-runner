@@ -13,14 +13,20 @@ TISSUE_SITE_COLUMN = os.environ.get("GTEX_COLUMN_TISSUE_SITE", "Tissue Site Deta
 
 
 def main(args: argparse.Namespace):
+    """Subsets and prints information from a h5ad file.
+    Printed values include "organ", "sex", "age", "donor_id", and "tissue_site".
+
+    Args:
+        args (argparse.Namespace): CLI arguments, must include "file", "dataset", and "output"
+    """
     data = anndata.read_h5ad(args.file)
     mask = data.obs[ID_COLUMN] == args.dataset
     subset = data[mask]
     subset.write_h5ad(args.output)
-    print("organ:", subset.obs[ORGAN_COLUMN][0], flush=True)
-    print("sex:", subset.obs[SEX_COLUMN][0], flush=True)
-    print("age:", subset.obs[AGE_COLUMN][0], flush=True)
-    print("donor_id:", subset.obs[DONOR_ID_COLUMN][0], flush=True)
+    print("organ:", subset.obs[ORGAN_COLUMN][0])
+    print("sex:", subset.obs[SEX_COLUMN][0])
+    print("age:", subset.obs[AGE_COLUMN][0])
+    print("donor_id:", subset.obs[DONOR_ID_COLUMN][0])
     print("tissue_site:", subset.obs[TISSUE_SITE_COLUMN][0], flush=True)
 
 

@@ -61,6 +61,13 @@ export async function downloadFile(dest, src, options = {}) {
   }
 }
 
+/**
+ * Opens a file for writing
+ *
+ * @param {string} path Path to file
+ * @param {{ overwrite?: boolean }} options Options controlling how to open the file
+ * @returns A file handle or undefined if overwrite is false and the file already exists
+ */
 async function openWriteFile(path, options) {
   const { overwrite = false } = options;
   const flags = overwrite ? 'w' : 'wx';

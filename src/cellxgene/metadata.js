@@ -16,6 +16,7 @@ import { groupBy } from '../util/iter.js';
  * @property {string} provider_name
  */
 
+/** Portal endpoint */
 const CELLXGENE_PORTAL_ENDPOINT = 'https://cellxgene.cziscience.com/collections/';
 
 /**
@@ -31,6 +32,12 @@ export function parseMetadataFromId(id) {
   return { collection, donor, tissue };
 }
 
+/**
+ * Downloads collection metadata
+ *
+ * @param {string} url Collection metadata url
+ * @returns Parsed metadata
+ */
 export async function downloadCollectionMetadata(url) {
   const resp = await fetch(url, { method: 'GET' });
   checkFetchResponse(resp, 'CellXGene collection download failed');
@@ -38,6 +45,12 @@ export async function downloadCollectionMetadata(url) {
   return parseCollectionMetadata(raw);
 }
 
+/**
+ * Parse a raw collection metadata object
+ *
+ * @param {any} raw Raw metadata object
+ * @returns Parsed metadata
+ */
 export function parseCollectionMetadata(raw) {
   const { id, datasets, name } = raw;
   const validDatasets = filterNonDiseasedHumanDatasets(datasets);
@@ -53,13 +66,19 @@ export function parseCollectionMetadata(raw) {
     publication: getPublicationDOI(raw),
     publication_title: name,
     publication_lead_author: getPublicationLeadAuthor(raw),
-    consortium_name: 'CxG', //alternate: consortia from raw
-    provider_name: 'CxG', //alternate: curator_name from raw
+    consortium_name: 'CxG', // alternate: consortia from raw
+    provider_name: 'CxG', // alternate: curator_name from raw
     provider_uuid: 'f6841a8a-cef2-4421-b632-fc34ff5c27d8',
     assay_type: getAssayType(selectedDatasets),
   });
 }
 
+/**
+ * Filter datasets that are from humans and without disease
+ *
+ * @param {any[]} datasets Raw dataset metadata
+ * @returns Filtered datasets
+ */
 function filterNonDiseasedHumanDatasets(datasets) {
   const someLabelMatchesICase = (items, value) => items.some(({ label }) => label.toLowerCase() === value);
 
@@ -69,6 +88,12 @@ function filterNonDiseasedHumanDatasets(datasets) {
   );
 }
 
+/**
+ * Groups datasets by whether they are primary or secondary datasets
+ *
+ * @param {any[]} datasets Datasets to partition
+ * @returns An object with the partitions
+ */
 function partitionDatasetsByType(datasets) {
   const grouped = groupBy(datasets, ({ is_primary_data }) => is_primary_data.toLowerCase());
 
@@ -78,6 +103,13 @@ function partitionDatasetsByType(datasets) {
   };
 }
 
+/**
+ * Select datasets based on which group has the highest total cell count
+ *
+ * @param {any[]} primary Primary datasets
+ * @param {any[]} secondary Secondary datasets
+ * @returns Selected datasets
+ */
 function selectDatasetUsingCellCount(primary, secondary) {
   const sumCellCounts = (items) => items.reduce((acc, { cell_count }) => acc + cell_count, 0);
 
@@ -86,6 +118,12 @@ function selectDatasetUsingCellCount(primary, secondary) {
   return primaryCount >= secondaryCount ? primary : secondary;
 }
 
+/**
+ * Extract h5ad datasets from dataset metadata
+ *
+ * @param {any[]} datasets Datasets
+ * @returns {{id: string, dataset: string}[]}
+ */
 function getAssets(datasets) {
   return datasets
     .map(({ dataset_assets }) => dataset_assets)
@@ -94,6 +132,12 @@ function getAssets(datasets) {
     .map(({ id, dataset_id }) => ({ id, dataset: dataset_id }));
 }
 
+/**
+ * Computes unique donor-tissue pairs available in the datasets
+ *
+ * @param {any[]} datasets Datasets
+ * @returns {{donor_id: string, tissue: string}[]} Unique donor-tissue pairs
+ */
 function getDonorTissuePairs(datasets) {
   const pairsArray = datasets.flatMap((dataset) =>
     dataset.donor_id.flatMap((donor_id) =>
@@ -109,6 +153,12 @@ function getDonorTissuePairs(datasets) {
   return uniquePairs;
 }
 
+/**
+ * Creates a lookup from tissue label to ontoloty id
+ *
+ * @param {any[]} datasets Datasets
+ * @returns {Map<string, string>}
+ */
 function getTissueIdLookup(datasets) {
   const items = datasets
     .map(({ tissue }) => tissue)
@@ -118,12 +168,23 @@ function getTissueIdLookup(datasets) {
   return new Map(items);
 }
 
+/**
+ * Finds the publication doi url
+ *
+ * @param {any} raw Raw metadata
+ * @returns {string}
+ */
 function getPublicationDOI(raw) {
   const { links } = raw;
   const doiLink = links.find((link) => link.link_type === 'DOI');
   return doiLink?.link_url ?? '';
 }
 
+/**
+ * Finds the lead author of the publication
+ *
+ * @param {any} raw Raw metadata
+ */
 function getPublicationLeadAuthor(raw) {
   try {
     const {
@@ -135,6 +196,11 @@ function getPublicationLeadAuthor(raw) {
   }
 }
 
+/**
+ * Get the unique assay types as a json encoded string
+ *
+ * @param {any[]} datasets Datasets
+ */
 function getAssayType(datasets) {
   const assayTypesArray = datasets.map(({ assay }) => assay).flat();
   return JSON.stringify(Array.from(new Set(assayTypesArray.map(JSON.stringify)), JSON.parse));

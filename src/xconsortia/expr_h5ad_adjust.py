@@ -7,6 +7,8 @@ from enum import Enum
 
 
 class AnnDataLayer(str, Enum):
+    """Layers available in xconsortia data."""
+
     SPLICED = "spliced"
     UNSPLICED = "unspliced"
     SPLICED_UNSPLICED_SUM = "spliced_unspliced_sum"
@@ -22,6 +24,14 @@ ASSAY_TO_LAYER_MAP = {
 
 
 def main(args: argparse.Namespace):
+    """Replaces the X matrix with a layer depending on assay type and writes the new data to file.
+
+    Args:
+        args (argparse.Namespace): CLI arguments, must contain "file", "assay", and "output"
+
+    Raises:
+        ValueError: When the data does not contain the correct layer
+    """
     layer = ASSAY_TO_LAYER_MAP[args.assay]
     adata = anndata.read_h5ad(args.file)
 

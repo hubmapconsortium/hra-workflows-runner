@@ -8,6 +8,11 @@ ID_COLUMN = os.environ.get("GTEX_COLUMN_ID", "Sample ID")
 
 
 def main(args: argparse.Namespace):
+    """Prints unique dataset ids from a h5ad.
+
+    Args:
+        args (argparse.Namespace): CLI arguments, must contain "file"
+    """
     data = anndata.read_h5ad(args.file)
     print(json.dumps(data.obs[ID_COLUMN].drop_duplicates().tolist()))
 

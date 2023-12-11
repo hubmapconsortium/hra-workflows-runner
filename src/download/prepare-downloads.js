@@ -2,9 +2,16 @@ import { Dataset } from '../dataset/dataset.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
+import { IDownloader } from '../util/handler.js';
 import { diff, groupBy } from '../util/iter.js';
 import { DOWNLOAD_STEP, getDownloaderRef, getSummaryRef } from './utils.js';
 
+/**
+ * Prepares datasets for downloading
+ *
+ * @param {[IDownloader, Dataset[]]} param0 Downloader and datasets packed into a tuple
+ * @returns Datasets to download
+ */
 async function prepare([downloader, datasets]) {
   const newDatasets = await tryPrepare(downloader, datasets);
   if (newDatasets === undefined) {
@@ -18,6 +25,13 @@ async function prepare([downloader, datasets]) {
   return newDatasets;
 }
 
+/**
+ * Runs IDownloader#prepareDownload safely catching and handling any errors thrown
+ *
+ * @param {IDownloader} downloader Downloader instance
+ * @param {Dataset[]} datasets Datasets
+ * @returns Potentially filtered datasets or 'error' in case an error was caught
+ */
 async function tryPrepare(downloader, datasets) {
   try {
     return await downloader.prepareDownload(datasets);
@@ -27,10 +41,21 @@ async function tryPrepare(downloader, datasets) {
   }
 }
 
+/**
+ * Marks multiple dataset's download step as not supported
+ *
+ * @param {Dataset[]} datasets Datasets
+ */
 function markNotSupported(datasets) {
   datasets.forEach((d) => getSummaryRef(d).setNotSupported(DOWNLOAD_STEP));
 }
 
+/**
+ * Marks multiple dataset's download step as failed
+ *
+ * @param {Dataset[]} datasets Datasets
+ * @param {any} error Cause of failure
+ */
 function markFailure(datasets, error) {
   const msg = `Prepare download failed: ${error.message ?? error}`;
   datasets.forEach((d) => getSummaryRef(d).setFailure(DOWNLOAD_STEP, msg));

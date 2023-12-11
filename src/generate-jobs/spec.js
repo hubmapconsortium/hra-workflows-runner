@@ -1,10 +1,21 @@
 import { join } from 'node:path';
 
+import { Config } from '../util/config.js';
 import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
 import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
-const ALL_DISABLED_METADATA = ALGORITHMS.reduce((metadata, algorithm) => ({ ...metadata, [algorithm]: false }), {});
+/** Metadata where all algorithms are disabled by default */
+const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
+  (metadata, algorithm) => ({ ...metadata, [algorithm]: false }),
+  /** @type {import('../util/handler.js').JobMetadata} */ ({})
+);
 
+/**
+ * Get default values for each algorithm
+ *
+ * @param {Config} config Configuration
+ * @returns Default values
+ */
 function getAlgorithmDefaults(config) {
   return {
     azimuth: {
@@ -27,10 +38,25 @@ function getAlgorithmDefaults(config) {
   };
 }
 
+/**
+ * Get the enabled algorithms in the metadata
+ *
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @returns Names of enabled algorithms
+ */
 function getEnabledAlgorithms(metadata) {
   return ALGORITHMS.filter((algorithm) => metadata[algorithm] !== false);
 }
 
+/**
+ * Creates the algorithm specification for a job
+ *
+ * @param {Config} config Configuration
+ * @param {string} algorithm Algorithm name
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {{ [algorithm: string]: object }} defaults Algorithm default values
+ * @param {boolean} crosswalkExists Whether to add crosswalking to the job
+ */
 function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExists) {
   return {
     [algorithm]: {
@@ -56,6 +82,13 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
   };
 }
 
+/**
+ * Creates a single job specification with all enabled algorithms
+ *
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {Config} config Configuration
+ * @param {{ [algorithm: string]: boolean }} crosswalks Whether crosswalk is enabled for each algorithm
+ */
 export function createSpec(metadata, config, crosswalks) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
@@ -73,8 +106,15 @@ export function createSpec(metadata, config, crosswalks) {
   };
 }
 
+/**
+ * Creates a job specification for each enabled algorithm individually
+ *
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {Config} config Configuration
+ * @param {{ [algorithm: string]: boolean }} crosswalks Whether crosswalk is enabled for each algorithm
+ */
 export function createSpecs(metadata, config, crosswalks) {
-  const result = {};
+  const result = /** @type {{ [algorithm: string]: ReturnType<typeof createSpec> }} */ ({});
   for (const algorithm of getEnabledAlgorithms(metadata)) {
     const newMetadata = {
       ...metadata,

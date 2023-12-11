@@ -37,15 +37,23 @@ export const AlgorithmStep = ALGORITHMS.reduce(
   /** @type {Object<string, string>} */ ({})
 );
 
+/** All steps */
 const STEPS = Object.values({
   ...Step,
   ...AlgorithmStep,
 });
 
+/** Mazimum length of errors stored in summary */
 const MAX_ERROR_LENGTH = 150;
 
 export class DatasetSummary {
-  /** @private */
+  /**
+   * Creates a summary object from a raw object
+   *
+   * @private
+   * @param {object} data Raw object
+   * @returns {DatasetSummary}
+   */
   static fromRaw(data) {
     return Object.assign(new DatasetSummary(data.id), data);
   }

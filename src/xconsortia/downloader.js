@@ -58,7 +58,14 @@ export class XConsortiaDownloader {
     ]);
   }
 
-  async getMetadataLookup(_ids) {
+  /**
+   * Get a lookup map for associating metadata with a dataset.
+   * Must be overrriden in subclasses.
+   * 
+   * @param {string[]} ids Dataset ids
+   * @returns {Promise<Map<string, object>>} Lookup map
+   */
+  async getMetadataLookup(ids) {
     throw new Error('getMetadataLookup must be overriden');
   }
 }

@@ -36,6 +36,11 @@ export const METADATA_FIELDS = [
   'source.uuid',
 ];
 
+/**
+ * Creates a metadata lookup from the raw metadata
+ *
+ * @param {object} result Raw metadata
+ */
 export function toLookup(result) {
   /** @type {Map<string, SennetMetadata>} */
   const lookup = new Map();

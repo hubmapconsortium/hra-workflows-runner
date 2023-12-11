@@ -1,12 +1,14 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import Papa from 'papaparse';
-import { DatasetSummaries } from './dataset/summary.js';
+import { DatasetSummaries, DatasetSummary } from './dataset/summary.js';
 import { getConfig, loadJson } from './util/common.js';
 import { concurrentMap } from './util/concurrent-map.js';
+import { Config } from './util/config.js';
 import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from './util/constants.js';
 import { getDatasetFilePath, getDirForId, getOutputDir, getSummariesFilePath } from './util/paths.js';
 
+/** Columns in the metadata csv */
 const METADATA_FIELDS = [
   'id',
   'handler',
@@ -39,6 +41,13 @@ const METADATA_FIELDS = [
   'rui_location',
 ];
 
+/**
+ * Attempts to load metadata from file for a summary item
+ *
+ * @param {DatasetSummary} item Summary item
+ * @param {Config} config Configuration
+ * @returns Metadata or undefined if not found
+ */
 async function readMetadata(item, config) {
   const directory = getDirForId(item.id);
   const metadataFile = getDatasetFilePath(config, directory);

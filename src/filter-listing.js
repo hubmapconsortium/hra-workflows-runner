@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises';
 import Papa from 'papaparse';
-import { DatasetSummaries, Status, Step } from './dataset/summary.js';
+import { DatasetSummaries, DatasetSummary, Status, Step } from './dataset/summary.js';
 import {
   getConfig,
   loadCsv,
@@ -10,6 +10,12 @@ import {
 import { DATASET_COLUMN_ID } from './util/constants.js';
 import { getListingFilePath } from './util/paths.js';
 
+/**
+ * Tests whether the download step failed due to there not existing any data for the dataset
+ *
+ * @param {DatasetSummary} summary Summary data
+ * @returns true if the download step errored due to not having any data, false otherwise
+ */
 function missingData(summary) {
   const error = summary.getError(Step.DOWNLOADED);
   return /^No data/i.test(error);
