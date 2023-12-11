@@ -13,6 +13,7 @@ requirements:
       DATASET: $(inputs.dataset)
       VERSION: $(inputs.version)
       HUBMAP_TOKEN: $(inputs.hubmap_token)
+      SENNET_TOKEN: $(inputs.sennet_token)
       DATASETS_DIR: /output/datasets
       RAW_DATA_DIR: /output/raw-data
   InitialWorkDirRequirement:
