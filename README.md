@@ -1,6 +1,17 @@
 # hra-workflows-runner
 Code to run hra-workflows locally or using Slurm.
 
+## Table of Content
+- [Requirements](#requirements)
+- [Running the pipeline](#running-the-pipeline)
+  - [Configuring the environment](#1-configure-the-environment)
+  - [Running scripts](#2-run-scripts)
+    - [Running locally](#locally)
+    - [Using Slurm](#slurm)
+- [Adding a new dataset handler](#adding-new-dataset-handlers)
+  - [Implementing the interfaces](#1-implementing-interfaces)
+  - [Registering the handler](#2-registering-the-new-handler)
+
 ## Requirements
 - [cwl-runner](https://github.com/common-workflow-language/cwltool)
 - Docker (only when running locally) **OR**
