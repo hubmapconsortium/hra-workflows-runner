@@ -1,4 +1,4 @@
-Popv_Label,Label,CL_ID,CL_Match
+Annotation_Label,CL_Label,CL_ID,CL_Match
 cell,cell,CL:0000000,
 epithelial cell,epithelial cell,CL:0000066,
 glandular epithelial cell,glandular epithelial cell,CL:0000150,
