@@ -10,7 +10,7 @@ import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 
 const GTEX_FULL_DATA_URL = 'GTEX_FULL_DATA_URL';
 const DEFAULT_GTEX_FULL_DATA_URL =
-  'https://storage.googleapis.com/gtex_analysis_v9/snrna_seq_data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad';
+  'https://storage.googleapis.com/adult-gtex/single-cell/v9/snrna-seq-data/GTEx_8_tissues_snRNAseq_atlas_071421.public_obs.h5ad';
 
 const execFile = promisify(callbackExecFile);
 
