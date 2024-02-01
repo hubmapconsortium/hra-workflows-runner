@@ -150,3 +150,6 @@ hra-run*.err
 
 # Temporary data folder
 tmp
+
+# History files
+.*_history
