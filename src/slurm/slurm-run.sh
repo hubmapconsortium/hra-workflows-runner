@@ -8,7 +8,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=96:00:00
-#SBATCH --mem=128G
+#SBATCH --mem=250G
 #SBATCH -A r00355
 
 module load python

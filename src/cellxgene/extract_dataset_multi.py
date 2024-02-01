@@ -9,6 +9,7 @@ from pathlib import Path
 
 import anndata
 from anndata import AnnData
+import pandas
 
 
 StrList = t.List[str]
@@ -216,27 +217,72 @@ class AssetCombiner:
     def combine(self):
         """Combine split asset pieces into a single h5ad.
         """
-        with _log_event("CellXGene:AssetCombiner:%s - %s", self.id):
+        with _log_event("CellXGene:AssetCombiner:%s - %s [%s]", self.id, ', '.join(self.sources)):
             if not _FORCE and self.out_file.exists():
                 return
 
             matrices = [anndata.read_h5ad(file) for file in self.files if file]
             non_empty_matrices = [matrix for matrix in matrices if matrix]
             if non_empty_matrices:
+                self.fix_obsm_shapes(non_empty_matrices)
+
+                filtered_matrices = self.filter_duplicates(non_empty_matrices)
                 combined = anndata.concat(
-                    non_empty_matrices,
+                    filtered_matrices,
                     join="outer",
                     label="source",
                     keys=self.sources
                 )
 
                 if combined:
+                    self.fix_obs_columns_dtype(combined)
                     self.out_file.parent.mkdir(parents=True, exist_ok=True)
                     combined.write_h5ad(self.out_file)
                     return
 
             _logger.warning(f"Subset {self.id} has zero rows")
 
+    def fix_obsm_shapes(self, matrices: t.List[AnnData]):
+        """Reshapes obsm columns to always have two dimensions to enable concatenation.
+
+        Args:
+          matrices (t.List[AnnData]): Matrices to update
+        """
+        for matrix in matrices:
+            for key in matrix.obsm:
+                array = matrix.obsm[key]
+                if len(array.shape) < 2:
+                    matrix.obsm[key] = array.reshape((-1, 1))
+
+    def fix_obs_columns_dtype(self, matrix: AnnData):
+        """Converts object and category columns to string to prevent errors when writing h5ad file.
+
+        Args:
+          matrix (AnnData): Matrix to update
+        """
+        for column in matrix.obs.columns:
+            array = matrix.obs[column]
+            if array.dtype in ("category", "object"):
+                matrix.obs[column] = array.astype(str)
+
+    def filter_duplicates(self, matrices: t.List[AnnData]) -> t.List[AnnData]:
+        """Filters matrices to ensure unique rows.
+
+        Args:
+          matrices (t.List[AnnData]): Matrices to filter
+        """
+        seen_index = pandas.Index([])
+        result: t.List[AnnData] = []
+        for matrix in matrices:
+            index = matrix.obs_names
+            duplicates_mask = index.isin(seen_index)
+            if duplicates_mask.any():
+                matrix = matrix[~duplicates_mask]
+            if matrix:
+                result.append(matrix)
+                seen_index = seen_index.union(matrix.obs_names)
+
+        return result
 
 
 def main(args: argparse.Namespace):
@@ -299,7 +345,7 @@ def _get_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--log-level",
         type=int,
-        default=logging.ERROR,
+        default=logging.INFO,
         help="Log level"
     )
 

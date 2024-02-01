@@ -69,7 +69,7 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
           class: 'File',
           path: getCrosswalkingFilePath(config, algorithm),
         },
-        tableLabelColumn: `${algorithm.charAt(0).toUpperCase() + algorithm.slice(1)}_Label`,
+        tableLabelColumn: 'Annotation_Label',
         tableClidColumn: 'CL_ID',
         tableMatchColumn: 'CL_Match',
       },

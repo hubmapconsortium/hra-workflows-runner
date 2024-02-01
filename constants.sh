@@ -28,6 +28,10 @@ export SRC_DIR="./src"
 # Absolute path to project. Used when starting slurm jobs
 export PROJECT_DIR=${PROJECT_DIR:-"/N/project/hra/hra-workflows-runner"}
 export SIF_CACHE_DIR=${SIF_CACHE_DIR:-"/N/project/hra/sif-cache"}
+export TEMP=${TEMP:-"$PROJECT_DIR/tmp/"}
+
+# Configure slurm
+export SLURM_UMASK="ug+rw"
 
 # Load dataset configuration
 source $DATASETS_DIR/$DATASET/config.sh

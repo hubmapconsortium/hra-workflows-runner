@@ -118,15 +118,15 @@ export class Downloader {
     const downloadAsset = ({ id, dataset }) =>
       this.assetCache.setDefaultFn(id, async () => {
         const pathname = `${ASSETS_PATH}${dataset}/asset/${id}`;
-        const url = new URL(pathname, this.endpoint);
-        const resp = await fetch(url, { method: 'POST' });
+        const asset_url = new URL(pathname, this.endpoint);
+        const resp = await fetch(asset_url, { method: 'GET' });
         checkFetchResponse(resp, 'CellXGene asset download failed');
 
-        const { presigned_url } = await resp.json();
+        const { url } = await resp.json();
         const outputFile = join(getCacheDir(this.config), `cellxgene-${id}.h5ad`);
 
         await logEvent('CellXGene:DownloadAsset', id, () =>
-          downloadFile(outputFile, presigned_url, {
+          downloadFile(outputFile, url, {
             overwrite: this.config.get(FORCE, false),
           })
         );
