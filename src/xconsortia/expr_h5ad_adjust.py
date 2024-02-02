@@ -32,7 +32,7 @@ def main(args: argparse.Namespace):
     Raises:
         ValueError: When the data does not contain the correct layer
     """
-    layer = ASSAY_TO_LAYER_MAP[args.assay]
+    layer = ASSAY_TO_LAYER_MAP.get(args.assay, AnnDataLayer.SPLICED_UNSPLICED_SUM)
     adata = anndata.read_h5ad(args.file)
 
     if layer in adata.layers:
