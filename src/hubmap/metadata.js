@@ -23,7 +23,7 @@ export const METADATA_FIELDS = [
   'uuid',
   'hubmap_id',
   'origin_samples.organ',
-  'data_types',
+  'data_types', // TODO: Replace with dataset_type
   'mapped_consortium',
   'group_name',
   'group_uuid',
