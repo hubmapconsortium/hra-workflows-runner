@@ -4,6 +4,7 @@ import { Config } from '../util/config.js';
 import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
 import { IDownloader } from '../util/handler.js';
 import { diff, groupBy } from '../util/iter.js';
+import { logEvent } from '../util/logging.js';
 import { DOWNLOAD_STEP, getDownloaderRef, getSummaryRef } from './utils.js';
 
 /**
@@ -34,7 +35,7 @@ async function prepare([downloader, datasets]) {
  */
 async function tryPrepare(downloader, datasets) {
   try {
-    return await downloader.prepareDownload(datasets);
+    return await logEvent(`PrepareDownload:${datasets[0].handler}`, () => downloader.prepareDownload(datasets));
   } catch (error) {
     markFailure(datasets, error);
     return 'error';

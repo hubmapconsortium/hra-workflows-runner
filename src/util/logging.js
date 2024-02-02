@@ -19,7 +19,7 @@ export async function logEvent(event, ...args) {
     console.debug(`${event}:End -- Args:`, ...args);
     return result;
   } catch (error) {
-    console.error(`${event}:Failure -- Args:`, ...args, `-- Cause: ${error.message}`);
+    console.error(`${event}:Failure -- Args:`, ...args, `-- Cause: ${error.message}\n${error.stack}\n`);
     throw error;
   } finally {
     console.timeEnd(timerId);

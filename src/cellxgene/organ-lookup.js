@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import { checkFetchResponse } from '../util/fs.js';
+import { logEvent } from '../util/logging.js';
 
 /** Endpoint to get available organs */
 const REF_ORGANS_ENDPOINT = 'https://grlc.io/api-git/hubmapconsortium/ccf-grlc/subdir/ccf//ref-organ-terms';
@@ -92,11 +93,11 @@ async function getLookup(organs, ids) {
  * @returns {Promise<Map<string, string>>}
  */
 export async function getOrganLookup(ids) {
-  const organs = await getOrgans();
+  const organs = await logEvent('CellXGene:GetOrgans', () => getOrgans());
   const tissueIds = ids.filter((id) => !organs.includes(id));
   const organToOrganPairs = organs.map((organ) => [organ, organ]);
   const extraOrganPairs = Object.values(EXTRA_ORGANS).map((organ) => [organ, organ]);
-  const tissueToOrganPairs = await getLookup(organs, tissueIds);
+  const tissueToOrganPairs = await logEvent('CellXGene:GetOrganLookup', () => getLookup(organs, tissueIds));
 
   return new Map([...organToOrganPairs, ...extraOrganPairs, ...tissueToOrganPairs]);
 }
