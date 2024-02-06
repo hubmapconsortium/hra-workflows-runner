@@ -1,0 +1,27 @@
+Organ,Azimuth,CellTypist,popV,hasReferenceOrgan
+blood,41,26,18,
+blood vasculature,0,0,140,x
+bone marrow,43,39,14,
+breast mammary gland,0,0,28,x
+eye,0,0,108,x
+heart,325,637,78,x
+hippocampal gyrus (formation),0,20,0,
+intestine,0,38,0,
+kidney,3944,2312,0,x
+large intestine,0,0,368,x
+liver,50,70,24,x
+lung,546,497,252,x
+lymph node,0,280,220,x
+male reproductive system,0,0,13,x
+mesenteric lymph node,0,0,132,x
+pancreas,22,18,28,x
+prostate,0,0,65,x
+respiratory system,0,0,180,x
+skeletal muscle tissue,0,18,0,
+skin,0,92,84,x
+small intestine,0,0,160,x
+spleen,0,352,242,x
+thoracic thymus,0,0,63,x
+trachea,0,0,108,x
+urinary bladder,0,0,98,x
+uterus,0,0,52,x

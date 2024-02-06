@@ -1,5 +1,13 @@
 {
   "@context": {
+    "skos": {
+      "@id": "http://www.w3.org/2004/02/skos/core#",
+      "@prefix": true
+    },
+    "UBERON": {
+      "@id": "http://purl.obolibrary.org/obo/UBERON_",
+      "@prefix": true
+    },
     "CL": {
       "@id": "http://purl.obolibrary.org/obo/CL_",
       "@prefix": true
@@ -9,14 +17,19 @@
       "@prefix": true
     },
     "ctpop": {
-      "@id": "https://cns-iu.github.io/hra-cell-type-populations-supporting-information/data/enriched_rui_locations.jsonld#",
+      "@id": "https://purl.humanatlas.io/graph/hra-pop#",
       "@prefix": true
     },
-
     "as_3d_id": {
       "@type": "@id"
     },
     "as_id": {
+      "@type": "@id"
+    },
+    "organ_id": {
+      "@type": "@id"
+    },
+    "cell_match": {
       "@type": "@id"
     },
     "all_collisions": {
@@ -43,6 +56,10 @@
       "@reverse": "ccf:has_cell_summary",
       "@type": "@id"
     },
+    "aggregated_summaries": {
+      "@id": "ccf:aggregates",
+      "@type": "@id"
+    },
     "annotation_method": {
       "@id": "ccf:cell_annotation_method"
     },
@@ -57,6 +74,19 @@
     },
     "percentage": {
       "@id": "ccf:percentage_of_total"
+    },
+
+    "cell_source_a": {
+      "@type": "@id"
+    },
+    "cell_source_b": {
+      "@type": "@id"
+    },
+    "entity_a": {
+      "@type": "@id"
+    },
+    "entity_b": {
+      "@type": "@id"
     },
 
     "@base": "http://purl.org/ccf/",

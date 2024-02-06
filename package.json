@@ -4,6 +4,7 @@
   "description": "Code to run hra-workflows locally",
   "type": "module",
   "scripts": {
+    "crosswalks-report": "./src/crosswalks-report.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +20,8 @@
     "node": "18"
   },
   "dependencies": {
+    "@comunica/query-sparql-file": "^2.10.2",
+    "glob": "^10.3.10",
     "papaparse": "^5.4.1"
   }
 }
