@@ -8,7 +8,7 @@ General Publication(s):,https://azimuth.hubmapconsortium.org/,,,,,
 Data DOI:,,,,,,
 Date:,15-Jun-24,,,,,
 Version number:,v1.0,,,,,
-Organ_Level,organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
+Organ_Level,Organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
 Heart_L2,UBERON:0000948,Adipocyte,AZ:0000001,adipocyte,CL:0000136,skos:exactMatch
 Heart_L2,UBERON:0000948,Arterial Endothelial,AZ:0000002,endothelial cell of artery,CL:1000413,skos:exactMatch
 Heart_L2,UBERON:0000948,Atrial Cardiomyocyte,AZ:0000003,regular atrial cardiac myocyte,CL:0002129,skos:exactMatch
