@@ -29,7 +29,7 @@ Heart_L2,UBERON:0000948,Pericyte,AZ:0000017,pericyte,CL:0000669,skos:exactMatch
 Heart_L2,UBERON:0000948,Smooth Muscle,AZ:0000018,smooth muscle cell,CL:0000192,skos:exactMatch
 Heart_L2,UBERON:0000948,T,AZ:0000019,T cell,CL:0000084,skos:exactMatch
 Heart_L2,UBERON:0000948,Venous Endothelial,AZ:0000020,endothelial cell of venule,CL:1000414,skos:exactMatch
-Heart_L2,UBERON:0000948,Ventricular Cardiomyocyte,AZ:0000021,regular ventricular cardiac myocyte,CL:0002131,skos:exactMatch
+Heart_L2,UBERON:0000948,Ventricular Cardiomycoyte,AZ:0000021,regular ventricular cardiac myocyte,CL:0002131,skos:exactMatch
 Kidney_L3,UBERON:0002113,Afferent / Efferent Arteriole Endothelial,AZ:0000022,endothelial cell of arteriole:afferent/efferent,CL:1000412,skos:narrowMatch
 Kidney_L3,UBERON:0002113,Ascending Thin Limb,AZ:0000023,kidney loop of Henle thin ascending limb epithelial cell,CL:1001107,skos:exactMatch
 Kidney_L3,UBERON:0002113,Ascending Vasa Recta Endothelial,AZ:0000024,vasa recta ascending limb cell,CL:1001131,skos:exactMatch
