@@ -41,6 +41,9 @@ const ORGAN_MAPPING = {
   uterus: 'UBERON:0000995',
   vasculature: 'UBERON:0004537',
   breast: 'UBERON:0001911',
+  'esophagus mucosa': 'UBERON:0002469',
+  'esophagus muscularis': 'UBERON:0004648',
+  'skeletal muscle': 'UBERON:0001134',
 };
 
 const execFile = promisify(callbackExecFile);
@@ -61,11 +64,7 @@ export class Downloader {
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset.py';
     /** @type {string} */
-    this.extractScriptFilePath = getSrcFilePath(
-      config,
-      'gtex',
-      this.extractScriptFile
-    );
+    this.extractScriptFilePath = getSrcFilePath(config, 'gtex', this.extractScriptFile);
   }
 
   /**
@@ -136,9 +135,7 @@ export class Downloader {
     const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
     dataset.donor_id = `${GTEX_DOI_URL}#${donor_id_match?.[1].trim()}` ?? '';
 
-    dataset.organ_id = dataset.organ
-      ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}`
-      : '';
+    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
 
     // Parse tissue_site line. Format: `tissue_site: X\n`
     const tissue_site_match = /tissue_site:(.+)\n/i.exec(stdout);

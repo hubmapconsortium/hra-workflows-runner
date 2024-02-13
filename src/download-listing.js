@@ -31,6 +31,25 @@ function createSummaries(listing) {
   return summaries;
 }
 
+async function mergeExistingSummary(summaries, config) {
+  const path = getSummariesFilePath(config);
+  let existingSummaries;
+
+  try {
+    existingSummaries = await DatasetSummaries.load(path);
+  } catch {
+    // Failing to load existing summaries usually means they don't exist - Do nothing
+    return;
+  }
+
+  for (const existingSummary of existingSummaries.values()) {
+    const summary = summaries.get(existingSummary.id);
+    if (summary) {
+      Object.assign(summary, existingSummary);
+    }
+  }
+}
+
 async function main() {
   const config = getConfig().validate([DATASET_COLUMN_ID]);
   await ensureDirsExist(getOutputDir(config));
@@ -46,6 +65,7 @@ async function main() {
 
   const listing = await loadListing(config);
   const summaries = createSummaries(listing);
+  await mergeExistingSummary(summaries, config);
   await summaries.save(getSummariesFilePath(config));
 }
 

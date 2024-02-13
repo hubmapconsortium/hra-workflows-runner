@@ -113,10 +113,11 @@ export async function loadDatasets(directoriesOrSummaries, config) {
   const items = Array.isArray(directoriesOrSummaries)
     ? directoriesOrSummaries
     : Array.from(directoriesOrSummaries.values());
-
-  return concurrentMap(items, (item) => loadDataset(item, config), {
+  const datasets = await concurrentMap(items, (item) => loadDataset(item, config), {
     maxConcurrency,
   });
+
+  return datasets.filter((dataset) => dataset !== undefined);
 }
 
 /**
@@ -142,8 +143,12 @@ async function loadDataset(dirOrSummary, config) {
   const [summary, directory] =
     typeof dirOrSummary === 'string' ? [undefined, dirOrSummary] : [dirOrSummary, getDirForId(dirOrSummary.id)];
   const path = getDatasetFilePath(config, directory);
-  const dataset = await Dataset.load(path, config);
 
-  setSummaryRef(dataset, summary);
-  return dataset;
+  try {
+    const dataset = await Dataset.load(path, config);
+    setSummaryRef(dataset, summary);
+    return dataset;
+  } catch {
+    return undefined;
+  }
 }

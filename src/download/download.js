@@ -28,7 +28,9 @@ async function tryDownload(dataset) {
   try {
     const downloader = getDownloaderRef(dataset);
     await logEvent('Download', dataset.id, () => downloader.download(dataset));
-    await dataset.save();
+    if (!dataset.scratch.exclude) {
+      await dataset.save();
+    }
     markSuccess(dataset);
   } catch (error) {
     markFailure(dataset, error);

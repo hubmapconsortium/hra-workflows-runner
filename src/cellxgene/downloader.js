@@ -71,7 +71,8 @@ export class Downloader {
     const assetsFiles = await this.downloadAssets(dataset.assets);
     await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
     if (!(await fileExists(dataset.dataFilePath))) {
-      throw new Error('No data for donor-tissue combination');
+      dataset.scratch.exclude = true;
+      return;
     }
 
     const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);

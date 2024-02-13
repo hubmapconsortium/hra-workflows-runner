@@ -1,4 +1,5 @@
 import { Dataset } from '../dataset/dataset.js';
+import { Status } from '../dataset/summary.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import { DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
@@ -48,7 +49,12 @@ async function tryPrepare(downloader, datasets) {
  * @param {Dataset[]} datasets Datasets
  */
 function markNotSupported(datasets) {
-  datasets.forEach((d) => getSummaryRef(d).setNotSupported(DOWNLOAD_STEP));
+  datasets.forEach((d) => {
+    const summary = getSummaryRef(d);
+    if (summary.getStatus(DOWNLOAD_STEP) === Status.NOT_STARTED) {
+      summary.setNotSupported(DOWNLOAD_STEP);
+    }
+  });
 }
 
 /**
