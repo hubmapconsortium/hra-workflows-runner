@@ -193,7 +193,7 @@ export class Downloader {
   async lookupOrgan(datasets) {
     const tissueIds = datasets.map(({ tissueId }) => tissueId).filter((id) => UBERON_ID_REGEX.test(id));
     const uniqueTissueIds = Array.from(new Set(tissueIds));
-    const organLookup = await getOrganLookup(uniqueTissueIds);
+    const organLookup = await getOrganLookup(uniqueTissueIds, this.config);
 
     for (const dataset of datasets) {
       dataset.organ = organLookup.get(dataset.tissueId) ?? '';
