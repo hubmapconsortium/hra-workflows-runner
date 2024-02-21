@@ -230,8 +230,8 @@ Human_PBMC_L3,UBERON:0000178,CD8 TEM_4,AZ:0000218,"effector CD8-positive, alpha-
 Human_PBMC_L3,UBERON:0000178,CD8 TEM_5,AZ:0000219,"effector CD8-positive, alpha-beta T cell:5",CL:0001050,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,CD8 TEM_6,AZ:0000220,"effector CD8-positive, alpha-beta T cell:6",CL:0001050,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,cDC1,AZ:0000221,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
-Human_PBMC_L3,UBERON:0000178,cDC2_1,AZ:0000222,CD1c-positive myeloid dendritic cell,CL:0002399,skos:exactMatch
-Human_PBMC_L3,UBERON:0000178,cDC2_2,AZ:0000223,CD1c-positive myeloid dendritic cell,CL:0002399,skos:exactMatch
+Human_PBMC_L3,UBERON:0000178,cDC2_1,AZ:0000222,CD1c-positive myeloid dendritic cell:1,CL:0002399,skos:narrowMatch
+Human_PBMC_L3,UBERON:0000178,cDC2_2,AZ:0000223,CD1c-positive myeloid dendritic cell:2,CL:0002399,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,dnT_1,AZ:0000224,"CD4-negative, CD8-negative, alpha-beta intraepithelial T cell:1",CL:0000935,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,dnT_2,AZ:0000225,"CD4-negative, CD8-negative, alpha-beta intraepithelial T cell:2",CL:0000935,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,Eryth,AZ:0000226,erythroid lineage cell,CL:0000764,skos:exactMatch
@@ -247,7 +247,7 @@ Human_PBMC_L3,UBERON:0000178,NK_1,AZ:0000235,"CD16-positive, CD56-dim natural ki
 Human_PBMC_L3,UBERON:0000178,NK_2,AZ:0000236,"CD16-positive, CD56-dim natural killer cell, human:2",CL:0000939,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,NK_3,AZ:0000237,"CD16-positive, CD56-dim natural killer cell, human:3",CL:0000939,skos:narrowMatch
 Human_PBMC_L3,UBERON:0000178,NK_4,AZ:0000238,"CD16-positive, CD56-dim natural killer cell, human:4",CL:0000939,skos:narrowMatch
-Human_PBMC_L3,UBERON:0000178,NK_CD56bright,AZ:0000239,"CD16-negative, CD56-bright natural killer cell, human",CL:0000938,skos:narrowMatch
+Human_PBMC_L3,UBERON:0000178,NK_CD56bright,AZ:0000239,"CD16-negative, CD56-bright natural killer cell, human",CL:0000938,skos:exactMatch
 Human_PBMC_L3,UBERON:0000178,pDC,AZ:0000240,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
 Human_PBMC_L3,UBERON:0000178,Plasma,AZ:0000241,plasma cell,CL:0000786,skos:exactMatch
 Human_PBMC_L3,UBERON:0000178,Plasmablast,AZ:0000242,plasmablast,CL:0000980,skos:exactMatch
@@ -487,3 +487,64 @@ Bone_marrow_L2,UBERON:0002371,Prog Mk,AZ:0000475,megakaryocyte progenitor cell,C
 Bone_marrow_L2,UBERON:0002371,Stromal,AZ:0000476,stromal cell,CL:0000499,skos:exactMatch
 Bone_marrow_L2,UBERON:0002371,T proliferating,AZ:0000477,T cell:proliferating,CL:0000084,skos:narrowMatch
 Bone_marrow_L2,UBERON:0002371,transitional B,AZ:0000478,transitional stage B cell,CL:0000818,skos:exactMatch
+Adipose_L1,UBERON:0001347,Adipocyte,AZ:0000479,adipocyte,CL:0000136,skos:exactMatch
+Adipose_L1,UBERON:0001347,ASPC,AZ:0000480,mesenchymal stem cell of adipose tissue,CL:0002570,skos:exactMatch
+Adipose_L1,UBERON:0001347,B,AZ:0000481,B cell,CL:0000236,skos:exactMatch
+Adipose_L1,UBERON:0001347,Dendritic,AZ:0000482,dendritic cell,CL:0000451,skos:exactMatch
+Adipose_L1,UBERON:0001347,Endometrial,AZ:0000483,epithelial cell of endometrial gland,CL:0009084,skos:exactMatch
+Adipose_L1,UBERON:0001347,Endothelial,AZ:0000484,endothelial cell,CL:0000115,skos:exactMatch
+Adipose_L1,UBERON:0001347,Lymphatic Endothelial,AZ:0000485,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
+Adipose_L1,UBERON:0001347,Macrophage,AZ:0000486,macrophage,CL:0000235,skos:exactMatch
+Adipose_L1,UBERON:0001347,Mast,AZ:0000487,mast cell,CL:0000097,skos:exactMatch
+Adipose_L1,UBERON:0001347,Mesothelial,AZ:0000488,mesothelial cell,CL:0000077,skos:exactMatch
+Adipose_L1,UBERON:0001347,Monocyte,AZ:0000489,monocyte,CL:0000576,skos:exactMatch
+Adipose_L1,UBERON:0001347,Neutrophil,AZ:0000490,neutrophil,CL:0000775,skos:exactMatch
+Adipose_L1,UBERON:0001347,NK,AZ:0000491,natural killer cell,CL:0000623,skos:exactMatch
+Adipose_L1,UBERON:0001347,Pericyte,AZ:0000492,pericyte,CL:0000669,skos:exactMatch
+Adipose_L1,UBERON:0001347,Smooth Muscle,AZ:0000493,smooth muscle cell,CL:0000192,skos:exactMatch
+Adipose_L1,UBERON:0001347,T,AZ:0000494,T cell,CL:0000084,skos:exactMatch
+Adipose_L2,UBERON:0001347,hAd1,AZ:0000495,subcutaneous adipocyte:white adipose tissue,CL:0002521,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd2,AZ:0000496,white adipocyte:visceral adipose tissue,CL:0000448,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd3,AZ:0000497,subcutaneous adipocyte:white adipose tissue,CL:0002521,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd4,AZ:0000498,subcutaneous adipocyte:white adipose tissue,CL:0002521,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd5,AZ:0000499,white adipocyte,CL:0000448,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd6,AZ:0000500,white adipocyte:visceral adipose tissue,CL:0000448,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hAd7,AZ:0000501,subcutaneous adipocyte:white adipose tissue,CL:0002521,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hASPC1,AZ:0000502,mesenchymal stem cell of adipose tissue:subcutaneous adipose tissue,CL:0002570,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hASPC2,AZ:0000503,mesenchymal stem cell of abdominal adipose tissue,CL:2000080,skos:exactMatch
+Adipose_L2,UBERON:0001347,hASPC3,AZ:0000504,mesenchymal stem cell of abdominal adipose tissue:visceral adipose tissue,CL:2000080,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hASPC4,AZ:0000505,mesenchymal stem cell of adipose tissue:subcutaneous adipose tissue,CL:0002570,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hASPC5,AZ:0000506,mesenchymal stem cell of adipose tissue:subcutaneous adipose tissue,CL:0002570,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hASPC6,AZ:0000507,mesenchymal stem cell of abdominal adipose tissue:visceral adipose tissue,CL:2000080,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hBcell,AZ:0000508,B cell,CL:0000236,skos:exactMatch
+Adipose_L2,UBERON:0001347,hcDC1,AZ:0000509,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
+Adipose_L2,UBERON:0001347,hcDC2,AZ:0000510,CD1c-positive myeloid dendritic cell,CL:0002399,skos:exactMatch
+Adipose_L2,UBERON:0001347,hEndM,AZ:0000511,epithelial cell of endometrial gland,CL:0009084,skos:exactMatch
+Adipose_L2,UBERON:0001347,hEndoA1,AZ:0000512,endothelial cell:A1,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hEndoA2,AZ:0000513,endothelial cell:A2,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hEndoS1,AZ:0000514,endothelial cell:S1,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hEndoS2,AZ:0000515,endothelial cell:S2,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hEndoS3,AZ:0000516,endothelial cell:S3,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hEndoV,AZ:0000517,endothelial cell:V,CL:0000115,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hLEC1,AZ:0000518,endothelial cell of lymphatic vessel:1,CL:0002138,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hLEC2,AZ:0000519,endothelial cell of lymphatic vessel:2,CL:0002138,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMac1,AZ:0000520,macrophage:1,CL:0000235,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMac2,AZ:0000521,macrophage:2,CL:0000235,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMac3,AZ:0000522,macrophage:3,CL:0000235,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMast,AZ:0000523,mast cell,CL:0000097,skos:exactMatch
+Adipose_L2,UBERON:0001347,hmDC,AZ:0000524,myeloid dendritic cell,CL:0000782,skos:exactMatch
+Adipose_L2,UBERON:0001347,hMes1,AZ:0000525,mesothelial cell:1,CL:0000077,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMes2,AZ:0000526,mesothelial cell:2,CL:0000077,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMes3,AZ:0000527,mesothelial cell:3,CL:0000077,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMono1,AZ:0000528,monocyte:1,CL:0000576,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hMono2,AZ:0000529,monocyte:2,CL:0000576,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hNeu,AZ:0000530,neutrophil,CL:0000775,skos:exactMatch
+Adipose_L2,UBERON:0001347,hNK,AZ:0000531,natural killer cell,CL:0000623,skos:exactMatch
+Adipose_L2,UBERON:0001347,hpDC,AZ:0000532,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
+Adipose_L2,UBERON:0001347,hPeri,AZ:0000533,pericyte,CL:0000669,skos:exactMatch
+Adipose_L2,UBERON:0001347,hPlasmablast,AZ:0000534,plasmablast,CL:0000980,skos:exactMatch
+Adipose_L2,UBERON:0001347,hSMC1,AZ:0000535,smooth muscle cell:1,CL:0000192,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hSMC2,AZ:0000536,smooth muscle cell:2,CL:0000192,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hTcell1,AZ:0000537,CD4-positive helper T cell:1,CL:0000492,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hTcell2,AZ:0000538,CD4-positive helper T cell:2,CL:0000492,skos:narrowMatch
+Adipose_L2,UBERON:0001347,hTreg,AZ:0000539,regulatory T cell,CL:0000815,skos:exactMatch
