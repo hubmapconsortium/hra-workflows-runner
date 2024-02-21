@@ -548,3 +548,162 @@ Adipose_L2,UBERON:0001347,hSMC2,AZ:0000536,smooth muscle cell:2,CL:0000192,skos:
 Adipose_L2,UBERON:0001347,hTcell1,AZ:0000537,CD4-positive helper T cell:1,CL:0000492,skos:narrowMatch
 Adipose_L2,UBERON:0001347,hTcell2,AZ:0000538,CD4-positive helper T cell:2,CL:0000492,skos:narrowMatch
 Adipose_L2,UBERON:0001347,hTreg,AZ:0000539,regulatory T cell,CL:0000815,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,aDC1,AZ:0000540,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,aDC2,AZ:0000541,CD1c-positive myeloid dendritic cell:2,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,aDC3,AZ:0000542,CD1c-positive myeloid dendritic cell:3,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Basal cells,AZ:0000543,basal cell,CL:0000646,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,C1Q Slan-like,AZ:0000544,non-classical monocyte:tonsil C1Q slan-like,CL:0000875,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CD14+CD55+ FDC,AZ:0000545,follicular dendritic cell:CD14+CD55+,CL:0000442,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CD16-CD56+ NK,AZ:0000546,"CD16-negative, CD56-bright natural killer cell, human",CL:0000938,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,CD16-CD56dim NK,AZ:0000547,"natural killer cell:CD16-negative, CD56-dim",CL:0000623,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CD16+CD56- NK,AZ:0000548,"natural killer cell:CD16-positive, CD56-negative",CL:0000623,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CD8 Tf,AZ:0000549,"effector memory CD8-positive, alpha-beta T cell:follicular",CL:0000913,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CM CD8 T,AZ:0000550,"central memory CD8-positive, alpha-beta T cell",CL:0000907,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,CM Pre-non-Tfh,AZ:0000551,"central memory CD8-positive, alpha-beta T cell:non-T follicular helper",CL:0000907,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,CM PreTfh,AZ:0000552,"central memory CD4-positive, alpha-beta T cell:preT follicular helper",CL:0000904,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,COL27A1+ FDC,AZ:0000553,follicular dendritic cell:COL27A1+,CL:0000442,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Crypt,AZ:0000554,tonsil squamous cell,CL:1001577,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,csMBC,AZ:0000555,class switched memory B cell,CL:0000972,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,csMBC FCRL4/5+,AZ:0000556,class switched memory B cell:FCRL4/5+,CL:0000972,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Cycling,AZ:0000557,Cycling,AZ:0000557,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,cycling FDC,AZ:0000558,follicular dendritic cell:cycling,CL:0000442,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,cycling T,AZ:0000559,T cell:cycling,CL:0000084,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DC recruiters CD8 T,AZ:0000560,DC recruiters CD8 T,AZ:0000560,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DC1 mature,AZ:0000561,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DC1 precursor,AZ:0000562,common myeloid progenitor:dendritic cell precursor,CL:0000049,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DC2,AZ:0000563,CD1c-positive myeloid dendritic cell:2,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DC3,AZ:0000564,CD1c-positive myeloid dendritic cell:3,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DC4,AZ:0000565,CD1c-positive myeloid dendritic cell:4,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DC5,AZ:0000566,CD1c-positive myeloid dendritic cell:5,CL:0002399,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,DN,AZ:0000567,double negative thymocyte,CL:0002489,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ cell cycle exit,AZ:0000568,DZ cell cycle exit,AZ:0000568,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ early G2Mphase,AZ:0000569,DZ early G2Mphase,AZ:0000569,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ early Sphase,AZ:0000570,DZ early Sphase,AZ:0000570,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ late G2Mphase,AZ:0000571,DZ late G2Mphase,AZ:0000571,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ late Sphase,AZ:0000572,DZ late Sphase,AZ:0000572,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ migratory PC precursor,AZ:0000573,DZ migratory PC precursor,AZ:0000573,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ non proliferative,AZ:0000574,DZ non proliferative,AZ:0000574,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,DZ_LZ transition,AZ:0000575,DZ_LZ transition,AZ:0000575,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Early GC-commited NBC,AZ:0000576,germinal center B cell:early commited naive B cell,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Early MBC,AZ:0000577,memory B cell:early,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Early PC precursor,AZ:0000578,plasma cell: early precursor,CL:0000786,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Eff-Tregs,AZ:0000579,effector T cell,CL:0000911,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Eff-Tregs-IL32,AZ:0000580,effector T cell:IL32,CL:0000911,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,EM CD8 T,AZ:0000581,"effector memory CD8-positive, alpha-beta T cell",CL:0000913,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,FDC,AZ:0000582,follicular dendritic cell,CL:0000442,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,FDCSP epithelium,AZ:0000583,follicular dendritic cell:secreted protein epithelial cell,CL:0000442,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,FRC,AZ:0000584,fibroblastic reticular cell,CL:0009101,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,GC DZ Noproli,AZ:0000585,GC DZ Noproli,AZ:0000585,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,GC-commited NBC,AZ:0000586,germinal center B cell:early commited naive B cell,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,GC-Tfh-OX40,AZ:0000587,germinal center T cell: OX40,CL:0009062,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,GC-Tfh-SAP,AZ:0000588,germinal center T cell: SAP,CL:0009062,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IFN+ CD8 T,AZ:0000589,"effector memory CD8-positive, alpha-beta T cell:Interferon positive",CL:0000913,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IFN1+ PDC,AZ:0000590,"plasmacytoid dendritic cell, human:Interferon 1 positive",CL:0001058,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IgD PC precursor,AZ:0000591,antibody secreting cell:IgD positive plasma precursor,CL:0000946,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IgG+ PC precursor,AZ:0000592,antibody secreting cell:IgG positive plasma precursor,CL:0000946,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IgM+ early PC precursor,AZ:0000593,antibody secreting cell:early IgM positive plasma precursor,CL:0000946,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IgM+ PC precursor,AZ:0000594,antibody secreting cell:IgM positive plasma precursor,CL:0000946,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,IL7R DC,AZ:0000595,"dendritic cell, human:IL7R",CL:0001056,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,ILC1,AZ:0000596,innate lymphoid cell:1,CL:0001065,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,ITGAX Slan-like,AZ:0000597,ITGAX Slan-like,AZ:0000597,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,LZ,AZ:0000598,germinal center B cell:light zone,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,LZ proliferative,AZ:0000599,germinal center B cell:proliferative,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,LZ_DZ reentry commitment,AZ:0000600,germinal center B cell:light zone to dark zone reentry commitment,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,LZ_DZ transition,AZ:0000601,germinal center B cell:light zone to dark zone transition,CL:0000844,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,M1 Macrophages,AZ:0000602,inflammatory macrophage,CL:0000863,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,MAIT/CD161+TRDV2+ gd T-cells,AZ:0000603,gamma-delta T cell:MAIT/CD161+TRDV2+,CL:0000798,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Mast,AZ:0000604,mast cell,CL:0000097,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Mature IgA+ PC,AZ:0000605,IgA plasma cell,CL:0000987,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Mature IgG+ PC,AZ:0000606,IgG plasma cell,CL:0000985,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Mature IgM+ PC,AZ:0000607,IgM plasma cell,CL:0000986,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,MBC derived early PC precursor,AZ:0000608,memory B cell:early plasma cell precursor,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,MBC derived IgA+ PC,AZ:0000609,memory B cell:IgA positive plasma cell,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,MBC derived IgG+ PC,AZ:0000610,memory B cell:IgG positive plasma cell,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,MBC derived PC precursor,AZ:0000611,memory B cell:plasma cell precursor,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,MBC FCRL5+,AZ:0000612,memory B cell:FCRL5+,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,MMP Slan-like,AZ:0000613,MMP Slan-like,AZ:0000613,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Monocytes,AZ:0000614,monocyte,CL:0000576,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,MRC,AZ:0000615,fibroblastic reticular cell,CL:0009101,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Naive,AZ:0000616,Naive,AZ:0000616,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Naive CD8 T,AZ:0000617,"CD8-positive, alpha-beta thymocyte",CL:0000811,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,NBC,AZ:0000618,naive B cell,CL:0000788,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,NBC CD229+,AZ:0000619,naive B cell:CD229+,CL:0000788,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,NBC early activation,AZ:0000620,naive B cell:early activation,CL:0000788,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,NBC IFN-activated,AZ:0000621,naive B cell:Interferon activated,CL:0000788,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,ncsMBC,AZ:0000622,unswitched memory B cell,CL:0000970,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,ncsMBC FCRL4/5+,AZ:0000623,unswitched memory B cell:Fc receptor-like (FCRL) 4/5+,CL:0000970,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Neutrophils,AZ:0000624,neutrophil,CL:0000775,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,NKp44- ILC3,AZ:0000625,innate lymphoid cell:NKp44-negative,CL:0001065,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,NKp44+ ILC3,AZ:0000626,innate lymphoid cell:NKp44-positive,CL:0001065,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Outer surface,AZ:0000627,Outer surface,AZ:0000627,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,PB,AZ:0000628,plasmablast,CL:0000980,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,PB committed early PC precursor,AZ:0000629,plasmablast:committed early plasma cell precursor,CL:0000980,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,PC committed Light Zone GCBC,AZ:0000630,plasma cell:committed light zone germinal center B cell,CL:0000786,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,PDC,AZ:0000631,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,preB,AZ:0000632,precursor B cell,CL:0000817,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Precursor MBCs,AZ:0000633,precursor B cell:memory,CL:0000817,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,preGC,AZ:0000634,preGC,AZ:0000634,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,preMature IgG+ PC,AZ:0000635,IgG plasma cell:premature,CL:0000985,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,preMature IgM+ PC,AZ:0000636,IgM plasma cell:premature,CL:0000986,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,preT,AZ:0000637,early T lineage precursor,CL:0002425,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Proliferative NBC,AZ:0000638,naive B cell:proliferative,CL:0000788,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Reactivated proliferative MBCs,AZ:0000639,memory B cell:reactivated proliferative,CL:0000787,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,RM CD8 activated T,AZ:0000640,"effector memory CD8-positive, alpha-beta T cell:activated resident memory",CL:0000913,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,RM CD8 T,AZ:0000641,"effector memory CD8-positive, alpha-beta T cell:resident memory",CL:0000913,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,SCM CD8 T,AZ:0000642,"CD8-positive, alpha-beta memory T cell:stem cell memory",CL:0000909,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,SELENOP Slan-like,AZ:0000643,SELENOP Slan-like,AZ:0000643,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Short lived IgM+ PC,AZ:0000644,IgM short lived plasma cell,CL:0000978,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Surface epithelium,AZ:0000645,Surface epithelium,AZ:0000645,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,T-Eff-Mem,AZ:0000646,"effector memory CD45RA-positive, alpha-beta T cell, terminally differentiated",CL:4030002,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,T-helper,AZ:0000647,helper T cell,CL:0000912,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,T-Trans-Mem,AZ:0000648,T-Trans-Mem,AZ:0000648,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,TCRV_+ gd T,AZ:0000649,gamma-delta T cell:TCRV_+,CL:0000798,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Tfh T:B border,AZ:0000650,Tfh T:B border,AZ:0000650,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Tfh-LZ-GC,AZ:0000651,Tfh-LZ-GC,AZ:0000651,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Tfh-Mem,AZ:0000652,T follicular helper cell:memory,CL:0002038,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,Tfr,AZ:0000653,T follicular helper cell,CL:0002038,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,Transitional PB,AZ:0000654,plasmablast:transitional,CL:0000980,skos:narrowMatch
+Tonsil_v2_L2,UBERON:0002373,VEGFA+,AZ:0000655,VEGFA+,AZ:0000655,skos:exactMatch
+Tonsil_v2_L2,UBERON:0002373,ZNF683+ CD8 T,AZ:0000656,"CD8-positive, alpha-beta memory T cell:ZNF683+",CL:0000909,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,aDC,AZ:0000657,"dendritic cell, human:activated",CL:0001056,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,B activated,AZ:0000658,B cell:activated,CL:0000236,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,B memory,AZ:0000659,memory B cell,CL:0000787,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,B naive,AZ:0000660,naive B cell,CL:0000788,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 naive,AZ:0000661,"naive thymus-derived CD4-positive, alpha-beta T cell",CL:0000895,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 Non-TFH,AZ:0000662,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 TCM,AZ:0000663,"CD4-positive, alpha-beta memory T cell",CL:0000897,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 TFH,AZ:0000664,T follicular helper cell,CL:0002038,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 TFH Mem,AZ:0000665,"CD4-positive, alpha-beta memory T cell:follicular helper",CL:0000897,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,CD4 TREG,AZ:0000666,regulatory T cell: CD4-positive,CL:0000815,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,CD8 naive,AZ:0000667,"naive thymus-derived CD8-positive, alpha-beta T cell",CL:0000900,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD8 T,AZ:0000668,"effector memory CD8-positive, alpha-beta T cell",CL:0000913,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,CD8 TCM,AZ:0000669,"CD8-positive, alpha-beta memory T cell",CL:0000909,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,Cycling DZ GCB,AZ:0000670,Cycling DZ GCB,AZ:0000670,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,Cycling FDC,AZ:0000671,follicular dendritic cell:cycling,CL:0000442,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,Cycling myeloid,AZ:0000672,myeloid cell:cycling,CL:0000763,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,Cycling T,AZ:0000673,T cell:cycling,CL:0000084,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,DC,AZ:0000674,"dendritic cell, human",CL:0001056,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,dnT,AZ:0000675,double negative thymocyte,CL:0002489,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,DZ GCB,AZ:0000676,germinal center B cell:dark zone,CL:0000844,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,DZtoLZ GCB transition,AZ:0000677,DZtoLZ GCB transition,AZ:0000677,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,Epithelial,AZ:0000678,epithelial cell,CL:0000066,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,FCRL4/5+ B memory,AZ:0000679,memory B cell:FCRL4/5+,CL:0000787,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,FDC,AZ:0000680,follicular dendritic cell,CL:0000442,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,Granulocytes,AZ:0000681,granulocyte,CL:0000094,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,ILC,AZ:0000682,innate lymphoid cell,CL:0001065,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,LZ GCB,AZ:0000683,germinal center B cell:light zone,CL:0000844,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,LZtoDZ GCB transition,AZ:0000684,germinal center B cell:light zone to dark zone transition,CL:0000844,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,MAIT/TRDV2+ gdT,AZ:0000685,gamma-delta T cell:TRDV2+,CL:0000798,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,Mast,AZ:0000686,mast cell,CL:0000097,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,Mono/Macro,AZ:0000687,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,NK,AZ:0000688,natural killer cell,CL:0000623,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,NK_CD56bright,AZ:0000689,"CD16-negative, CD56-bright natural killer cell, human",CL:0000938,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,non-TRDV2+ gdT,AZ:0000690,gamma-delta T cell:non-TRDV2+,CL:0000798,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,PB,AZ:0000691,plasmablast,CL:0000980,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,PC,AZ:0000692,plasma cell,CL:0000786,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,PC/doublet,AZ:0000693,plasma cell:doublet,CL:0000786,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,PDC,AZ:0000694,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
+Tonsil_v2_L1,UBERON:0002373,preB/T,AZ:0000695,common lymphoid progenitor:preB/T,CL:0000051,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,preGCB,AZ:0000696,tonsil germinal center B cell:precursor,CL:2000006,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,preMBC/doublet,AZ:0000697,precursor B cell:memory/doublet,CL:0000817,skos:narrowMatch
+Tonsil_v2_L1,UBERON:0002373,prePB,AZ:0000698,plasmablast:pre,CL:0000980,skos:narrowMatch
