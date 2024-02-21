@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
 import Papa from 'papaparse';
+import { loadJson } from '../util/common.js';
 import { checkFetchResponse } from '../util/fs.js';
 import { logEvent } from '../util/logging.js';
 
@@ -15,7 +15,7 @@ const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
  */
 async function getOrgans() {
   const organs = new Set();
-  const crosswalks = JSON.parse(readFileSync(CROSSWALK_DATA))['@graph'];
+  const crosswalks = (await loadJson(CROSSWALK_DATA))['@graph'];
   for (const { organ_id: organ } of crosswalks) {
     if (organ?.trim().startsWith('UBERON')) {
       organs.add(organ);
@@ -50,7 +50,7 @@ async function getLookup(organs, ids) {
       BIND(REPLACE(STR(?organ_id), STR(UBERON:), 'UBERON:') as ?organ)
     }
   `;
-  console.log(query);
+
   const resp = await fetch(SPARQL_ENDPOINT, {
     method: 'POST',
     headers: {
