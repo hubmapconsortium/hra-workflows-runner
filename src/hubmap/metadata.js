@@ -65,7 +65,7 @@ export function metadataToLookup(result) {
         ancestors,
       },
     } = hit;
-    const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()];
+    const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '';
     const { block_id, rui_location } = getSampleBlockId(ancestors, HUBMAP_ENTITY_ENDPOINT);
     lookup.set(hubmap_id, {
       organ: mapped_organ,
