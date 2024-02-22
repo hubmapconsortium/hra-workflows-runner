@@ -1,38 +1,214 @@
 import { checkFetchResponse } from '../util/fs.js';
 
+// Code mappings derived from:
+// https://ontology.api.hubmapconsortium.org/organs?application_context=HUBMAP
+// https://ontology.api.hubmapconsortium.org/organs?application_context=SENNET
 export const ORGAN_MAPPING = {
-  AO: 'UBERON:0000948',
-  BL: 'UBERON:0001255',
-  BD: 'UBERON:0001270',
-  BM: 'UBERON:0001270',
-  BR: 'UBERON:0000955',
-  LB: 'UBERON:0001004',
-  RB: 'UBERON:0001004',
-  LE: 'UBERON:0004548',
-  RE: 'UBERON:0004549',
-  LF: 'UBERON:0001303',
-  RF: 'UBERON:0001302',
-  HT: 'UBERON:0000948',
-  LK: 'UBERON:0004538',
-  RK: 'UBERON:0004539',
-  LI: 'UBERON:0000059',
-  LV: 'UBERON:0002107',
-  LL: 'UBERON:0001004',
-  LN: 'FMA:24978',
-  RL: 'UBERON:0001004',
-  RN: 'FMA:24977',
-  LY: 'UBERON:0002509',
-  LO: 'FMA:7214',
-  RO: 'FMA:7213',
-  PA: 'UBERON:0001264',
-  PL: 'UBERON:0001987',
-  SI: 'UBERON:0002108',
-  SK: 'UBERON:0002097',
-  SP: 'UBERON:0002106',
-  TH: 'UBERON:0002370',
-  TR: 'UBERON:0001004',
-  UR: 'UBERON:0001223',
-  UT: 'UBERON:0000995',
+  AD: {
+    code: 'AD',
+    label: 'Adipose Tissue',
+    organ_id: 'UBERON:0001013',
+  },
+  AO: {
+    code: 'AO',
+    label: 'Aorta',
+    organ_id: 'UBERON:0000947',
+  },
+  BD: {
+    code: 'BD',
+    label: 'Blood',
+    organ_id: 'UBERON:0000178',
+  },
+  BL: {
+    code: 'BL',
+    label: 'Bladder',
+    organ_id: 'UBERON:0001255',
+  },
+  BM: {
+    code: 'BM',
+    label: 'Bone Marrow',
+    organ_id: 'UBERON:0002371',
+  },
+  BR: {
+    code: 'BR',
+    label: 'Brain',
+    organ_id: 'UBERON:0000955',
+  },
+  BS: {
+    code: 'BS',
+    label: 'Breast',
+    organ_id: 'UBERON:0000310', // mammary gland? UBERON:0001911
+  },
+  BX: {
+    code: 'BX',
+    label: 'Bone',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0001474',
+  },
+  HT: {
+    code: 'HT',
+    label: 'Heart',
+    organ_id: 'UBERON:0000948',
+  },
+  LB: {
+    code: 'LB',
+    label: 'Bronchus (Left)',
+    organ_id: 'UBERON:0002178',
+  },
+  LE: {
+    code: 'LE',
+    label: 'Eye (Left)',
+    organ_id: 'UBERON:0004548',
+  },
+  LF: {
+    code: 'LF',
+    label: 'Fallopian Tube (Left)',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0001303',
+  },
+  LI: {
+    code: 'LI',
+    label: 'Large Intestine',
+    organ_id: 'UBERON:0000059',
+  },
+  LK: {
+    code: 'LK',
+    label: 'Kidney (Left)',
+    organ_id: 'UBERON:0004538',
+  },
+  LL: {
+    code: 'LL',
+    label: 'Lung (Left)',
+    organ_id: 'UBERON:0002168',
+  },
+  LN: {
+    code: 'LN',
+    label: 'Lymph Node', 
+    organ_id: 'UBERON:0000029', // mesenteric? UBERON:0002509
+  },
+  LO: {
+    code: 'LO',
+    label: 'Ovary (Left)',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0002119',
+  },
+  LV: {
+    code: 'LV',
+    label: 'Liver',
+    organ_id: 'UBERON:0002107',
+  },
+  LY: {
+    code: 'LY',
+    label: 'Lymph Node',
+    organ_id: 'UBERON:0000029',
+  },
+  MU: {
+    code: 'MU',
+    label: 'Muscle',
+    organ_id: 'UBERON:0005090',
+  },
+  OT: {
+    code: 'OT',
+    label: 'Other',
+    organ_id: undefined,
+  },
+  PA: {
+    code: 'PA',
+    label: 'Pancreas',
+    organ_id: 'UBERON:0001264',
+  },
+  PL: {
+    code: 'PL',
+    label: 'Placenta',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0001987',
+  },
+  RB: {
+    code: 'RB',
+    label: 'Bronchus (Right)',
+    organ_id: 'UBERON:0002177',
+  },
+  RE: {
+    code: 'RE',
+    label: 'Eye (Right)',
+    organ_id: 'UBERON:0004549',
+  },
+  RF: {
+    code: 'RF',
+    label: 'Fallopian Tube (Right)',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0001302',
+  },
+  RK: {
+    code: 'RK',
+    label: 'Kidney (Right)',
+    organ_id: 'UBERON:0004539',
+  },
+  RL: {
+    code: 'RL',
+    label: 'Lung (Right)',
+    organ_id: 'UBERON:0002167',
+  },
+  RN: {
+    code: 'RN',
+    label: 'Knee (Right)',
+    // No trained model as of 2/22/24
+    organ_id: 'FMA:24977',
+  },
+  RO: {
+    code: 'RO',
+    label: 'Ovary (Right)',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0002118',
+  },
+  SI: {
+    code: 'SI',
+    label: 'Small Intestine',
+    organ_id: 'UBERON:0002108',
+  },
+  SK: {
+    code: 'SK',
+    label: 'Skin',
+    organ_id: 'UBERON:0002097',
+  },
+  SP: {
+    code: 'SP',
+    label: 'Spleen',
+    organ_id: 'UBERON:0002106',
+  },
+  ST: {
+    code: 'ST',
+    label: 'Sternum',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0000975',
+  },
+  TH: {
+    code: 'TH',
+    label: 'Thymus',
+    organ_id: 'UBERON:0002370',
+  },
+  TR: {
+    code: 'TR',
+    label: 'Trachea',
+    organ_id: 'UBERON:0003126',
+  },
+  UR: {
+    code: 'UR',
+    label: 'Ureter',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0000056',
+  },
+  UT: {
+    code: 'UT',
+    label: 'Uterus',
+    organ_id: 'UBERON:0000995',
+  },
+  VL: {
+    code: 'VL',
+    label: 'Lymphatic Vasculature',
+    // No trained model as of 2/22/24
+    organ_id: 'UBERON:0001473',
+  },
 };
 
 export function getHeaders(token) {

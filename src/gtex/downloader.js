@@ -29,7 +29,7 @@ const ORGAN_MAPPING = {
   large_intestine: 'UBERON:0000059',
   liver: 'UBERON:0002107',
   lung: 'UBERON:0002048',
-  lymph_node: 'UBERON:0000029',
+  lymph_node: 'UBERON:0000029', // or mesenteric lymph node (UBERON:0002509)?
   mammary: 'UBERON:0001911',
   pancreas: 'UBERON:0001264',
   prostate: 'UBERON:0002367',
