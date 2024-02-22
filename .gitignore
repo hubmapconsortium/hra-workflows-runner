@@ -145,6 +145,8 @@ raw-data
 *.sif
 
 # Slurm output
+slurm-output
+!slurm-output/.gitkeep
 hra-run*.txt
 hra-run*.err
 
