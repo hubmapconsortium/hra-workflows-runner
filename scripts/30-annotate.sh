@@ -35,5 +35,5 @@ else
   printf "%s\n" "${DATASET_DIRS[@]}" >$DIRS_FILE
 
   echo "Use 30x-annotate.sh to run annotations. Exiting..."
-  exit 1
+  exit $STOP_CODE
 fi

@@ -5,11 +5,12 @@
 #SBATCH -p general
 #SBATCH -o slurm-output/annotate-worker/hra-run_%j.txt
 #SBATCH -e slurm-output/annotate-worker/hra-run_%j.err
-#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=FAIL,TIME_LIMIT,INVALID_DEPEND,ARRAY_TASKS
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-core=1
 #SBATCH --time=1:00:00
 #SBATCH --mem=128G
+#SBATCH --kill-on-invalid-dep=yes
 
 module load nodejs
 module load python
@@ -18,7 +19,7 @@ module load singularity
 # ---------------------------------------
 # Constants
 # ---------------------------------------
-readonly NUM_TASKS=4 # Keep in sync with --ntasks
+readonly NUM_TASKS="${SLURM_NTASKS:-4}"
 readonly HORIZONTAL_LINE='------------------------------------------------'
 
 readonly CWL_PIPELINE_URL="https://cdn.jsdelivr.net/gh/hubmapconsortium/hra-workflows@main/pipeline.cwl"

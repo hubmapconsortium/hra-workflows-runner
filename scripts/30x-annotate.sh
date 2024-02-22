@@ -8,11 +8,16 @@ set -e
 # ---------------------------------------
 declare -a args worker_args
 declare -i num_workers="${NUM_WORKERS:-10}"
+declare wait_for_job_id
 
 while (("$#" > 0)); do
   case $1 in
   -n | --num-workers)
     num_workers="$2"
+    shift 2
+    ;;
+  --wait-for-job)
+    wait_for_job_id="$2"
     shift 2
     ;;
   --)
@@ -84,11 +89,29 @@ id="${control_file##*/*-}"
 id="${id%.lock}"
 
 # ---------------------------------------
+# Build sbatch argument list
+# ---------------------------------------
+declare -a sbatch_args
+
+# Add workers
+sbatch_args+=("--array" "1-$num_workers")
+
+# Add job dependency
+if [[ -n "$wait_for_job_id" ]]; then
+  sbatch_args+=("-d" "afterok:$wait_for_job_id")
+fi
+
+# Add script with arguments
+sbatch_args+=("$SRC_DIR/slurm/slurm-annotate-worker.sh")
+sbatch_args+=("$control_file" "${worker_args[@]}")
+
+# ---------------------------------------
 # Start worker
 # ---------------------------------------
-echo "Starting workers"
+echo "Starting worker sbatch scripts"
 echo "Control file: $control_file"
+echo "Job dependency: $wait_for_job_id"
 echo "Number of new workers: $num_workers"
 echo "Use '30x-annotate $id' to start additional workers"
 echo "Use '30x-cancel.sh $id' to cancel the run"
-sbatch --array "1-$num_workers" "$SRC_DIR/slurm/slurm-annotate-worker.sh" "$control_file" "${worker_args[@]}"
+sbatch "${sbatch_args[@]}"
