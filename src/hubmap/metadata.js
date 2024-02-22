@@ -1,3 +1,4 @@
+import { OrganMetadataCollection } from '../organ/metadata.js';
 import { getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
 
 /**
@@ -39,8 +40,9 @@ export const METADATA_FIELDS = [
  * Creates a metadata lookup from the raw metadata
  *
  * @param {object} result Raw metadata
+ * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export function metadataToLookup(result) {
+export function metadataToLookup(result, organMetadata) {
   /** @type {Map<string, HubmapMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -65,7 +67,7 @@ export function metadataToLookup(result) {
         ancestors,
       },
     } = hit;
-    const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '';
+    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
     const { block_id, rui_location } = getSampleBlockId(ancestors, HUBMAP_ENTITY_ENDPOINT);
     lookup.set(hubmap_id, {
       organ: mapped_organ,

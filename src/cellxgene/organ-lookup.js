@@ -1,49 +1,11 @@
-import { join } from 'node:path';
 import Papa from 'papaparse';
-import { loadJson } from '../util/common.js';
-import { concurrentMap } from '../util/concurrent-map.js';
+import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, FORCE, MAX_CONCURRENCY } from '../util/constants.js';
-import { checkFetchResponse, downloadFile, ensureDirsExist } from '../util/fs.js';
+import { checkFetchResponse } from '../util/fs.js';
 import { logEvent } from '../util/logging.js';
-import { getOutputDir } from '../util/paths.js';
 
 /** Endpoint to do tissue to organ query */
 const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
-/** Template for organ metadata file urls */
-const ORGAN_METADATA_URL_TEMPLATE =
-  'https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/containers/{{algorithm}}/context/organ-metadata.json';
-
-/**
- * Downloads organ metadata for an algorithm
- *
- * @param {string} algorithm Algorithm organ metadata to download
- * @param {Config} config Configuration
- * @returns {Promise<Record<string, any>>} Organ metadata
- */
-async function downloadAlgorithmOrganMetadata(algorithm, config) {
-  const url = ORGAN_METADATA_URL_TEMPLATE.replace('{{algorithm}}', algorithm);
-  const dir = join(getOutputDir(config), 'organ-metadata');
-  const file = join(dir, `${algorithm}.json`);
-
-  await ensureDirsExist(dir);
-  await downloadFile(file, url, { overwrite: config.get(FORCE, false) });
-  return await loadJson(file);
-}
-
-/**
- * Gets available organs
- *
- * @param {Config} config Configuration
- * @returns {Promise<string[]>}
- */
-export async function getOrgans(config) {
-  const metadata = await concurrentMap(ALGORITHMS, (algorithm) => downloadAlgorithmOrganMetadata(algorithm, config), {
-    maxConcurrency: config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY),
-  });
-
-  return Array.from(new Set(metadata.flatMap(Object.keys)));
-}
 
 /**
  * Get tissue to organ lookup pairs
@@ -52,7 +14,11 @@ export async function getOrgans(config) {
  * @param {string[]} ids Tissue ids
  * @returns {Promise<[string, string][]>}
  */
-async function getLookup(organs, ids) {
+async function getTissueOrganPairs(organs, ids) {
+  if (organs.length === 0 || ids.length === 0) {
+    return [];
+  }
+
   const serializeIds = (ids) => ids.map((id) => `(${id})`).join(' ');
   const query = `
     PREFIX part_of: <http://purl.obolibrary.org/obo/BFO_0000050>
@@ -91,6 +57,46 @@ async function getLookup(organs, ids) {
 }
 
 /**
+ * Adds lookup from each organ to itself
+ *
+ * @param {OrganMetadataCollection} metadata Organ metadata
+ * @param {Map<string, string>} lookup Map to add organs lookups
+ */
+function addOrgansToLookup(metadata, lookup) {
+  for (const organ of metadata.organs) {
+    lookup.set(organ, organ);
+  }
+}
+
+/**
+ * Adds a lookup from each tissue to it's organ
+ * Selects the most specific organ if a tissue maps to multiple organs
+ *
+ * @param {[string, string][]} pairs Tissue to organ pairs
+ * @param {OrganMetadataCollection} metadata Organ metadata
+ * @param {Map<string, string>} lookup Map to add tissue to organ lookups
+ */
+function addTissueOrganPairsToLookup(pairs, metadata, lookup) {
+  for (const [tissue, organ] of pairs) {
+    const existing = lookup.get(tissue);
+    const selectedOrgan = existing ? metadata.selectBySpecificity(organ, existing) : organ;
+    lookup.set(tissue, selectedOrgan);
+  }
+}
+
+/**
+ * Resolves organs in the lookup mapping
+ *
+ * @param {OrganMetadataCollection} metadata Organ metadata
+ * @param {Map<string, string>} lookup Map to add tissue to organ lookups
+ */
+function resolveOrgansInLookup(metadata, lookup) {
+  for (const [key, organ] of lookup.entries()) {
+    lookup.set(key, metadata.resolve(organ));
+  }
+}
+
+/**
  * Creates a mapping from tissue id to organ id
  *
  * @param {string[]} ids Tissue ids
@@ -98,10 +104,17 @@ async function getLookup(organs, ids) {
  * @returns {Promise<Map<string, string>>}
  */
 export async function getOrganLookup(ids, config) {
-  const organs = await logEvent('CellXGene:GetOrgans', () => getOrgans(config));
-  const tissueIds = ids.filter((id) => !organs.includes(id));
-  const organToOrganPairs = organs.map((organ) => [organ, organ]);
-  const tissueToOrganPairs = await logEvent('CellXGene:GetOrganLookup', () => getLookup(organs, tissueIds));
+  const metadata = await OrganMetadataCollection.load(config);
+  const pairs = await logEvent('CellXGene:GetTissueOrganPairs', () =>
+    getTissueOrganPairs(
+      metadata.organs,
+      ids.filter((id) => !metadata.has(id))
+    )
+  );
+  const lookup = /** @type {Map<string, string>} */ new Map();
+  addOrgansToLookup(metadata, lookup);
+  addTissueOrganPairsToLookup(pairs, metadata, lookup);
+  resolveOrgansInLookup(metadata, lookup);
 
-  return new Map([...organToOrganPairs, ...tissueToOrganPairs]);
+  return lookup;
 }

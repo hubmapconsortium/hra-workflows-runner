@@ -1,3 +1,4 @@
+import { OrganMetadataCollection } from '../organ/metadata.js';
 import { IDownloader } from '../util/handler.js';
 import { XConsortiaDownloader } from '../xconsortia/downloader.js';
 import { getMetadata } from '../xconsortia/metadata.js';
@@ -21,7 +22,8 @@ export class Downloader extends XConsortiaDownloader {
   }
 
   async getMetadataLookup(ids) {
+    const organMetadata = await OrganMetadataCollection.load(this.config);
     const metadata = await getMetadata(ids, this.searchUrl, this.token, ID_KEYWORD, METADATA_FIELDS);
-    return toLookup(metadata);
+    return toLookup(metadata, organMetadata);
   }
 }

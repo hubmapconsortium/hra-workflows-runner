@@ -2,6 +2,7 @@ import { execFile as callbackExecFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
+import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
@@ -65,6 +66,8 @@ export class Downloader {
     this.extractScriptFile = 'extract_dataset.py';
     /** @type {string} */
     this.extractScriptFilePath = getSrcFilePath(config, 'gtex', this.extractScriptFile);
+    /** @type {OrganMetadataCollection} */
+    this.organMetadata = undefined;
   }
 
   /**
@@ -87,6 +90,8 @@ export class Downloader {
   }
 
   async prepareDownload(datasets) {
+    this.organMetadata = await OrganMetadataCollection.load(this.config);
+
     await downloadFile(this.dataFilePath, this.dataUrl, {
       overwrite: this.config.get(FORCE, false),
     });
@@ -121,7 +126,7 @@ export class Downloader {
     dataset.organ_source = organ_match?.[1].trim() ?? '';
 
     const organ = dataset.organ_source.toLowerCase();
-    dataset.organ = ORGAN_MAPPING[organ] ?? '';
+    dataset.organ = this.organMetadata.resolve(ORGAN_MAPPING[organ] ?? '');
 
     // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);

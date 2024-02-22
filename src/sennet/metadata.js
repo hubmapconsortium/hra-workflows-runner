@@ -1,3 +1,4 @@
+import { OrganMetadataCollection } from '../organ/metadata.js';
 import { getMetadata, getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
 
 /**
@@ -40,8 +41,9 @@ export const METADATA_FIELDS = [
  * Creates a metadata lookup from the raw metadata
  *
  * @param {object} result Raw metadata
+ * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export function toLookup(result) {
+export function toLookup(result, organMetadata) {
   /** @type {Map<string, SennetMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -66,7 +68,7 @@ export function toLookup(result) {
         ancestors,
       },
     } = hit;
-    const mapped_organ = ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '';
+    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
 
     const { block_id, rui_location } = getSampleBlockId(ancestors, SENNET_ENTITY_ENDPOINT);
     lookup.set(sennet_id, {
