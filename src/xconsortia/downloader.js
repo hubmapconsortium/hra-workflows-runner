@@ -48,7 +48,7 @@ export class XConsortiaDownloader {
       overwrite: this.config.get(FORCE, false),
     });
 
-    await execFile('python3', [
+    const { stdout } = await execFile('python3', [
       this.exprAdjustScriptFilePath,
       dataset.dataFilePath,
       '--assay',
@@ -56,12 +56,18 @@ export class XConsortiaDownloader {
       '--output',
       dataset.dataFilePath,
     ]);
+
+    const cell_count_match = /cell_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_cell_count = parseInt(cell_count_match?.[1]);
+
+    const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
   }
 
   /**
    * Get a lookup map for associating metadata with a dataset.
    * Must be overrriden in subclasses.
-   * 
+   *
    * @param {string[]} ids Dataset ids
    * @returns {Promise<Map<string, object>>} Lookup map
    */

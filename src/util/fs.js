@@ -1,4 +1,5 @@
 import { access, constants, mkdir, open, writeFile } from 'node:fs/promises';
+import { Agent } from 'undici';
 import { concurrentMap } from './concurrent-map.js';
 
 /**
@@ -52,7 +53,10 @@ export async function downloadFile(dest, src, options = {}) {
   }
 
   try {
-    const resp = await fetch(src, options);
+    const resp = await fetch(src, {
+      dispatcher: new Agent({ connectTimeout: 300e3 }),
+      ...options,
+    });
     checkFetchResponse(resp);
 
     await writeFile(fileHandle, resp.body, { encoding: 'utf8' });

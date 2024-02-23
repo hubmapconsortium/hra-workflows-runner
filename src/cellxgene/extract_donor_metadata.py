@@ -10,7 +10,7 @@ ETHNICITY_COLUMN = os.environ.get("CELLXGENE_COLUMN_AGE", "self_reported_ethnici
 
 def main(args: argparse.Namespace):
     """Print information from a h5ad file.
-    Printed values includes "sex", "age", and "ethnicity".
+    Printed values includes "sex", "age", "ethnicity", "cell_count", and "gene_count".
 
     Args:
         args (argparse.Namespace): CLI arguments, must contain "file"
@@ -19,6 +19,8 @@ def main(args: argparse.Namespace):
     print("sex:", data.obs[SEX_COLUMN][0])
     print("age:", data.obs[AGE_COLUMN][0])
     print("ethnicity:", data.obs[ETHNICITY_COLUMN][0])
+    print("cell_count:", len(data.obs))
+    print("gene_count:", len(data.var))
 
 
 def _get_arg_parser() -> argparse.ArgumentParser:

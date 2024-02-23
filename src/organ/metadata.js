@@ -6,9 +6,19 @@ import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, FORCE, MAX_CONCURRENCY } from '../
 import { downloadFile, ensureDirsExist } from '../util/fs.js';
 import { getOutputDir } from '../util/paths.js';
 
+/**
+ * @typedef {Record<string, string | Record<string, any>>} RawOrganMetadata
+ */
+
 /** Template for organ metadata file urls */
 const ORGAN_METADATA_URL_TEMPLATE =
   'https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/containers/{{algorithm}}/context/organ-metadata.json';
+
+/**
+ * Raw metadata loaded from file cached by algorithm
+ * @type {Map<string, Promise<RawOrganMetadata>>}
+ */
+const cachedMetadataFileDownload = new Map();
 
 /**
  * Tests whether a value is a string
@@ -38,17 +48,25 @@ export class OrganMetadata {
    * @param {Config} config Configuration
    */
   static async load(algorithm, config) {
-    const url = ORGAN_METADATA_URL_TEMPLATE.replace('{{algorithm}}', algorithm);
-    const dir = join(getOutputDir(config), 'organ-metadata');
-    const file = join(dir, `${algorithm}.json`);
+    if (!cachedMetadataFileDownload.has(algorithm)) {
+      const url = ORGAN_METADATA_URL_TEMPLATE.replace('{{algorithm}}', algorithm);
+      const dir = join(getOutputDir(config), 'organ-metadata');
+      const file = join(dir, `${algorithm}.json`);
+      const download = async () => {
+        await ensureDirsExist(dir);
+        await downloadFile(file, url, { overwrite: config.get(FORCE, false) });
+        return await loadJson(file);
+      };
 
-    await ensureDirsExist(dir);
-    await downloadFile(file, url, { overwrite: config.get(FORCE, false) });
-    return new OrganMetadata(await loadJson(file));
+      cachedMetadataFileDownload.set(algorithm, download());
+    }
+
+    const result = await cachedMetadataFileDownload.get(algorithm);
+    return new OrganMetadata({ ...result });
   }
 
   constructor(metadata) {
-    /** @type {Record<string, string | Record<string, any>>} */
+    /** @type {RawOrganMetadata} */
     this.metadata = metadata;
   }
 
@@ -64,7 +82,7 @@ export class OrganMetadata {
    * May return a redirect organ code.
    *
    * @param {string} organ Organ code
-   * @returns {string | Record<string, any> | undefined}
+   * @returns {RawOrganMetadata[string] | undefined}
    */
   get(organ) {
     return this.metadata[organ];

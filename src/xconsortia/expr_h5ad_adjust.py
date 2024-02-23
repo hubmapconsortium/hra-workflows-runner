@@ -14,6 +14,7 @@ class AnnDataLayer(str, Enum):
     SPLICED_UNSPLICED_SUM = "spliced_unspliced_sum"
 
 
+# https://github.com/hubmapconsortium/ingest-pipeline/blob/master/src/ingest-pipeline/airflow/dags/utils.py#L350
 ASSAY_TO_LAYER_MAP = {
     "salmon_sn_rnaseq_10x": AnnDataLayer.SPLICED_UNSPLICED_SUM,
     "salmon_rnaseq_snareseq": AnnDataLayer.SPLICED_UNSPLICED_SUM,
@@ -25,6 +26,7 @@ ASSAY_TO_LAYER_MAP = {
 
 def main(args: argparse.Namespace):
     """Replaces the X matrix with a layer depending on assay type and writes the new data to file.
+    Also prints the number of cells (rows) and genes (columns) to stdout.
 
     Args:
         args (argparse.Namespace): CLI arguments, must contain "file", "assay", and "output"
@@ -40,6 +42,10 @@ def main(args: argparse.Namespace):
         adata.X = adata.layers[layer]
     else:
         raise ValueError(f"Layer {layer} not found")
+
+    print('cell_count:', len(adata.obs))
+    print('gene_count:', len(adata.var))
+
     adata.write_h5ad(args.output)
 
 

@@ -82,17 +82,20 @@ export class Downloader {
     dataset.block_id = `${dataset.id}_Block`;
     dataset.dataset_id = dataset.id;
 
-    // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
     dataset.donor_sex = sex_match?.[1].trim() ?? '';
 
-    // Parse age line. Format: `age: X\n`
     const age_match = /age:(.+)\n/i.exec(stdout);
     dataset.donor_development_stage = age_match?.[1].trim() ?? '';
 
-    // Parse age line. Format: `age: X\n`
     const ethnicity_match = /ethnicity:(.+)\n/i.exec(stdout);
     dataset.donor_race = ethnicity_match?.[1].trim() ?? '';
+
+    const cell_count_match = /cell_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_cell_count = parseInt(cell_count_match?.[1]);
+
+    const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
   }
 
   /**
@@ -126,7 +129,7 @@ export class Downloader {
         const { url } = await resp.json();
         const outputFile = join(getCacheDir(this.config), `cellxgene-${id}.h5ad`);
 
-        await logEvent('CellXGene:DownloadAsset', id, () =>
+        await logEvent('CellXGene:DownloadAsset', id, url, () =>
           downloadFile(outputFile, url, {
             overwrite: this.config.get(FORCE, false),
           })

@@ -121,28 +121,28 @@ export class Downloader {
       dataset.dataFilePath,
     ]);
 
-    // Parse organ line. Format: `organ: X\n`
     const organ_match = /organ:(.+)\n/i.exec(stdout);
     dataset.organ_source = organ_match?.[1].trim() ?? '';
 
     const organ = dataset.organ_source.toLowerCase();
     dataset.organ = this.organMetadata.resolve(ORGAN_MAPPING[organ] ?? '');
+    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
 
-    // Parse sex line. Format: `sex: X\n`
     const sex_match = /sex:(.+)\n/i.exec(stdout);
     dataset.donor_sex = sex_match?.[1].trim() ?? '';
 
-    // Parse age line. Format: `age: X\n`
     const age_match = /age:(.+)\n/i.exec(stdout);
     dataset.donor_age_bin = age_match?.[1].trim() ?? '';
 
-    // Parse donor_id line. Format: `donor_id: X\n`
     const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
     dataset.donor_id = `${GTEX_DOI_URL}#${donor_id_match?.[1].trim()}` ?? '';
 
-    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
+    const cell_count_match = /cell_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_cell_count = parseInt(cell_count_match?.[1]);
 
-    // Parse tissue_site line. Format: `tissue_site: X\n`
+    const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
+    dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
+
     const tissue_site_match = /tissue_site:(.+)\n/i.exec(stdout);
     const tissueSite =
       `${GTEX_BLOCK_URL}${tissue_site_match?.[1]
@@ -150,8 +150,7 @@ export class Downloader {
         .replace(/[^a-zA-Z]+/g, '_')
         .replace(/_$/, '')}` ?? '';
 
-    dataset.rui_location = this.extractionSiteLookup[tissueSite] ?? '';
-
     dataset.block_id = `${dataset.dataset_id}_TissueBlock`;
+    dataset.rui_location = this.extractionSiteLookup[tissueSite] ?? '';
   }
 }

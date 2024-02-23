@@ -19,6 +19,9 @@ const METADATA_FIELDS = [
   'dataset_id',
   'dataset_link',
   'dataset_technology',
+  'dataset_info',
+  'dataset_cell_count',
+  'dataset_gene_count',
 
   'publication',
   'publication_title',
