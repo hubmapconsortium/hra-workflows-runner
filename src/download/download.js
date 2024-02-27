@@ -15,10 +15,8 @@ import { DOWNLOAD_STEP, getDownloaderRef, getSummaryRef } from './utils.js';
  * @param {Dataset} dataset Dataset to download
  */
 async function tryDownload(dataset) {
-  const force = dataset.config.get(FORCE, false);
   await ensureDirsExist(dataset.dirPath);
-  // This precheck could be moved to before prepareDownloads to reduce excess work even further
-  if (!force && (await fileExists(dataset.dataFilePath))) {
+  if (await alreadyDownloaded(dataset)) {
     await mergeExistingDataset(dataset);
     await dataset.save();
     markSuccess(dataset);
@@ -36,6 +34,21 @@ async function tryDownload(dataset) {
     markFailure(dataset, error);
     await rm(dataset.dirPath, { recursive: true });
   }
+}
+
+/**
+ * Checks if a dataset is already downloaded.
+ *
+ * @param {Dataset} dataset Dataset to check
+ */
+async function alreadyDownloaded(dataset) {
+  if (dataset.config.get(FORCE, false)) {
+    return false;
+  }
+
+  const hasMetadataFile = await fileExists(dataset.filePath);
+  const hasDataFile = await fileExists(dataset.dataFilePath);
+  return hasMetadataFile && hasDataFile;
 }
 
 /**

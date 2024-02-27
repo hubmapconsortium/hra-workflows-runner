@@ -12,7 +12,6 @@
 #SBATCH --mem=128G
 #SBATCH --kill-on-invalid-dep=yes
 
-module load nodejs
 module load python
 module load singularity
 

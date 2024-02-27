@@ -13,7 +13,7 @@ export class JobGenerator {
 
   createJob(dataset) {
     if (!dataset.organ) {
-      throw new UnknownOrganError(dataset.tissue);
+      throw new UnknownOrganError(`${dataset.tissue} (${dataset.tissueId})`);
     }
 
     return {
