@@ -19,8 +19,12 @@ export class JobGenerator {
     return {
       organ: dataset.organ,
       geneColumn: 'feature_name',
-      azimuth: {},
-      celltypist: {},
+      azimuth: {
+        queryLayersKey: 'raw',
+      },
+      celltypist: {
+        queryLayersKey: 'raw',
+      },
       popv: {
         queryLayersKey: 'raw',
       },
