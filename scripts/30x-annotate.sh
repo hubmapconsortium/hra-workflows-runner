@@ -8,12 +8,22 @@ set -e
 # ---------------------------------------
 declare -a args worker_args
 declare -i num_workers="${NUM_WORKERS:-10}"
+declare dataset_dirs_file="$OUTPUT_DIR/annotate-dirs.txt"
+declare failed_dirs_file="$OUTPUT_DIR/failed-annotate-dirs.txt"
 declare wait_for_job_id
 
 while (("$#" > 0)); do
   case $1 in
   -n | --num-workers)
     num_workers="$2"
+    shift 2
+    ;;
+  --dirs-file)
+    dataset_dirs_file="$2"
+    shift 2
+    ;;
+  --failed-dirs-file)
+    failed_dirs_file="$2"
     shift 2
     ;;
   --wait-for-job)
@@ -103,7 +113,8 @@ fi
 
 # Add script with arguments
 sbatch_args+=("$SRC_DIR/slurm/slurm-annotate-worker.sh")
-sbatch_args+=("$control_file" "${worker_args[@]}")
+sbatch_args+=("$control_file" "$dataset_dirs_file" "$failed_dirs_file")
+sbatch_args+=("${worker_args[@]}")
 
 # ---------------------------------------
 # Start worker

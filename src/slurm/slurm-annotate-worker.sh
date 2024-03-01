@@ -29,6 +29,8 @@ readonly CWL_OPTIONS="${CWL_OPTIONS:-}"
 # Inputs
 # ---------------------------------------
 readonly CONTROL_FILE="${1:?"Missing control file"}"
+readonly DATASET_DIRS_FILE="${2:?"Missing dataset directory file"}"
+readonly FAILED_DIRS_FILE="${3:?"Missing failed dataset output file"}"
 
 # ----------------------------------------
 # Functions
@@ -58,7 +60,32 @@ cleanup() {
 #   CONTROL_FILE
 #######################################
 find_jobs() {
-  exec "$SRC_DIR/slurm/util/find-jobs.sh" "$CONTROL_FILE" "$NUM_TASKS"
+  exec "$SRC_DIR/slurm/util/find-jobs.sh" "$CONTROL_FILE" "$DATASET_DIRS_FILE" "$NUM_TASKS"
+}
+
+#######################################
+# Checks the result of a job run
+# Globals:
+#   FAILED_DIRS_FILE
+# Arguments:
+#   Job file path, a string
+#######################################
+check_job_result() {
+  local -r job="$1"
+  local -r job_dir="$(dirname "$job")"
+
+  [[ "$job" =~ job-(.+)\.json ]]
+  local -r algorithm="${BASH_REMATCH[1]}"
+  local -r report_file="$job_dir/$algorithm/report.json"
+  local is_success="" is_unsupported_organ=""
+  
+  if [[ -e "$report_file" ]]; then
+    is_success="$(grep -oe '"status":\s*"success"' "$report_file")"
+    is_unsupported_organ="$(grep -oe 'is not supported' "$report_file")"
+  fi
+  if [[ -z "$is_success" && -z "$is_unsupported_organ" ]]; then
+    exec "$SRC_DIR/slurm/util/update-failed-jobs.sh" "$FAILED_DIRS_FILE" "$job_dir"
+  fi
 }
 
 #######################################
@@ -89,6 +116,7 @@ run_job() {
   pushd "$(dirname "$job")" >/dev/null || exit
   srun time cwl-runner "${args[@]}"
   popd >/dev/null || exit
+  check_job_result "$job"
 }
 
 #######################################
@@ -114,8 +142,8 @@ declare job
 # Install traps
 trap cleanup EXIT TERM
 
-# Remove control file from argument list
-shift 1
+# Remove worker arguments
+shift 3
 
 cat <<EOF
 $HORIZONTAL_LINE
@@ -159,4 +187,4 @@ $HORIZONTAL_LINE
 EOF
 
 # Reschedule another worker
-reschedule_worker "$CONTROL_FILE" "$@"
+reschedule_worker "$CONTROL_FILE" "$DATASET_DIRS_FILE" "$FAILED_DIRS_FILE" "$@"

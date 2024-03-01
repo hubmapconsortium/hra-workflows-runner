@@ -9,13 +9,12 @@ readonly SKIP_FAILED="${SKIP_FAILED:-false}"
 readonly ALGORITHMS=(azimuth celltypist popv)
 readonly NUM_ALGORITHMS="${#ALGORITHMS[@]}"
 
-readonly DATASET_DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
-
 # ---------------------------------------
 # Inputs
 # ---------------------------------------
 readonly CONTROL_FILE="${1:?"Control file not provided"}"
-readonly NUM_TASKS="${2:?"Must specify maximum number of runnable jobs to find"}"
+readonly DATASET_DIRS_FILE="${2:?"Dataset directory file not provided"}"
+readonly NUM_TASKS="${3:?"Must specify maximum number of runnable jobs to find"}"
 
 # ----------------------------------------
 # Functions
