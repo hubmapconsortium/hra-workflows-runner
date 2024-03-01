@@ -3,7 +3,13 @@ source constants.sh
 shopt -s extglob
 set -ev
 
-sif="$SIF_CACHE_DIR/ghcr.io_hubmapconsortium_hra-workflows-runner:main.sif"
+container="${1:-"runner"}"
+separator="-"
+if [[ "$container" != "runner" ]]; then
+  separator="_"
+fi
+
+sif="$SIF_CACHE_DIR/ghcr.io_hubmapconsortium_hra-workflows$separator$container:main.sif"
 work_dir="$PROJECT_DIR"
 
 declare -a bindings
