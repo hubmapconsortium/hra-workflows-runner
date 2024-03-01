@@ -1,7 +1,7 @@
 import { execFile as callbackExecFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { Config } from '../util/config.js';
-import { FORCE } from '../util/constants.js';
+import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
 import { getSrcFilePath } from '../util/paths.js';
 
@@ -62,6 +62,11 @@ export class XConsortiaDownloader {
 
     const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
     dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
+
+    const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
+    if (dataset.dataset_cell_count < minCount) {
+      throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
+    }
   }
 
   /**

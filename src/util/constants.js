@@ -15,6 +15,7 @@ export const SRC_DIR = 'SRC_DIR';
 export const DATASET_LIST = 'DATASET_LIST';
 export const DATASET_LIST_URL = 'DATASET_LIST_URL';
 export const DATASET_COLUMN_ID = 'DATASET_COLUMN_ID';
+export const DATASET_MIN_CELL_COUNT = 'DATASET_MIN_CELL_COUNT';
 
 export const REQUIRED_ENV_VARIABLES = [DATASET, DATASETS_DIR, OUTPUT_DIR, DATA_REPO_DIR, MODELS_DIR, SRC_DIR];
 
@@ -36,3 +37,4 @@ export const DEFAULT_PYTHON_LOG_LEVEL = 40; // Error level
 export const DEFAULT_CACHE_DIR = './tmp';
 export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'sennet', 'gtex', 'cellxgene'];
 export const DEFAULT_DATASET_LIST = 'listing.csv';
+export const DEFAULT_DATASET_MIN_CELL_COUNT = 100;

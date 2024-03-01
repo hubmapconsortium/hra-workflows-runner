@@ -8,6 +8,8 @@ import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import {
+  DATASET_MIN_CELL_COUNT,
+  DEFAULT_DATASET_MIN_CELL_COUNT,
   DEFAULT_MAX_CONCURRENCY,
   DEFAULT_PYTHON_LOG_LEVEL,
   FORCE,
@@ -96,6 +98,11 @@ export class Downloader {
 
     const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
     dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
+
+    const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
+    if (dataset.dataset_cell_count < minCount) {
+      throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
+    }
   }
 
   /**

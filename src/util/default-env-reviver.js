@@ -4,7 +4,9 @@ import {
   CROSSWALKING_TABLES_DIR,
   DATASETS_DIR,
   DATASET_HANDLERS,
+  DATASET_MIN_CELL_COUNT,
   DATA_REPO_DIR,
+  DEFAULT_DATASET_MIN_CELL_COUNT,
   DEFAULT_MAX_CONCURRENCY,
   DEFAULT_PYTHON_LOG_LEVEL,
   FORCE,
@@ -35,6 +37,11 @@ export function defaultEnvReviver(key, value) {
     case PYTHON_LOG_LEVEL: {
       const num = Number.parseInt(value);
       return num > 0 ? num : DEFAULT_PYTHON_LOG_LEVEL;
+    }
+
+    case DATASET_MIN_CELL_COUNT: {
+      const num = Number.parseInt(value);
+      return num >= 0 ? num : DEFAULT_DATASET_MIN_CELL_COUNT;
     }
 
     case DATASET_HANDLERS:
