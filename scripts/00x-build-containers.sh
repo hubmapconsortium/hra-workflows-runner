@@ -19,3 +19,8 @@ for name in "${CONTAINERS[@]}"; do
   url="docker://ghcr.io/hubmapconsortium/hra-workflows/$name:main"
   apptainer pull --force --name "$sif" "$url"
 done
+
+# nodejs
+sif="node_alpine.sif"
+url="docker://node:20-alpine"
+apptainer pull --force --name "$sif" "$url"
