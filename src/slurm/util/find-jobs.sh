@@ -37,7 +37,7 @@ function should_run() {
   local -r report_file="$1/$2/report.json"
 
   if [[ -e "$report_file" ]]; then
-    local -r is_success=$(grep -e 'success' "$report_file")
+    local -r is_success=$(grep -oe '"status":\s*"success"' "$report_file")
     if [[ -n "$is_success" && "$FORCE" != true ]]; then
       return 1
     elif [[ -z "$is_success" && "$SKIP_FAILED" == true ]]; then
@@ -75,14 +75,17 @@ length=$((NUM_ALGORITHMS * ${#dirs[@]}))
 
 # Find jobs that have not run or should be rerun
 declare -i count=0
-declare dir algorithm
+declare dir algorithm job_file
 while ((index < length && count < NUM_TASKS)); do
   dir="${dirs[$((index / NUM_ALGORITHMS))]}"
   algorithm="${ALGORITHMS[$((index % NUM_ALGORITHMS))]}"
 
   if should_run "$dir" "$algorithm"; then
-    echo "$dir/job-$algorithm.json"
-    ((count += 1))
+    job_file="$dir/job-$algorithm.json"
+    if [[ -e "$job_file" ]]; then
+      echo "$job_file"
+      ((count += 1))
+    fi
   fi
 
   ((index += 1))
