@@ -1,12 +1,12 @@
 #!/bin/bash
 source constants.sh
 shopt -s extglob
-set -ev
+set -e
 
 id="${1:?"Must provide the run id to cancel a run"}"
 
 tmp_dir="${TEMP%'/'}/annotate"
-control_file=$(find "$tmp_dir" -name "*$id.lock")
+control_file=$(find "$tmp_dir" -name "index-*$id.lock")
 
 if [[ ! -e "$control_file" ]]; then
   echo "Could not found control file for run $id"
