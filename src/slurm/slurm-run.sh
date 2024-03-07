@@ -7,8 +7,8 @@
 #SBATCH --mail-type=ALL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=96:00:00
-#SBATCH --mem=250G
+#SBATCH --time=72:00:00
+#SBATCH --mem=200G
 #SBATCH -A r00355
 
 module load python
