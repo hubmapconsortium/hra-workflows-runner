@@ -53,6 +53,18 @@ cleanup() {
 }
 
 #######################################
+# Updates the number of active workers
+# Globals:
+#   SRC_DIR
+#   CONTROL_FILE
+# Arguments:
+#   Number of active workers to add/remove, an integer
+#######################################
+update_active_workers() {
+  bash "$SRC_DIR/slurm/util/update-active-workers.sh" "$CONTROL_FILE" "$1"
+}
+
+#######################################
 # Finds available jobs
 # Globals:
 #   SRC_DIR
@@ -60,7 +72,7 @@ cleanup() {
 #   CONTROL_FILE
 #######################################
 find_jobs() {
-  exec "$SRC_DIR/slurm/util/find-jobs.sh" "$CONTROL_FILE" "$DATASET_DIRS_FILE" "$NUM_TASKS"
+  bash "$SRC_DIR/slurm/util/find-jobs.sh" "$CONTROL_FILE" "$DATASET_DIRS_FILE" "$NUM_TASKS"
 }
 
 #######################################
@@ -84,7 +96,7 @@ check_job_result() {
     is_unsupported_organ="$(grep -oe 'is not supported' "$report_file")"
   fi
   if [[ -z "$is_success" && -z "$is_unsupported_organ" ]]; then
-    exec "$SRC_DIR/slurm/util/update-failed-jobs.sh" "$FAILED_DIRS_FILE" "$job_dir"
+    bash "$SRC_DIR/slurm/util/update-failed-jobs.sh" "$FAILED_DIRS_FILE" "$job_dir"
   fi
 }
 
@@ -136,7 +148,7 @@ reschedule_worker() {
 # ----------------------------------------
 
 declare -a pids
-declare -i counter=0
+declare -i counter=0 worker_count
 declare job
 
 # Install traps
@@ -160,12 +172,18 @@ EOF
 # Find and start jobs
 for job in $(find_jobs); do
   printf 'Starting job: %s\n' "$job"
-  run_job "$job" "$counter" "$@" &
+  (run_job "$job" "$counter" "$@") &
   pids+=("$!")
   ((counter += 1))
 done
 
 if [[ "${#pids[@]}" == 0 ]]; then
+  worker_count="$(update_active_workers -1)"
+  if (( "$worker_count" == 0 )); then
+    printf 'All workers done. Starting post annotation script\n'
+    sbatch "$SRC_DIR/slurm/slurm-post-annotate-run.sh"
+  fi
+
   printf 'No more jobs. Exiting...\n'
   exit 0
 fi
@@ -176,6 +194,7 @@ wait "${pids[@]}"
 # Check if wait terminated due to a signal
 if (("$?" > 128)); then
   printf 'Terminated by signal!'
+  update_active_workers -1
   exit 0
 fi
 

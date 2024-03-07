@@ -18,18 +18,22 @@ while (("$#" > 0)); do
     num_workers="$2"
     shift 2
     ;;
+
   --dirs-file)
     dataset_dirs_file="$2"
     shift 2
     ;;
+
   --failed-dirs-file)
     failed_dirs_file="$2"
     shift 2
     ;;
+
   --wait-for-job)
     wait_for_job_id="$2"
     shift 2
     ;;
+
   --)
     shift              # Remove --
     worker_args=("$@") # All arguments after -- are passed to the worker script
@@ -125,4 +129,6 @@ echo "Job dependency: $wait_for_job_id"
 echo "Number of new workers: $num_workers"
 echo "Use '30x-annotate $id' to start additional workers"
 echo "Use '30x-cancel.sh $id' to cancel the run"
+
+bash "$SRC_DIR/slurm/util/update-active-workers.sh" "$control_file" "$num_workers"
 sbatch "${sbatch_args[@]}"
