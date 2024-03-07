@@ -83,7 +83,7 @@ export const ORGAN_MAPPING = {
   },
   LN: {
     code: 'LN',
-    label: 'Lymph Node', 
+    label: 'Lymph Node',
     organ_id: 'UBERON:0000029', // mesenteric? UBERON:0002509
   },
   LO: {
@@ -212,10 +212,15 @@ export const ORGAN_MAPPING = {
 };
 
 export function getHeaders(token) {
-  return {
+  const headers = {
     'Content-type': 'application/json',
-    Authorization: `Bearer ${token}`,
   };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
 }
 
 function getBody(ids, id_keyword, fields) {
