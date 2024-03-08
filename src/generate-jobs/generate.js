@@ -4,7 +4,7 @@ import { getSummaryRef } from '../util/common.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY } from '../util/constants.js';
-import { UnknownOrganError } from '../util/errors.js';
+import { DataTooLargeError, UnknownOrganError } from '../util/errors.js';
 import { fileExists } from '../util/fs.js';
 import { getCrosswalkingFilePath } from '../util/paths.js';
 import { createSpecs } from './spec.js';
@@ -58,7 +58,7 @@ async function tryGenerateJobs(dataset, crosswalks, config) {
       await writeFile(filePath, specString, { encoding: 'utf8' });
     }
   } catch (error) {
-    if (error instanceof UnknownOrganError) {
+    if (error instanceof UnknownOrganError || error instanceof DataTooLargeError) {
       ALGORITHMS.forEach((step) => ref.setNotSupported(step));
       ref.comments = error.message;
     } else {
