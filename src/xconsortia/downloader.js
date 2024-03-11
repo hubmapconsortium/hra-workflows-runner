@@ -40,11 +40,13 @@ export class XConsortiaDownloader {
     }
 
     const url = new URL(`${dataset.uuid}/expr.h5ad`, this.assetsUrl);
-    url.searchParams.set('token', this.token);
+    const headers = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
     await downloadFile(dataset.dataFilePath, url, {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
+      headers,
       overwrite: this.config.get(FORCE, false),
     });
 
