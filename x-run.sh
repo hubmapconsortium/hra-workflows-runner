@@ -2,6 +2,10 @@
 set -e
 source constants.sh
 
+# Create slurm output directories
+mkdir -p slurm-output/run
+mkdir -p slurm-output/annotate-worker
+
 # Link project level sif containers
 link_sif .
 

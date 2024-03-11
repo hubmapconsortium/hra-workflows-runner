@@ -17,5 +17,6 @@ fi
 if [[ $RUNNER != "slurm" ]]; then
   cwl-runner ${CWL_OPTS[@]} $CWL_PIPELINE --outputDirectory $MODELS_DIR
 else
+  mkdir -p slurm-output/download-models
   sbatch $SRC_DIR/slurm/slurm-download-models.sh
 fi
