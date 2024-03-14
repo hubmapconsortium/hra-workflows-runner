@@ -8,7 +8,7 @@
 #SBATCH --mail-type=FAIL,TIME_LIMIT,INVALID_DEPEND,ARRAY_TASKS
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-core=1
-#SBATCH --time=1:00:00
+#SBATCH --time=1:20:00
 #SBATCH --mem=128G
 #SBATCH --kill-on-invalid-dep=yes
 
@@ -89,13 +89,13 @@ check_job_result() {
   [[ "$job" =~ job-(.+)\.json ]]
   local -r algorithm="${BASH_REMATCH[1]}"
   local -r report_file="$job_dir/$algorithm/report.json"
-  local is_success="" is_unsupported_organ=""
+  local is_success="" is_ignored_error=""
   
   if [[ -e "$report_file" ]]; then
     is_success="$(grep -oe '"status":\s*"success"' "$report_file")"
-    is_unsupported_organ="$(grep -oe 'is not supported' "$report_file")"
+    is_ignored_error="$(grep -o -e 'is not supported' -e 'too few unique cells' "$report_file")"
   fi
-  if [[ -z "$is_success" && -z "$is_unsupported_organ" ]]; then
+  if [[ -z "$is_success" && -z "$is_ignored_error" ]]; then
     bash "$SRC_DIR/slurm/util/update-failed-jobs.sh" "$FAILED_DIRS_FILE" "$job_dir"
   fi
 }
@@ -113,13 +113,17 @@ check_job_result() {
 run_job() {
   local -r job="$1" index="$2"
   local -a args
+  local tmp_dir
 
   # Remove the job file path and index
   shift 2
 
+  # Create temp dir
+  tmp_dir="$(mktemp -d -p "$CWL_TMP_DIR" "$index-XXXX")"
+
   # Build cwl-runner command arguments
   args+=(--singularity --no-doc-cache)
-  args+=(--tmpdir-prefix "$CWL_TMP_DIR/$index/")
+  args+=(--tmpdir-prefix "$tmp_dir/") # Note: prefix must end with a '/'
   args+=("$@")
   args+=("$CWL_PIPELINE_URL")
   args+=("$(basename "$job")")
@@ -156,6 +160,9 @@ trap cleanup EXIT TERM
 
 # Remove worker arguments
 shift 3
+
+# Create top temp dir
+mkdir -p "$CWL_TMP_DIR"
 
 cat <<EOF
 $HORIZONTAL_LINE

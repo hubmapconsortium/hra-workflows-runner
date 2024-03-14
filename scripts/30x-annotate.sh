@@ -68,6 +68,11 @@ if [[ ! -d "$MODELS_DIR" || -z $(ls -A "$MODELS_DIR") ]]; then
   exit 1
 fi
 
+if [[ ! -e "$dataset_dirs_file" ]]; then
+  echo "Dataset annotation directories file does not exist"
+  exit 1
+fi
+
 # ---------------------------------------
 # Setup control file
 # ---------------------------------------
