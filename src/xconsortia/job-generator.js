@@ -19,10 +19,14 @@ export class JobGenerator {
     return {
       organ: dataset.organ,
       geneColumn: 'hugo_symbol',
-      azimuth: {},
-      celltypist: {},
+      azimuth: {
+        queryLayersKey: 'raw',
+      },
+      celltypist: {
+        queryLayersKey: 'raw',
+      },
       popv: {
-        queryLayersKey: 'X',
+        queryLayersKey: 'raw',
       },
       cellSource: dataset.dataset_id,
     };

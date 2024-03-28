@@ -19,8 +19,12 @@ export class JobGenerator {
     return {
       organ: dataset.organ,
       geneColumn: 'gene_name',
-      azimuth: {},
-      celltypist: {},
+      azimuth: {
+        queryLayersKey: 'counts',
+      },
+      celltypist: {
+        queryLayersKey: 'counts',
+      },
       popv: {
         queryLayersKey: 'counts',
       },
