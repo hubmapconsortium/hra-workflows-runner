@@ -223,6 +223,7 @@ class AssetCombiner:
 
             matrices = [anndata.read_h5ad(file) for file in self.files if file]
             non_empty_matrices = [matrix for matrix in matrices if matrix]
+            combined = None
             if non_empty_matrices:
                 self.fix_obsm_shapes(non_empty_matrices)
 
@@ -233,14 +234,22 @@ class AssetCombiner:
                     label="source",
                     keys=self.sources
                 )
+            
+            if not combined:
+                _logger.warning(f"Subset {self.id} has zero rows")
+                self.print_error_status("empty")
+                return
 
-                if combined:
-                    self.fix_obs_columns_dtype(combined)
-                    self.out_file.parent.mkdir(parents=True, exist_ok=True)
-                    combined.write_h5ad(self.out_file)
-                    return
+            if not self.valid_X(combined):
+                _logger.warning(f"Subset {self.id} does not have proper counts")
+                self.print_error_status("invalid counts")
+                return
 
-            _logger.warning(f"Subset {self.id} has zero rows")
+            self.fix_obs_columns_dtype(combined)
+            self.out_file.parent.mkdir(parents=True, exist_ok=True)
+            combined.write_h5ad(self.out_file)
+
+
 
     def fix_obsm_shapes(self, matrices: t.List[AnnData]):
         """Reshapes obsm columns to always have two dimensions to enable concatenation.
@@ -283,6 +292,32 @@ class AssetCombiner:
                 seen_index = seen_index.union(matrix.obs_names)
 
         return result
+    
+    def valid_X(self, matrix: AnnData) -> bool:
+        """Checks that the matrix has counts in raw.X or X
+
+        Args:
+          matrix (AnnData): Matrix to check
+
+        Returns:
+          bool: True if it seems like it might have proper counts
+        """
+        X = matrix.raw.X if matrix.raw is not None else matrix.X
+        min_value = X.min()
+        max_value = X.max()
+        if min_value < 0 or max_value < 2:
+            return False
+        # Check for integer only values?
+
+        return True
+    
+    def print_error_status(self, msg):
+        """Prints a failure to stdout
+
+        Args:
+          msg (str): Error message
+        """
+        print(f"Status {self.id}: ${msg}")
 
 
 def main(args: argparse.Namespace):

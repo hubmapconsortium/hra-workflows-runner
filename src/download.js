@@ -54,9 +54,9 @@ async function main() {
   await newSummaries.save(summariesFilePath);
   await writeFile(listingPath, newListingCsv);
 
-  if (newListing.length < listing.length) {
-    const diff = listing.length - newListing.length;
-    console.info(`Excluded ${diff} datasets without any data`);
+  const diff = listing.length - newListing.length;
+  if (diff > 0) {
+    console.info(`Excluded ${diff} datasets`);
   }
 }
 

@@ -47,6 +47,8 @@ export class Downloader {
     this.assetCache = new Cache();
     /** @type {Cache<string, Promise<void>>} */
     this.extractCache = new Cache();
+    /** @type {Record<string, string>} */
+    this.extractStatuses = {};
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset_multi.py';
     /** @type {string} */
@@ -72,9 +74,13 @@ export class Downloader {
 
     const assetsFiles = await this.downloadAssets(dataset.assets);
     await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
-    if (!(await fileExists(dataset.dataFilePath))) {
+
+    const status = this.extractStatuses[dataset.id];
+    if (status === 'empty' || !(await fileExists(dataset.dataFilePath))) {
       dataset.scratch.exclude = true;
       return;
+    } else if (status === 'invalid counts') {
+      throw new Error('Dataset does not contain valid counts');
     }
 
     const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
@@ -257,9 +263,10 @@ export class Downloader {
           '--log-level',
           this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
         ],
-        { stdio: [null, 'inherit', 'inherit'] }
+        { stdio: [null, 'pipe', 'inherit'] }
       );
 
+      process.stdout.on('data', (chunk) => this.processExtractOutputChunk(chunk));
       process.on('error', reject);
       process.on('exit', (code) => {
         if (code === 0) {
@@ -293,5 +300,20 @@ export class Downloader {
     };
 
     return JSON.stringify(content, undefined, 4);
+  }
+
+  /**
+   * Processes text chunks from the extract script's stdout
+   *
+   * @param {string} chunk Data from script
+   */
+  processExtractOutputChunk(chunk) {
+    const STATUS_REGEX = /Status ([^:]*): (.*)\n/gi;
+    let match;
+    while ((match = STATUS_REGEX.exec(chunk)) !== null) {
+      const id = match[1].trim();
+      const status = match[2].trim().toLowerCase();
+      this.extractStatuses[id] = status;
+    }
   }
 }
