@@ -68,7 +68,7 @@ if [[ ! -d "$MODELS_DIR" || -z $(ls -A "$MODELS_DIR") ]]; then
   exit 1
 fi
 
-if [[ ! -e "$dataset_dirs_file" ]]; then
+if [[ -z "$wait_for_job_id" && ! -e "$dataset_dirs_file" ]]; then
   echo "Dataset annotation directories file does not exist"
   exit 1
 fi
@@ -135,5 +135,5 @@ echo "Number of new workers: $num_workers"
 echo "Use '30x-annotate $id' to start additional workers"
 echo "Use '30x-cancel.sh $id' to cancel the run"
 
-bash "$SRC_DIR/slurm/util/update-active-workers.sh" "$control_file" "$num_workers"
+bash "$SRC_DIR/slurm/util/update-active-workers.sh" "$control_file" "$num_workers" >/dev/null
 sbatch "${sbatch_args[@]}"
