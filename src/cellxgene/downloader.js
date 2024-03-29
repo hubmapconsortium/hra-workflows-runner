@@ -76,11 +76,14 @@ export class Downloader {
     await this.extractDatasets(dataset.collection, dataset.assets, assetsFiles);
 
     const status = this.extractStatuses[dataset.id];
-    if (status === 'empty' || !(await fileExists(dataset.dataFilePath))) {
+    if (status === 'empty') {
       dataset.scratch.exclude = true;
       return;
     } else if (status === 'invalid counts') {
       throw new Error('Dataset does not contain valid counts');
+    } else if (!(await fileExists(dataset.dataFilePath))) {
+      const msg = `Unknown failure${status ? ': ' : ''}${status}`;
+      throw new Error(msg);
     }
 
     const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
