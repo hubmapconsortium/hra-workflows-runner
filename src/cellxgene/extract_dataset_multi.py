@@ -317,7 +317,7 @@ class AssetCombiner:
         Args:
           msg (str): Error message
         """
-        print(f"Status {self.id}: ${msg}")
+        print(f"Status {self.id}: {msg}")
 
 
 def main(args: argparse.Namespace):
