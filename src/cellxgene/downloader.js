@@ -82,7 +82,7 @@ export class Downloader {
     } else if (status === 'invalid counts') {
       throw new Error('Dataset does not contain valid counts');
     } else if (!(await fileExists(dataset.dataFilePath))) {
-      const msg = `Unknown failure${status ? ': ' : ''}${status}`;
+      const msg = `Unknown failure${status ? ': ' : ''}${status ?? ''}`;
       throw new Error(msg);
     }
 
@@ -311,7 +311,7 @@ export class Downloader {
    * @param {string} chunk Data from script
    */
   processExtractOutputChunk(chunk) {
-    const STATUS_REGEX = /Status ([^:]*): (.*)\n/gi;
+    const STATUS_REGEX = /Status (.+): (.+)\n/gi;
     let match;
     while ((match = STATUS_REGEX.exec(chunk)) !== null) {
       const id = match[1].trim();
