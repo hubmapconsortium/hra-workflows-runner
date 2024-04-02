@@ -81,8 +81,11 @@ for script in scripts/??-*.sh; do
   elif [[ "$?" == "$STOP_CODE" ]]; then
     echo
     echo "Early exit signaled from $script"
-    exit
+    break
   else
     exit "$?"
   fi
 done
+
+echo
+echo "Run completed on $(date)"
