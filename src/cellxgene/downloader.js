@@ -1,8 +1,7 @@
-import { execFile as callbackExecFile, spawn } from 'node:child_process';
+import { execFile as callbackExecFile } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-
 import { Dataset } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
 import { concurrentMap } from '../util/concurrent-map.js';
@@ -16,7 +15,7 @@ import {
   MAX_CONCURRENCY,
   PYTHON_LOG_LEVEL,
 } from '../util/constants.js';
-import { checkFetchResponse, downloadFile, fileExists } from '../util/fs.js';
+import { checkFetchResponse, downloadFile, ensureDirsExist, fileExists } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { groupBy } from '../util/iter.js';
 import { logEvent } from '../util/logging.js';
@@ -255,31 +254,22 @@ export class Downloader {
    * @returns Promise resolving when the extraction is done
    */
   async runExtractDatasetsScript(extractInfoFilePath, tempExtractDirPath) {
-    return new Promise((resolve, reject) => {
-      const process = spawn(
-        'python3',
-        [
-          this.extractScriptFilePath,
-          extractInfoFilePath,
-          '--tmp-dir',
-          tempExtractDirPath,
-          '--log-level',
-          this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
-        ],
-        { stdio: [null, 'pipe', 'inherit'] }
-      );
+    const outputLogFilePath = join(tempExtractDirPath, 'output.txt');
+    const errorsLogFilePath = join(tempExtractDirPath, 'errors.txt');
+    await ensureDirsExist(tempExtractDirPath);
 
-      process.stdout.on('data', (chunk) => this.processExtractOutputChunk(chunk));
-      process.on('error', reject);
-      process.on('exit', (code) => {
-        if (code === 0) {
-          resolve();
-        } else {
-          const msg = `Python exited with code ${code}`;
-          reject(new Error(msg));
-        }
-      });
-    });
+    const { stdout, stderr } = await execFile('python3', [
+      this.extractScriptFilePath,
+      extractInfoFilePath,
+      '--tmp-dir',
+      tempExtractDirPath,
+      '--log-level',
+      this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
+    ]);
+
+    await writeFile(outputLogFilePath, stdout);
+    await writeFile(errorsLogFilePath, stderr);
+    this.processExtractOutput(stdout);
   }
 
   /**
@@ -306,14 +296,14 @@ export class Downloader {
   }
 
   /**
-   * Processes text chunks from the extract script's stdout
+   * Processes the output from the extract script
    *
-   * @param {string} chunk Data from script
+   * @param {string} data Script output
    */
-  processExtractOutputChunk(chunk) {
+  processExtractOutput(data) {
     const STATUS_REGEX = /Status (.+): (.+)\n/gi;
     let match;
-    while ((match = STATUS_REGEX.exec(chunk)) !== null) {
+    while ((match = STATUS_REGEX.exec(data)) !== null) {
       const id = match[1].trim();
       const status = match[2].trim().toLowerCase();
       this.extractStatuses[id] = status;

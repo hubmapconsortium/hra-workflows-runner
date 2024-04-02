@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import sys
 import typing as t
 from pathlib import Path
 
@@ -34,6 +35,7 @@ class ExtractInfo(t.TypedDict):
 
 _FORCE = os.environ.get('FORCE', '').lower() not in ['', 'false']
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.NOTSET)
 
 
 @contextlib.contextmanager
@@ -388,8 +390,13 @@ def _get_arg_parser() -> argparse.ArgumentParser:
 
 
 if __name__ == "__main__":
-    parser = _get_arg_parser()
-    args = parser.parse_args()
-    logging.basicConfig(level=args.log_level)
-    logging.captureWarnings(True)
-    main(args)
+    try:
+        parser = _get_arg_parser()
+        args = parser.parse_args()
+        logging.basicConfig(level=args.log_level, force=True)
+        logging.captureWarnings(True)
+        main(args)
+    finally:
+        print(end="", file=sys.stdout, flush=True)
+        print(end="", file=sys.stderr, flush=True)
+        logging.shutdown()
