@@ -28,7 +28,7 @@ export class UnknownOrganError extends BaseError {
  */
 function formatSize(size) {
   const units = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi'];
-  for (const unit in units) {
+  for (const unit of units) {
     if (size < 1024) {
       return `${size.toFixed(2)}${unit}B`;
     }
