@@ -11,7 +11,7 @@
 #SBATCH --mem=32G
 #SBATCH -A r00355
 
-module load python
+module load python/3.10.5
 module load singularity
 
 #Run your program

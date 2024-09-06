@@ -12,7 +12,7 @@
 #SBATCH --mem=128G
 #SBATCH --kill-on-invalid-dep=yes
 
-module load python
+module load python/3.10.5
 module load singularity
 
 # ---------------------------------------
