@@ -5,7 +5,7 @@ Author ORCID(s):,0000-0001-7655-4833,,,,,
 Reviewer(s):,"Bruce Herr II, Katy Borner",,,,,
 Reviewer ORCID(s):,"0000-0002-6703-7647, 0000-0002-3321-6137",,,,,
 General Publication(s):,https://azimuth.hubmapconsortium.org/,,,,,
-Data DOI:,,,,,,
+Data DOI:,https://doi.org/10.48539/HBM587.ZSWT.783,,,,,
 Date:,15-Jun-24,,,,,
 Version number:,v1.0,,,,,
 Organ_Level,Organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
@@ -90,50 +90,50 @@ Lung_v2_finest_level,UBERON:0002048,AT2,AZ:0000078,type II pneumocyte,CL:0002063
 Lung_v2_finest_level,UBERON:0002048,AT2 proliferating,AZ:0000079,type II pneumocyte:proliferating,CL:0002063,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,B cells,AZ:0000080,B cell,CL:0000236,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Basal resting,AZ:0000081,respiratory basal cell:resting,CL:0002633,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,CD4 T cells,AZ:0000082,CD4-positive helper T cell,CL:0000492,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,CD8 T cells,AZ:0000083,"effector memory CD8-positive, alpha-beta T cell",CL:0000913,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Classical monocytes,AZ:0000084,monocyte,CL:0000576,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,CD4 T cells,AZ:0000082,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,CD8 T cells,AZ:0000083,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Classical monocytes,AZ:0000084,classical monocyte,CL:0000860,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Club (nasal),AZ:0000085,club cell:nasal,CL:0000158,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Club (non-nasal),AZ:0000086,club cell:non-nasal,CL:0000158,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,DC1,AZ:0000087,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,DC2,AZ:0000088,CD1c-positive myeloid dendritic cell,CL:0002399,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Deuterosomal,AZ:0000089,deuterosomal cell,CL:4033044,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,EC aerocyte capillary,AZ:0000090,alveolar capillary type 2 endothelial cell,CL:4028003,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,EC arterial,AZ:0000091,endothelial cell of artery,CL:1000413,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,EC general capillary,AZ:0000092,capillary endothelial cell,CL:0002144,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,EC venous pulmonary,AZ:0000093,endothelial cell of venule:pulmonary,CL:1000414,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,EC venous systemic,AZ:0000094,endothelial cell of venule,CL:1000414,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,EC arterial,AZ:0000091,pulmonary artery endothelial cell,CL:1001568,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,EC general capillary,AZ:0000092,alveolar capillary type 1 endothelial cell,CL:4028002,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,EC venous pulmonary,AZ:0000093,vein endothelial cell of respiratory system:pulmonary vein,CL:4033008,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,EC venous systemic,AZ:0000094,vein endothelial cell of respiratory system:bronchial vein,CL:4033008,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Fibromyocytes,AZ:0000095,fibroblast of lung:fibromyocyte,CL:0002553,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Goblet (bronchial),AZ:0000096,tracheobronchial goblet cell,CL:0019003,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Goblet (nasal),AZ:0000097,nasal mucosa goblet cell,CL:0002480,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Goblet (subsegmental),AZ:0000098,bronchial goblet cell:subsegmental,CL:1000312,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,Interstitial M_ perivascular,AZ:0000099,tissue-resident macrophage,CL:0000864,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Ionocyte,AZ:0000100,ionocyte,CL:0005006,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Lymphatic EC differentiating,AZ:0000101,endothelial cell of lymphatic vessel:differentiating,CL:0002138,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,Lymphatic EC mature,AZ:0000102,endothelial cell of lymphatic vessel:mature,CL:0002138,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,Lymphatic EC proliferating,AZ:0000103,endothelial cell of lymphatic vessel:proliferating,CL:0002138,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,Goblet (subsegmental),AZ:0000098,lung goblet cell,CL:1000143,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Interstitial M_ perivascular,AZ:0000099,lung interstitial macrophage,CL:4033043,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Ionocyte,AZ:0000100,pulmonary ionocyte,CL:0017000,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Lymphatic EC differentiating,AZ:0000101,endothelial cell of respiratory system lymphatic vessel:differentiating,CL:0009086,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,Lymphatic EC mature,AZ:0000102,endothelial cell of respiratory system lymphatic vessel:mature,CL:0009086,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,Lymphatic EC proliferating,AZ:0000103,endothelial cell of respiratory system lymphatic vessel:proliferating,CL:0009086,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Mast cells,AZ:0000104,mast cell,CL:0000097,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Mesothelium,AZ:0000105,mesothelial cell of pleura,CL:1000491,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Migratory DCs,AZ:0000106,lung migratory dendritic cell,CL:4033045,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Monocyte derived M_,AZ:0000107,lung macrophage:monocyte derived,CL:1001603,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Multiciliated (nasal),AZ:0000108,multi-ciliated epithelial cell:nasal,CL:0005012,skos:narrowMatch
-Lung_v2_finest_level,UBERON:0002048,Multiciliated (non-nasal),AZ:0000109,multi-ciliated epithelial cell:non-nasal,CL:0005012,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,Multiciliated (non-nasal),AZ:0000109,ciliated columnar cell of tracheobronchial tree,CL:0002145,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Myofibroblasts,AZ:0000110,myofibroblast cell,CL:0000186,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Neuroendocrine,AZ:0000111,neuroendocrine cell,CL:0000165,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Neuroendocrine,AZ:0000111,lung neuroendocrine cell,CL:1000223,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,NK cells,AZ:0000112,natural killer cell,CL:0000623,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Non classical monocytes,AZ:0000113,non-classical monocyte,CL:0000875,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Peribronchial fibroblasts,AZ:0000114,pulmonary interstitial fibroblast,CL:0002241,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Pericytes,AZ:0000115,lung pericyte,CL:0009089,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Plasma cells,AZ:0000116,plasma cell,CL:0000786,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Plasmacytoid DCs,AZ:0000117,"plasmacytoid dendritic cell, human",CL:0001058,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,SM activated stress response,AZ:0000118,serous secreting cell:activated,CL:0000313,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,SM activated stress response,AZ:0000118,smooth muscle cell:activated stress response,CL:0000192,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,SMG duct,AZ:0000119,airway submucosal gland collecting duct epithelial cell,CL:4033023,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,SMG mucous,AZ:0000120,mucus secreting cell of bronchus submucosal gland,CL:4033022,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,SMG serous (bronchial),AZ:0000121,serous secreting cell of bronchus submucosal gland,CL:4033005,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,SMG serous (nasal),AZ:0000122,serous secreting cell:nasal,CL:0000313,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Smooth muscle,AZ:0000123,smooth muscle cell,CL:0000192,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Subpleural fibroblasts,AZ:0000124,mesothelial fibroblast,CL:4023054,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Suprabasal,AZ:0000125,respiratory basal cell,CL:0002633,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Suprabasal,AZ:0000125,respiratory suprabasal cell,CL:4033048,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,T cells proliferating,AZ:0000126,T cell:proliferating,CL:0000084,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Transitional Club AT2,AZ:0000127,club cell:transitional alveolar type 2 epithelial cell,CL:0000158,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Tuft,AZ:0000128,brush cell of trachebronchial tree,CL:0002075,skos:exactMatch
@@ -321,18 +321,18 @@ Lung_v2_L2,UBERON:0002048,Smooth muscle,AZ:0000309,smooth muscle cell,CL:0000192
 Lung_v2_L2,UBERON:0002048,Submucosal Gland,AZ:0000310,seromucus secreting cell:submucosal gland,CL:0000159,skos:narrowMatch
 Lung_v2_L2,UBERON:0002048,Lymphatic EC,AZ:0000311,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
 Lung_v2_L2,UBERON:0002048,Mesothelium,AZ:0000312,mesothelial cell,CL:0000077,skos:exactMatch
-Lung_v2_L3,UBERON:0002048,Macrophages,AZ:0000313,lung macrophage,CL:1001603,skos:exactMatch
+Lung_v2_L3,UBERON:0002048,Macrophages,AZ:0000313,macrophage,CL:0000235,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,Innate lymphoid cell NK,AZ:0000314,natural killer cell,CL:0000623,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,AT2,AZ:0000315,type II pneumocyte,CL:0002063,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,Basal,AZ:0000316,basal cell,CL:0000646,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,EC venous,AZ:0000317,vein endothelial cell,CL:0002543,skos:exactMatch
-Lung_v2_L3,UBERON:0002048,T cell lineage,AZ:0000318,type I pneumocyte,CL:0002062,skos:exactMatch
+Lung_v2_L3,UBERON:0002048,T cell lineage,AZ:0000318,T cell,CL:0000084,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,EC arterial,AZ:0000319,endothelial cell of artery,CL:1000413,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,Fibroblasts,AZ:0000320,fibroblast,CL:0000057,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,AT1,AZ:0000321,type I pneumocyte,CL:0002062,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,Multiciliated lineage,AZ:0000322,multi-ciliated epithelial cell,CL:0005012,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,B cell lineage,AZ:0000323,lymphocyte of B lineage,CL:0000945,skos:exactMatch
-Lung_v2_L3,UBERON:0002048,Secretory,AZ:0000324,lung secretory cell,CL:1000272,skos:exactMatch
+Lung_v2_L3,UBERON:0002048,Secretory,AZ:0000324,secretory cell,CL:0000151,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,SM activated stress response,AZ:0000325,smooth muscle cell:activated stress response,CL:0000192,skos:narrowMatch
 Lung_v2_L3,UBERON:0002048,Monocytes,AZ:0000326,monocyte,CL:0000576,skos:exactMatch
 Lung_v2_L3,UBERON:0002048,Submucosal Secretory,AZ:0000327,seromucus secreting cell:submucosal gland,CL:0000159,skos:narrowMatch
@@ -355,14 +355,14 @@ Lung_v2_L4,UBERON:0002048,Peribronchial fibroblasts,AZ:0000343,fibroblast of lun
 Lung_v2_L4,UBERON:0002048,CD4 T cells,AZ:0000344,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Multiciliated,AZ:0000345,multi-ciliated epithelial cell:respiratory system,CL:0005012,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,Plasma cells,AZ:0000346,plasma cell,CL:0000786,skos:exactMatch
-Lung_v2_L4,UBERON:0002048,Goblet,AZ:0000347,lung goblet cell,CL:1000143,skos:exactMatch
+Lung_v2_L4,UBERON:0002048,Goblet,AZ:0000347,goblet cell,CL:0000160,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Club,AZ:0000348,club cell,CL:0000158,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Classical monocytes,AZ:0000349,classical monocyte,CL:0000860,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Interstitial macrophages,AZ:0000350,lung interstitial macrophage,CL:4033043,skos:exactMatch
-Lung_v2_L4,UBERON:0002048,SMG serous,AZ:0000351,serous secreting cell of bronchus submucosal gland,CL:4033005,skos:exactMatch
+Lung_v2_L4,UBERON:0002048,SMG serous,AZ:0000351,serous secreting cell,CL:0000313,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,EC venous systemic,AZ:0000352,vein endothelial cell:systemic,CL:0002543,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,Non classical monocytes,AZ:0000353,non-classical monocyte,CL:0000875,skos:exactMatch
-Lung_v2_L4,UBERON:0002048,EC general capillary,AZ:0000354,capillary endothelial cell,CL:0002144,skos:exactMatch
+Lung_v2_L4,UBERON:0002048,EC general capillary,AZ:0000354,alveolar capillary type 1 endothelial cell,CL:4028002,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Adventitial fibroblasts,AZ:0000355,alveolar type 2 fibroblast cell,CL:4028006,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,EC aerocyte capillary,AZ:0000356,alveolar capillary type 2 endothelial cell,CL:4028003,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Alveolar fibroblasts,AZ:0000357,alveolar type 1 fibroblast cell,CL:4028004,skos:exactMatch
@@ -371,7 +371,7 @@ Lung_v2_L4,UBERON:0002048,DC2,AZ:0000359,CD1c-positive myeloid dendritic cell,CL
 Lung_v2_L4,UBERON:0002048,Transitional Club AT2,AZ:0000360,club:transitional AT2,CL:0000158,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,DC1,AZ:0000361,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,B cells,AZ:0000362,B cell,CL:0000236,skos:exactMatch
-Lung_v2_L4,UBERON:0002048,SMG mucous,AZ:0000363,mucus secreting cell of bronchus submucosal gland,CL:4033022,skos:exactMatch
+Lung_v2_L4,UBERON:0002048,SMG mucous,AZ:0000363,mucus secreting cell:submucosal gland,CL:0000319,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,AT2 proliferating,AZ:0000364,type II pneumocyte:proliferating,CL:0002063,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,Pericytes,AZ:0000365,lung pericyte,CL:0009089,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,SMG duct,AZ:0000366,seromucus secreting cell:submucosal gland duct,CL:0000159,skos:narrowMatch
@@ -388,13 +388,13 @@ Lung_v2_L5,UBERON:0002048,Goblet (nasal),AZ:0000376,goblet cell:nasal,CL:0000160
 Lung_v2_L5,UBERON:0002048,Club (nasal),AZ:0000377,club cell:nasal,CL:0000158,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Monocyte derived M_,AZ:0000378,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Alveolar M_ proliferating,AZ:0000379,alveolar macrophage:proliferating,CL:0000583,skos:narrowMatch
-Lung_v2_L5,UBERON:0002048,Club (non-nasal),AZ:0000380,club cell,CL:0000158,skos:exactMatch
+Lung_v2_L5,UBERON:0002048,Club (non-nasal),AZ:0000380,club cell:tracheobronchial,CL:0000158,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,SMG serous (bronchial),AZ:0000381,serous secreting cell of bronchus submucosal gland,CL:4033005,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Multiciliated (nasal),AZ:0000382,multi-ciliated epithelial cell:nasal,CL:0005012,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Goblet (bronchial),AZ:0000383,bronchial goblet cell,CL:1000312,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Interstitial M_ perivascular,AZ:0000384,lung interstitial macrophage:perivascular,CL:4033043,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Goblet (subsegmental),AZ:0000385,bronchial goblet cell:subsegmental,CL:1000312,skos:narrowMatch
-Lung_v2_L5,UBERON:0002048,SMG serous (nasal),AZ:0000386,seromucus secreting cell:submucosal gland nasal,CL:0000159,skos:narrowMatch
+Lung_v2_L5,UBERON:0002048,SMG serous (nasal),AZ:0000386,seromucus secreting cell:submucosal gland nasal,CL:0000313,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Alveolar M_ MT-positive,AZ:0000387,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
 Pancreas_L1,UBERON:0001264,cycling,AZ:0000388,pancreatic endocrine cell:cycling,CL:0008024,skos:narrowMatch
 Pancreas_L1,UBERON:0001264,immune,AZ:0000389,leukocyte,CL:0000738,skos:exactMatch

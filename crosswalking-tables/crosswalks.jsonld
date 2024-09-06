@@ -12263,8 +12263,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000492",
-      "cell_label": "CD4-positive helper T cell",
+      "cell_id": "CL:0000624",
+      "cell_label": "CD4-positive, alpha-beta T cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12274,8 +12274,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000913",
-      "cell_label": "effector memory CD8-positive, alpha-beta T cell",
+      "cell_id": "CL:0000625",
+      "cell_label": "CD8-positive, alpha-beta T cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12285,8 +12285,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000576",
-      "cell_label": "monocyte",
+      "cell_id": "CL:0000860",
+      "cell_label": "classical monocyte",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12362,8 +12362,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:1000413",
-      "cell_label": "endothelial cell of artery",
+      "cell_id": "CL:1001568",
+      "cell_label": "pulmonary artery endothelial cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12373,8 +12373,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0002144",
-      "cell_label": "capillary endothelial cell",
+      "cell_id": "CL:4028002",
+      "cell_label": "alveolar capillary type 1 endothelial cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12384,8 +12384,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:1000414",
-      "cell_label": "endothelial cell of venule:pulmonary",
+      "cell_id": "CL:4033008",
+      "cell_label": "vein endothelial cell of respiratory system:pulmonary vein",
       "cell_match": "skos:narrowMatch"
     },
     {
@@ -12395,8 +12395,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:1000414",
-      "cell_label": "endothelial cell of venule",
+      "cell_id": "CL:4033008",
+      "cell_label": "vein endothelial cell of respiratory system:bronchial vein",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12439,9 +12439,9 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:1000312",
-      "cell_label": "bronchial goblet cell:subsegmental",
-      "cell_match": "skos:narrowMatch"
+      "cell_id": "CL:1000143",
+      "cell_label": "lung goblet cell",
+      "cell_match": "skos:exactMatch"
     },
     {
       "@id": "AZ:0000099",
@@ -12450,8 +12450,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000864",
-      "cell_label": "tissue-resident macrophage",
+      "cell_id": "CL:4033043",
+      "cell_label": "lung interstitial macrophage",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12461,8 +12461,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0005006",
-      "cell_label": "ionocyte",
+      "cell_id": "CL:0017000",
+      "cell_label": "pulmonary ionocyte",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12472,8 +12472,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0002138",
-      "cell_label": "endothelial cell of lymphatic vessel:differentiating",
+      "cell_id": "CL:0009086",
+      "cell_label": "endothelial cell of respiratory system lymphatic vessel:differentiating",
       "cell_match": "skos:narrowMatch"
     },
     {
@@ -12483,8 +12483,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0002138",
-      "cell_label": "endothelial cell of lymphatic vessel:mature",
+      "cell_id": "CL:0009086",
+      "cell_label": "endothelial cell of respiratory system lymphatic vessel:mature",
       "cell_match": "skos:narrowMatch"
     },
     {
@@ -12494,8 +12494,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0002138",
-      "cell_label": "endothelial cell of lymphatic vessel:proliferating",
+      "cell_id": "CL:0009086",
+      "cell_label": "endothelial cell of respiratory system lymphatic vessel:proliferating",
       "cell_match": "skos:narrowMatch"
     },
     {
@@ -12560,9 +12560,9 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0005012",
-      "cell_label": "multi-ciliated epithelial cell:non-nasal",
-      "cell_match": "skos:narrowMatch"
+      "cell_id": "CL:0002145",
+      "cell_label": "ciliated columnar cell of tracheobronchial tree",
+      "cell_match": "skos:exactMatch"
     },
     {
       "@id": "AZ:0000110",
@@ -12582,8 +12582,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000165",
-      "cell_label": "neuroendocrine cell",
+      "cell_id": "CL:1000223",
+      "cell_label": "lung neuroendocrine cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -12659,8 +12659,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0000313",
-      "cell_label": "serous secreting cell:activated",
+      "cell_id": "CL:0000192",
+      "cell_label": "smooth muscle cell:activated stress response",
       "cell_match": "skos:narrowMatch"
     },
     {
@@ -12736,8 +12736,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_finest_level",
-      "cell_id": "CL:0002633",
-      "cell_label": "respiratory basal cell",
+      "cell_id": "CL:4033048",
+      "cell_label": "respiratory suprabasal cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -14804,8 +14804,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L3",
-      "cell_id": "CL:1001603",
-      "cell_label": "lung macrophage",
+      "cell_id": "CL:0000235",
+      "cell_label": "macrophage",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -14859,8 +14859,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L3",
-      "cell_id": "CL:0002062",
-      "cell_label": "type I pneumocyte",
+      "cell_id": "CL:0000084",
+      "cell_label": "T cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -14925,8 +14925,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L3",
-      "cell_id": "CL:1000272",
-      "cell_label": "lung secretory cell",
+      "cell_id": "CL:0000151",
+      "cell_label": "secretory cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -15178,8 +15178,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L4",
-      "cell_id": "CL:1000143",
-      "cell_label": "lung goblet cell",
+      "cell_id": "CL:0000160",
+      "cell_label": "goblet cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -15222,9 +15222,9 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L4",
-      "cell_id": "CL:4033005",
-      "cell_label": "serous secreting cell of bronchus submucosal gland",
-      "cell_match": "skos:exactMatch"
+      "cell_id": "CL:0000313",
+      "cell_label": "serous secreting cell",
+      "cell_match": "skos:narrowMatch"
     },
     {
       "@id": "AZ:0000352",
@@ -15255,8 +15255,8 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L4",
-      "cell_id": "CL:0002144",
-      "cell_label": "capillary endothelial cell",
+      "cell_id": "CL:4028002",
+      "cell_label": "alveolar capillary type 1 endothelial cell",
       "cell_match": "skos:exactMatch"
     },
     {
@@ -15354,9 +15354,9 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L4",
-      "cell_id": "CL:4033022",
-      "cell_label": "mucus secreting cell of bronchus submucosal gland",
-      "cell_match": "skos:exactMatch"
+      "cell_id": "CL:0000319",
+      "cell_label": "mucus secreting cell:submucosal gland",
+      "cell_match": "skos:narrowMatch"
     },
     {
       "@id": "AZ:0000364",
@@ -15542,8 +15542,8 @@
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L5",
       "cell_id": "CL:0000158",
-      "cell_label": "club cell",
-      "cell_match": "skos:exactMatch"
+      "cell_label": "club cell:tracheobronchial",
+      "cell_match": "skos:narrowMatch"
     },
     {
       "@id": "AZ:0000381",
@@ -15607,7 +15607,7 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0002048",
       "organ_level": "Lung_v2_L5",
-      "cell_id": "CL:0000159",
+      "cell_id": "CL:0000313",
       "cell_label": "seromucus secreting cell:submucosal gland nasal",
       "cell_match": "skos:narrowMatch"
     },
