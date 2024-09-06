@@ -85,7 +85,6 @@ eye,UBERON:0000970,surface ectodermal cell,PV:0000073,surface ectodermal cell,CL
 heart,UBERON:0000948,cardiac endothelial cell,PV:0000074,cardiac endothelial cell,CL:0010008,skos:exactMatch
 heart,UBERON:0000948,cardiac muscle cell,PV:0000075,cardiac muscle cell,CL:0000746,skos:exactMatch
 heart,UBERON:0000948,fibroblast of cardiac tissue,PV:0000076,fibroblast of cardiac tissue,CL:0002548,skos:exactMatch
-heart,UBERON:0000948,hepatocyte,PV:0000077,hepatocyte,CL:0000182,skos:exactMatch
 heart,UBERON:0000948,macrophage,PV:0000078,macrophage,CL:0000235,skos:exactMatch
 heart,UBERON:0000948,smooth muscle cell,PV:0000079,smooth muscle cell,CL:0000192,skos:exactMatch
 large intestine,UBERON:0000059,B cell,PV:0000080,B cell,CL:0000236,skos:exactMatch
