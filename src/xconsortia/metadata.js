@@ -286,7 +286,10 @@ export function getSampleBlockId(ancestors, url_prefix) {
 
 export function getSampleSectionId(ancestors, url_prefix) {
   for (const ancestor of ancestors) {
-    if (ancestor['entity_type'].toLowerCase() == 'sample' && ancestor['sample_category'].toLowerCase() == 'section') {
+    if (
+      ancestor['entity_type'].toLowerCase() == 'sample' &&
+      ancestor['sample_category'].toLowerCase().replace('suspension', 'section') == 'section'
+    ) {
       return `${url_prefix}${ancestor['uuid']}`;
     }
   }

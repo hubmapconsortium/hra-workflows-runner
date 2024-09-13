@@ -26,12 +26,12 @@ export class Listing extends XConsortiaListing {
             },
             {
               term: {
-                'files.rel_path.keyword': 'expr.h5ad',
+                'ingest_metadata.files.rel_path.keyword': 'expr.h5ad',
               },
             },
             {
               term: {
-                'source.source_type.keyword': 'Human',
+                'sources.source_type.keyword': 'Human',
               },
             },
           ],

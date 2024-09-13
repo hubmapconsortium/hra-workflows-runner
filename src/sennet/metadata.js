@@ -1,5 +1,5 @@
 import { OrganMetadataCollection } from '../organ/metadata.js';
-import { getMetadata, getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
+import { getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsortia/metadata.js';
 
 /**
  * @typedef {object} SennetMetadata
@@ -20,6 +20,7 @@ import { getMetadata, getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from
  */
 
 const SENNET_ENTITY_ENDPOINT = 'https://entity.api.sennetconsortium.org/entities/';
+const SENNET_ANCESTORS_ENDPOINT = 'https://entity.api.sennetconsortium.org/ancestors/';
 const SENNET_PORTAL_ENDPOINT = 'https://data.sennetconsortium.org/dataset';
 export const ID_KEYWORD = 'sennet_id';
 export const METADATA_FIELDS = [
@@ -29,12 +30,7 @@ export const METADATA_FIELDS = [
   'dataset_info',
   'group_name',
   'group_uuid',
-  'source.source_mapped_metadata.race',
-  'source.source_mapped_metadata.sex',
-  'source.source_mapped_metadata.age_value',
-  'source.source_mapped_metadata.body_mass_index_value',
-  'ancestors',
-  'source.uuid',
+  'sources.uuid',
 ];
 
 /**
@@ -43,7 +39,7 @@ export const METADATA_FIELDS = [
  * @param {object} result Raw metadata
  * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export function toLookup(result, organMetadata) {
+export async function toLookup(result, organMetadata) {
   /** @type {Map<string, SennetMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -55,18 +51,19 @@ export function toLookup(result, organMetadata) {
         dataset_info,
         group_name,
         group_uuid,
-        source: {
-          source_mapped_metadata: {
-            age_value: [donor_age] = [''],
-            race: [donor_race] = [''],
-            sex: [donor_sex] = [''],
-            body_mass_index_value: [donor_bmi] = [''],
-          } = {},
-          uuid: donor_uuid,
-        },
-        ancestors,
+        sources: [{ uuid: donor_uuid }],
       },
     } = hit;
+    const source = await fetch(`${SENNET_ENTITY_ENDPOINT}${donor_uuid}`).then((r) => r.json());
+    const {
+      source_mapped_metadata: {
+        age: { value: [donor_age] = [''] },
+        race: { value: [donor_race] = [''] },
+        sex: { value: [donor_sex] = [''] },
+        body_mass_index: { value: [donor_bmi] = [''] },
+      },
+    } = source;
+    const ancestors = await fetch(`${SENNET_ANCESTORS_ENDPOINT}${uuid}`).then((r) => r.json());
     const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
 
     const { block_id, rui_location } = getSampleBlockId(ancestors, SENNET_ENTITY_ENDPOINT);
