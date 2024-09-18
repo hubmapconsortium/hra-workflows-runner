@@ -26,6 +26,11 @@ readonly CWL_TMP_DIR="${TEMP%'/'}/$SLURM_JOB_ID-$SLURM_ARRAY_TASK_ID"
 readonly CWL_OPTIONS="${CWL_OPTIONS:-}"
 
 # ---------------------------------------
+# Environment exports
+# ---------------------------------------
+export APPTAINER_TMPDIR="$TEMP"
+
+# ---------------------------------------
 # Inputs
 # ---------------------------------------
 readonly CONTROL_FILE="${1:?"Missing control file"}"

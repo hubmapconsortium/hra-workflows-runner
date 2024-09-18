@@ -15,5 +15,10 @@
 module load python/3.10.5
 module load singularity
 
+# ---------------------------------------
+# Environment exports
+# ---------------------------------------
+export APPTAINER_TMPDIR="$TEMP"
+
 #Run your program
 srun cwl-runner --singularity --no-doc-cache --tmpdir-prefix $TEMP https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/download-models.cwl --outputDirectory $MODELS_DIR

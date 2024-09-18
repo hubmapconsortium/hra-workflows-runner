@@ -30,6 +30,9 @@ export PROJECT_DIR=${PROJECT_DIR:-"/N/project/hra/hra-workflows-runner"}
 export SIF_CACHE_DIR=${SIF_CACHE_DIR:-"/N/project/hra/sif-cache"}
 export TEMP=${TEMP:-"$PROJECT_DIR/tmp/"}
 
+# Configure apptainer
+export APPTAINER_TMPDIR="$TEMP"
+
 # Configure slurm
 export SLURM_UMASK="ug+rw"
 

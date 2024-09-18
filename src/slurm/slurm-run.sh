@@ -14,5 +14,10 @@
 module load python/3.10.5
 module load singularity
 
+# ---------------------------------------
+# Environment exports
+# ---------------------------------------
+export APPTAINER_TMPDIR="$TEMP"
+
 #Run your program
 srun singularity exec -H $PROJECT_DIR --bind $SIF_CACHE_DIR:$SIF_CACHE_DIR $PROJECT_DIR/ghcr.io_hubmapconsortium_hra-workflows-runner\:main.sif ./run.sh
