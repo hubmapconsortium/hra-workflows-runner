@@ -18,6 +18,7 @@ import { getSampleBlockId, getSampleSectionId, ORGAN_MAPPING } from '../xconsort
  */
 
 const HUBMAP_ENTITY_ENDPOINT = 'https://entity.api.hubmapconsortium.org/entities/';
+const HUBMAP_ANCESTORS_ENDPOINT = 'https://entity.api.hubmapconsortium.org/ancestors/';
 const HUBMAP_PORTAL_ENDPOINT = 'https://portal.hubmapconsortium.org/browse/dataset/';
 export const ID_KEYWORD = 'hubmap_id';
 export const METADATA_FIELDS = [
@@ -32,7 +33,6 @@ export const METADATA_FIELDS = [
   'donor.mapped_metadata.sex',
   'donor.mapped_metadata.age_value',
   'donor.mapped_metadata.body_mass_index_value',
-  'ancestors',
   'donor.uuid',
 ];
 
@@ -42,7 +42,7 @@ export const METADATA_FIELDS = [
  * @param {object} result Raw metadata
  * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export function metadataToLookup(result, organMetadata) {
+export async function metadataToLookup(result, organMetadata) {
   /** @type {Map<string, HubmapMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -64,9 +64,9 @@ export function metadataToLookup(result, organMetadata) {
           } = {},
           uuid: donor_uuid,
         },
-        ancestors,
       },
     } = hit;
+    const ancestors = await fetch(`${HUBMAP_ANCESTORS_ENDPOINT}${uuid}`).then((r) => r.json());
     const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
     const { block_id, rui_location } = getSampleBlockId(ancestors, HUBMAP_ENTITY_ENDPOINT);
     lookup.set(hubmap_id, {
