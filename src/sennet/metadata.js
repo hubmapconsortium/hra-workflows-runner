@@ -39,7 +39,13 @@ export const METADATA_FIELDS = [
  * @param {object} result Raw metadata
  * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export async function toLookup(result, organMetadata) {
+export async function toLookup(result, organMetadata, token = undefined) {
+  // Headers to use in authenticated fetch requests
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   /** @type {Map<string, SennetMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -54,18 +60,23 @@ export async function toLookup(result, organMetadata) {
         sources: [{ uuid: donor_uuid }],
       },
     } = hit;
-    const source = await fetch(`${SENNET_ENTITY_ENDPOINT}${donor_uuid}`).then((r) => r.json());
+    const source = await fetch(`${SENNET_ENTITY_ENDPOINT}${donor_uuid}`, { headers }).then((r) => r.json());
     const {
       source_mapped_metadata: {
-        age: { value: [donor_age] = [''] },
-        race: { value: [donor_race] = [''] },
-        sex: { value: [donor_sex] = [''] },
-        body_mass_index: { value: [donor_bmi] = [''] },
-      },
+        age: { value: [donor_age] = [''] } = {},
+        race: { value: [donor_race] = [''] } = {},
+        sex: { value: [donor_sex] = [''] } = {},
+        body_mass_index: { value: [donor_bmi] = [''] } = {},
+      } = {},
     } = source;
-    const ancestors = await fetch(`${SENNET_ANCESTORS_ENDPOINT}${uuid}`).then((r) => r.json());
-    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
 
+    const ancestors = await fetch(`${SENNET_ANCESTORS_ENDPOINT}${uuid}`, { headers }).then((r) => r.json());
+    if (ancestors.error) {
+      console.error(`Error getting ancestors for ${uuid}: ${ancestors.error}`);
+      throw new Error(ancestors.error);
+    }
+
+    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
     const { block_id, rui_location } = getSampleBlockId(ancestors, SENNET_ENTITY_ENDPOINT);
     lookup.set(sennet_id, {
       organ: mapped_organ,

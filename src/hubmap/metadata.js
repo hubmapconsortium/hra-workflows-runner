@@ -42,7 +42,13 @@ export const METADATA_FIELDS = [
  * @param {object} result Raw metadata
  * @param {OrganMetadataCollection} organMetadata Organ metadata
  */
-export async function metadataToLookup(result, organMetadata) {
+export async function metadataToLookup(result, organMetadata, token = undefined) {
+  // Headers to use in authenticated fetch requests
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   /** @type {Map<string, HubmapMetadata>} */
   const lookup = new Map();
   for (const hit of result.hits.hits) {
@@ -66,7 +72,13 @@ export async function metadataToLookup(result, organMetadata) {
         },
       },
     } = hit;
-    const ancestors = await fetch(`${HUBMAP_ANCESTORS_ENDPOINT}${uuid}`).then((r) => r.json());
+
+    const ancestors = await fetch(`${HUBMAP_ANCESTORS_ENDPOINT}${uuid}`, { headers }).then((r) => r.json());
+    if (ancestors.error) {
+      console.error(`Error getting ancestors for ${uuid}: ${ancestors.error}`);
+      throw new Error(ancestors.error);
+    }
+
     const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
     const { block_id, rui_location } = getSampleBlockId(ancestors, HUBMAP_ENTITY_ENDPOINT);
     lookup.set(hubmap_id, {

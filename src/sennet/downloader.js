@@ -24,6 +24,6 @@ export class Downloader extends XConsortiaDownloader {
   async getMetadataLookup(ids) {
     const organMetadata = await OrganMetadataCollection.load(this.config);
     const metadata = await getMetadata(ids, this.searchUrl, this.token, ID_KEYWORD, METADATA_FIELDS);
-    return await toLookup(metadata, organMetadata);
+    return await toLookup(metadata, organMetadata, this.token);
   }
 }
