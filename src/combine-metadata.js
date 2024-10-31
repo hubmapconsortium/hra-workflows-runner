@@ -62,6 +62,17 @@ async function readMetadata(item, config) {
   }
 }
 
+function stringifyFields(obj, fields) {
+  const shouldStringify = (value) => typeof value === 'object' && value !== null;
+  const result = {};
+  for (const field of fields) {
+    const value = obj[field];
+    result[field] = shouldStringify(value) ? JSON.stringify(value) : value;
+  }
+
+  return result;
+}
+
 async function main() {
   const config = getConfig();
   const maxConcurrency = config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
@@ -69,7 +80,7 @@ async function main() {
   const metadata = await concurrentMap(Array.from(summaries.values()), (item) => readMetadata(item, config), {
     maxConcurrency,
   });
-  const items = metadata.filter((item) => !!item);
+  const items = metadata.filter((item) => !!item).map((item) => stringifyFields(item, METADATA_FIELDS));
 
   const outputFile = join(getOutputDir(config), 'bulk-dataset-metadata.csv');
   const content = Papa.unparse({

@@ -6,10 +6,10 @@
 #SBATCH -o slurm-output/annotate-worker/hra-run_%j.txt
 #SBATCH -e slurm-output/annotate-worker/hra-run_%j.err
 #SBATCH --mail-type=FAIL,TIME_LIMIT,INVALID_DEPEND,ARRAY_TASKS
-#SBATCH --ntasks=4
+#SBATCH --ntasks=1
 #SBATCH --ntasks-per-core=1
-#SBATCH --time=1:20:00
-#SBATCH --mem=128G
+#SBATCH --time=2:00:00
+#SBATCH --mem=64G
 #SBATCH --kill-on-invalid-dep=yes
 
 module load python/3.10.5
@@ -18,7 +18,7 @@ module load singularity
 # ---------------------------------------
 # Constants
 # ---------------------------------------
-readonly NUM_TASKS="${SLURM_NTASKS:-4}"
+readonly NUM_TASKS="${SLURM_NTASKS:-1}"
 readonly HORIZONTAL_LINE='------------------------------------------------'
 
 readonly CWL_PIPELINE_URL="https://cdn.jsdelivr.net/gh/hubmapconsortium/hra-workflows@main/pipeline.cwl"
@@ -125,6 +125,10 @@ run_job() {
 
   # Create temp dir
   tmp_dir="$(mktemp -d -p "$CWL_TMP_DIR" "$index-XXXX")"
+
+  # Make a temp dir for apptainer
+  export APPTAINER_TMPDIR="${tmp_dir}-apptainer/"
+  mkdir -p "${APPTAINER_TMPDIR}"
 
   # Build cwl-runner command arguments
   args+=(--singularity --no-doc-cache)
