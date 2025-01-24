@@ -26,7 +26,7 @@ export const ID_KEYWORD = 'sennet_id';
 export const METADATA_FIELDS = [
   'uuid',
   'sennet_id',
-  'origin_sample.organ',
+  'origin_samples.organ',
   'dataset_info',
   'group_name',
   'group_uuid',
@@ -53,7 +53,7 @@ export async function toLookup(result, organMetadata, token = undefined) {
       _source: {
         sennet_id,
         uuid,
-        origin_sample: { organ },
+        origin_samples: [{ organ }],
         dataset_info,
         group_name,
         group_uuid,
