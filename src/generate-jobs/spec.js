@@ -74,6 +74,9 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
         tableMatchColumn: 'CL_Match',
       },
     }),
+    geneExpression: {
+      geneExprCount: Number(config.get('TOP_GENE_COUNT', 200)),
+    },
     summarize: {
       annotationMethod: algorithm,
       cellSource: metadata.cellSource,

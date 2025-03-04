@@ -82,7 +82,7 @@ async function main() {
   });
   const items = metadata.filter((item) => !!item).map((item) => stringifyFields(item, METADATA_FIELDS));
 
-  const outputFile = join(getOutputDir(config), 'bulk-dataset-metadata.csv');
+  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-dataset-metadata.csv');
   const content = Papa.unparse({
     data: items,
     fields: METADATA_FIELDS,

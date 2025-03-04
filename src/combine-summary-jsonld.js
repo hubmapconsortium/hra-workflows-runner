@@ -1,23 +1,12 @@
-import { writeFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
 import { join } from 'node:path';
-import { argv } from 'node:process';
+import { createGzip } from 'node:zlib';
 import { DatasetSummaries } from './dataset/summary.js';
 import { getConfig, loadJson } from './util/common.js';
 import { concurrentMap } from './util/concurrent-map.js';
 import { Config } from './util/config.js';
-import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, MAX_CONCURRENCY, SRC_DIR } from './util/constants.js';
+import { ALGORITHMS } from './util/constants.js';
 import { getAlgorithmSummaryJsonLdFilePath, getDirForId, getOutputDir, getSummariesFilePath } from './util/paths.js';
-
-/**
- * Loads a base context jsonld file
- *
- * @param {string} path Path to context file
- * @param {Config} config Configuration
- */
-async function readContextFile(path, config) {
-  const defaultPath = join(config.get(SRC_DIR), 'summary-context.jsonld');
-  return await loadJson(path || defaultPath);
-}
 
 /**
  * Attempts to read the summary jsonld file for a specific dataset and algorithm
@@ -47,30 +36,35 @@ async function readSummaryJsonLd(item, config) {
   return await concurrentMap(ALGORITHMS, (algorithm) => tryReadSummaryJsonLd(directory, algorithm, config));
 }
 
-async function main(contextFilePath) {
+async function main() {
   const config = getConfig();
-  const maxConcurrency = config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY);
+  const topGeneCount = Number(config.get('TOP_GENE_COUNT', 200));
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
-  const context = await readContextFile(contextFilePath, config);
-  const jsonlds = await concurrentMap(Array.from(summaries.values()), (item) => readSummaryJsonLd(item, config), {
-    maxConcurrency,
-  });
-  const entries = jsonlds
-    .flat()
-    .filter((json) => !!json)
-    .flatMap((json) => json['@graph']);
-
-  const outputFile = join(getOutputDir(config), 'bulk-cell-summaries.jsonld');
-  const content = JSON.stringify(
-    {
-      ...context,
-      '@graph': entries,
-    },
-    undefined,
-    2
-  );
-
-  await writeFile(outputFile, content);
+  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-summaries.jsonl.gz');
+  let output = createWriteStream(outputFile, { autoClose: true });
+  if (outputFile.endsWith('.gz')) {
+    const gzip = createGzip();
+    gzip.pipe(output);
+    output = gzip;
+  }
+  for (const item of summaries.values()) {
+    const jsonld = await readSummaryJsonLd(item, config);
+    for (const entries of jsonld.flat().filter((s) => !!s)) {
+      for (const entry of entries['@graph']) {
+        for (const cellInfo of entry?.summary ?? []) {
+          cellInfo['gene_expr'] = cellInfo['gene_expr'].slice(0, topGeneCount);
+        }
+        const content = JSON.stringify(entry);
+        if (!output.write(content + '\n')) {
+          // Drain buffer periodically
+          await new Promise((resolve) => {
+            output.once('drain', resolve);
+          });
+        }
+      }
+    }
+  }
+  output.end();
 }
 
-main(argv[2]);
+main();

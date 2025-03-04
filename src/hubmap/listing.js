@@ -17,8 +17,8 @@ export class Listing extends XConsortiaListing {
       from: 0,
       size: 10000,
       query: {
-        term: {
-          'files.rel_path.keyword': 'expr.h5ad',
+        terms: {
+          'files.rel_path.keyword': ['expr.h5ad'], // , 'cell_by_gene.h5ad'],
         },
       },
       _source: {

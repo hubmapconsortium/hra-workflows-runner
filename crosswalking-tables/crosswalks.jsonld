@@ -1037,17 +1037,6 @@
       "cell_match": "skos:exactMatch"
     },
     {
-      "@id": "PV:0000077",
-      "@type": "AnnotationItem",
-      "label": "hepatocyte",
-      "tool": "popv",
-      "organ_id": "UBERON:0000948",
-      "organ_level": "heart",
-      "cell_id": "CL:0000182",
-      "cell_label": "hepatocyte",
-      "cell_match": "skos:exactMatch"
-    },
-    {
       "@id": "PV:0000078",
       "@type": "AnnotationItem",
       "label": "macrophage",
@@ -15750,7 +15739,7 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0001264",
       "organ_level": "Pancreas_L1",
-      "cell_id": "CL:0000171",
+      "cell_id": "CL:0000169",
       "cell_label": "type B pancreatic cell",
       "cell_match": "skos:exactMatch"
     },
@@ -15772,7 +15761,7 @@
       "tool": "azimuth",
       "organ_id": "UBERON:0000178",
       "organ_level": "Human_PBMC_L2",
-      "cell_id": "CL:0000173",
+      "cell_id": "CL:0000818",
       "cell_label": "transitional stage B cell",
       "cell_match": "skos:exactMatch"
     },

@@ -11,13 +11,47 @@ if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
   done
 fi
 
+#######################################
+# Checks whether a job has run
+# Globals:
+#   FORCE
+#   SKIP_FAILED
+# Arguments:
+#   Directory of dataset, a path
+#   Algorithm, a string
+# Outputs:
+#   None
+# Returns:
+#   0 if the job should run, non-zero otherwise
+#######################################
+function should_run() {
+  local -r report_file="$1/$2/report.json"
+
+  if [[ -e "$report_file" ]]; then
+    local -r is_success=$(grep -oe '"status":\s*"success"' "$report_file")
+    if [[ -n "$is_success" && "$FORCE" != true ]]; then
+      return 1
+    elif [[ -z "$is_success" && "$SKIP_FAILED" == true ]]; then
+      return 1
+    fi
+  fi
+
+  return 0
+}
+
 # Main logic
 if [[ $RUNNER != "slurm" ]]; then
   rm -f progress
+
+  # Include parallel jobs functions
+  source ${SRC_DIR}/parallel_jobs.sh
+
   for DIR in ${DATASET_DIRS[@]}; do
     echo $(basename $DIR) >> progress
     for ALGORITHM in azimuth celltypist popv; do
-      queue_job "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}"
+      if should_run $DIR $ALGORITHM; then
+        queue_job "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}"
+      fi
     done
   done
 

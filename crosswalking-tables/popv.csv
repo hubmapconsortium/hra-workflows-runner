@@ -5,9 +5,9 @@ Author ORCID(s):,0000-0001-7655-4833,,,,,
 Reviewer(s):,"Bruce Herr II, Katy Borner",,,,,
 Reviewer ORCID(s):,"0000-0002-6703-7647, 0000-0002-3321-6137",,,,,
 General Publication(s):,"https://github.com/YosefLab/PopV, 1.  Ergen C, Xing G, Xu C, Jayasuriya M, McGeever E, Pisco AO, Streets A, Yosef N. Consensus prediction of cell type labels with popV. bioRxiv [Internet]. 2023 Jan 1;2023.08.18.553912. Available from: http://biorxiv.org/content/early/2023/08/21/2023.08.18.553912.abstract",,,,,
-Data DOI:,https://doi.org/10.48539/HBM978.STZB.569,,,,,
-Date:,15-Jun-24,,,,,
-Version number:,v1.0,,,,,
+Data DOI:,https://doi.org/10.48539/HBM487.DWCB.974,,,,,
+Date:,"December 15, 2024",,,,,
+Version number:,v1.1,,,,,
 Organ_Level,Organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
 blood,UBERON:0000178,CD141-positive myeloid dendritic cell,PV:0000001,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
 blood,UBERON:0000178,"CD4-positive, alpha-beta memory T cell",PV:0000002,"CD4-positive, alpha-beta memory T cell",CL:0000897,skos:exactMatch
@@ -85,7 +85,6 @@ eye,UBERON:0000970,surface ectodermal cell,PV:0000073,surface ectodermal cell,CL
 heart,UBERON:0000948,cardiac endothelial cell,PV:0000074,cardiac endothelial cell,CL:0010008,skos:exactMatch
 heart,UBERON:0000948,cardiac muscle cell,PV:0000075,cardiac muscle cell,CL:0000746,skos:exactMatch
 heart,UBERON:0000948,fibroblast of cardiac tissue,PV:0000076,fibroblast of cardiac tissue,CL:0002548,skos:exactMatch
-heart,UBERON:0000948,hepatocyte,PV:0000077,hepatocyte,CL:0000182,skos:exactMatch
 heart,UBERON:0000948,macrophage,PV:0000078,macrophage,CL:0000235,skos:exactMatch
 heart,UBERON:0000948,smooth muscle cell,PV:0000079,smooth muscle cell,CL:0000192,skos:exactMatch
 large intestine,UBERON:0000059,B cell,PV:0000080,B cell,CL:0000236,skos:exactMatch

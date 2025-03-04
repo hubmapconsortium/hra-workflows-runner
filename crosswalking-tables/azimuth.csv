@@ -5,9 +5,9 @@ Author ORCID(s):,0000-0001-7655-4833,,,,,
 Reviewer(s):,"Bruce Herr II, Katy Borner",,,,,
 Reviewer ORCID(s):,"0000-0002-6703-7647, 0000-0002-3321-6137",,,,,
 General Publication(s):,https://azimuth.hubmapconsortium.org/,,,,,
-Data DOI:,https://doi.org/10.48539/HBM587.ZSWT.783,,,,,
-Date:,15-Jun-24,,,,,
-Version number:,v1.0,,,,,
+Data DOI:,https://doi.org/10.48539/HBM257.FFGJ.978,,,,,
+Date:,"December 15, 2024",,,,,
+Version number:,v1.1,,,,,
 Organ_Level,Organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
 Heart_L2,UBERON:0000948,Adipocyte,AZ:0000001,adipocyte,CL:0000136,skos:exactMatch
 Heart_L2,UBERON:0000948,Arterial Endothelial,AZ:0000002,endothelial cell of artery,CL:1000413,skos:exactMatch
@@ -407,9 +407,9 @@ Pancreas_L1,UBERON:0001264,gamma,AZ:0000395,pancreatic PP cell,CL:0002275,skos:e
 Pancreas_L1,UBERON:0001264,delta,AZ:0000396,pancreatic D cell,CL:0000173,skos:exactMatch
 Pancreas_L1,UBERON:0001264,ductal,AZ:0000397,pancreatic ductal cell,CL:0002079,skos:exactMatch
 Pancreas_L1,UBERON:0001264,acinar,AZ:0000398,pancreatic acinar cell,CL:0002064,skos:exactMatch
-Pancreas_L1,UBERON:0001264,beta,AZ:0000399,type B pancreatic cell,CL:0000171,skos:exactMatch
+Pancreas_L1,UBERON:0001264,beta,AZ:0000399,type B pancreatic cell,CL:0000169,skos:exactMatch
 Pancreas_L1,UBERON:0001264,alpha,AZ:0000400,pancreatic A cell,CL:0000171,skos:exactMatch
-Human_PBMC_L2,UBERON:0000178,B intermediate,AZ:0000401,transitional stage B cell,CL:0000173,skos:exactMatch
+Human_PBMC_L2,UBERON:0000178,B intermediate,AZ:0000401,transitional stage B cell,CL:0000818,skos:exactMatch
 Human_PBMC_L2,UBERON:0000178,B memory,AZ:0000402,memory B cell,CL:0000787,skos:exactMatch
 Human_PBMC_L2,UBERON:0000178,B naive,AZ:0000403,naive B cell,CL:0000788,skos:exactMatch
 Human_PBMC_L2,UBERON:0000178,Plasmablast,AZ:0000404,plasmablast,CL:0000980,skos:exactMatch
