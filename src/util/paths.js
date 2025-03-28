@@ -1,12 +1,13 @@
 import { join } from 'node:path';
 import { Config } from './config.js';
 import {
+  ALGORITHM_ANNOTATIONS_FILE,
   ALGORITHM_REPORT_FILE,
   ALGORITHM_SUMMARY_JSON_LD_FILE,
   CACHE_DIR,
+  CROSSWALKING_TABLES_DIR,
   DATASET,
   DATASETS_DIR,
-  CROSSWALKING_TABLES_DIR,
   DATASET_FILE,
   DATASET_LIST,
   DATA_FILE,
@@ -184,6 +185,17 @@ export function getAlgorithmReportFilePath(config, dir, algorithm) {
  */
 export function getAlgorithmSummaryJsonLdFilePath(config, dir, algorithm) {
   return join(getDataDir(config, dir), algorithm, ALGORITHM_SUMMARY_JSON_LD_FILE);
+}
+
+/**
+ * Get the configured algorithm annotations file path
+ *
+ * @param {Config} config Configuration
+ * @param {string} dir Dataset directory
+ * @param {string} algorithm Algorithm
+ */
+export function getAlgorithmAnnotationsFilePath(config, dir, algorithm) {
+  return join(getDataDir(config, dir), algorithm, ALGORITHM_ANNOTATIONS_FILE);
 }
 
 /**

@@ -22,7 +22,7 @@ export RAW_DATA_DIR=${RAW_DATA_DIR:-"./raw-data"}
 export OUTPUT_DIR="$RAW_DATA_DIR/$DATASET/$VERSION"
 export DATA_REPO_DIR="$RAW_DATA_DIR/data-repo"
 export CACHE_DIR="$RAW_DATA_DIR/tmp"
-export MODELS_DIR="$RAW_DATA_DIR/models"
+export MODELS_DIR=${MODELS_DIR:-"$RAW_DATA_DIR/models"}
 export SRC_DIR="./src"
 
 # Absolute path to project. Used when starting slurm jobs
