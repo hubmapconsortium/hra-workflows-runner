@@ -1,11 +1,12 @@
-import { createWriteStream } from 'node:fs';
+import { createWriteStream, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createGzip } from 'node:zlib';
 import Papa from 'papaparse';
 import { DatasetSummaries } from './dataset/summary.js';
-import { getConfig, loadCsv, loadJson } from './util/common.js';
+import { getConfig, loadJson } from './util/common.js';
 import { Config } from './util/config.js';
-import { ALGORITHMS } from './util/constants.js';
+import { ALGORITHMS, POPV_METHOD_COUNT } from './util/constants.js';
+import { readCsv } from './util/csv.js';
 import {
   getAlgorithmAnnotationsFilePath,
   getDatasetFilePath,
@@ -20,13 +21,17 @@ import {
  * @param {string} dir Dataset directory
  * @param {string} algorithm Algorithm name
  * @param {Config} config Configuration
- * @returns The summary file content or undefined if the file does not exist
+ * @returns The an async iterator summary file content or undefined if the file does not exist
  */
-async function readCellAnnotations(dir, algorithm, config) {
+function readCellAnnotations(dir, algorithm, config) {
   const path = getAlgorithmAnnotationsFilePath(config, dir, algorithm);
   try {
-    return await loadCsv(path);
-  } catch {
+    if (existsSync(path)) {
+      return readCsv(path);
+    }
+    return undefined;
+  } catch (err) {
+    console.log('Error processing', path, err);
     return undefined;
   }
 }
@@ -49,8 +54,9 @@ async function getDataset(dir, config) {
 
 async function main() {
   const config = getConfig();
+  const popvMethodCount = parseInt(config.get(POPV_METHOD_COUNT, '6'));
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
-  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-cell-instances.csv.gz');
+  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-instances.csv.gz');
   let output = createWriteStream(outputFile, { autoClose: true });
   if (outputFile.endsWith('.gz')) {
     const gzip = createGzip();
@@ -63,12 +69,12 @@ async function main() {
     const directory = getDirForId(item.id);
     const dataset = await getDataset(directory, config);
     for (const tool of ALGORITHMS) {
-      const cells = (await readCellAnnotations(directory, tool, config)) ?? [];
-      for (const cell of cells) {
+      const cells = readCellAnnotations(directory, tool, config) ?? [];
+      for await (const cell of cells) {
         const confidence_score =
-          cell['mapping.score'] ||
-          cell.conf_score ||
-          cell.popv_prediction_score / (cell.popv_prediction_depth || 1) ||
+          parseFloat(cell['mapping.score']) ||
+          parseFloat(cell.conf_score) ||
+          parseFloat(cell.popv_prediction_score) / popvMethodCount ||
           0;
         const entry = {
           dataset: dataset.dataset_id,

@@ -18,7 +18,7 @@ const TS2_PUBLICATION_NAME = 'Tabula Sapiens v2';
 const TS2_PUBLICATION_LEAD_AUTHOR = 'Angela Pisco';
 const TS2_PORTAL_LINK = TS2_PUBLICATION_DOI;
 const TS2_EXTRACTION_SITES =
-  'https://hubmapconsortium.github.io/hra-registrations/staging/hca-pan-tabula_sapiens-2022/rui_locations.jsonld';
+  'https://hubmapconsortium.github.io/hra-registrations/hca-pan-tabula_sapiens-2022/rui_locations.jsonld';
 
 const ORGAN_MAPPING = {
   Bladder: 'UBERON:0001255',
