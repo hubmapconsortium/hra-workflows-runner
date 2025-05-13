@@ -28,6 +28,9 @@ export class JobGenerator {
       popv: {
         queryLayersKey: 'raw_counts',
       },
+      'pan-human-azimuth': {
+        queryLayersKey: 'raw_counts',
+      },
       cellSource: dataset.dataset_id,
     };
   }

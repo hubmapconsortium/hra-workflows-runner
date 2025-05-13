@@ -6,7 +6,7 @@
 readonly FORCE="${FORCE:-false}"
 readonly SKIP_FAILED="${SKIP_FAILED:-false}"
 
-readonly ALGORITHMS=(azimuth celltypist popv)
+readonly ALGORITHMS=(azimuth celltypist popv pan-human-azimuth)
 readonly NUM_ALGORITHMS="${#ALGORITHMS[@]}"
 
 # ---------------------------------------

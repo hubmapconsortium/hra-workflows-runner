@@ -35,6 +35,7 @@ function getAlgorithmDefaults(config) {
         path: join(getModelsDir(config), 'popv/models'),
       },
     },
+    'pan-human-azimuth': {},
   };
 }
 

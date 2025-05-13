@@ -36,6 +36,9 @@ export class JobGenerator {
       popv: {
         queryLayersKey: 'raw',
       },
+      'pan-human-azimuth': {
+        queryLayersKey: 'raw',
+      },
       cellSource: dataset.dataset_id,
     };
   }
