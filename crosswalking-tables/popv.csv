@@ -5,9 +5,9 @@ Author ORCID(s):,0000-0001-7655-4833,,,,,
 Reviewer(s):,"Bruce Herr II, Katy Borner",,,,,
 Reviewer ORCID(s):,"0000-0002-6703-7647, 0000-0002-3321-6137",,,,,
 General Publication(s):,"https://github.com/YosefLab/PopV, 1.  Ergen C, Xing G, Xu C, Jayasuriya M, McGeever E, Pisco AO, Streets A, Yosef N. Consensus prediction of cell type labels with popV. bioRxiv [Internet]. 2023 Jan 1;2023.08.18.553912. Available from: http://biorxiv.org/content/early/2023/08/21/2023.08.18.553912.abstract",,,,,
-Data DOI:,https://doi.org/10.48539/HBM487.DWCB.974,,,,,
-Date:,"December 15, 2024",,,,,
-Version number:,v1.1,,,,,
+Data DOI:,,,,,,
+Date:,"June 15, 2025",,,,,
+Version number:,v1.2,,,,,
 Organ_Level,Organ_ID,Annotation_Label,Annotation_Label_ID,CL_Label,CL_ID,CL_Match
 blood,UBERON:0000178,CD141-positive myeloid dendritic cell,PV:0000001,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
 blood,UBERON:0000178,"CD4-positive, alpha-beta memory T cell",PV:0000002,"CD4-positive, alpha-beta memory T cell",CL:0000897,skos:exactMatch
@@ -66,7 +66,7 @@ eye,UBERON:0000970,endothelial cell,PV:0000054,endothelial cell,CL:0000115,skos:
 eye,UBERON:0000970,epithelial cell of lacrimal sac,PV:0000055,epithelial cell of lacrimal sac,CL:1000436,skos:exactMatch
 eye,UBERON:0000970,erythroid lineage cell,PV:0000056,erythroid lineage cell,CL:0000764,skos:exactMatch
 eye,UBERON:0000970,eye photoreceptor cell,PV:0000057,eye photoreceptor cell,CL:0000287,skos:exactMatch
-eye,UBERON:0000970,fat cell,PV:0000058,fat cell,CL:0000136,skos:exactMatch
+eye,UBERON:0000970,fat cell,PV:0000058,adipocyte,CL:0000136,skos:exactMatch
 eye,UBERON:0000970,fibroblast,PV:0000059,fibroblast,CL:0000057,skos:exactMatch
 eye,UBERON:0000970,keratocyte,PV:0000060,keratocyte,CL:0002363,skos:exactMatch
 eye,UBERON:0000970,macrophage,PV:0000061,macrophage,CL:0000235,skos:exactMatch
@@ -118,7 +118,7 @@ liver,UBERON:0002107,plasma cell,PV:0000107,plasma cell,CL:0000786,skos:exactMat
 lung,UBERON:0002048,B cell,PV:0000108,B cell,CL:0000236,skos:exactMatch
 lung,UBERON:0002048,"CD4-positive, alpha-beta T cell",PV:0000109,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
 lung,UBERON:0002048,"CD8-positive, alpha-beta T cell",PV:0000110,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
-lung,UBERON:0002048,adventitial cell,PV:0000111,alveolar type 2 fibroblast cell,CL:4028006,skos:exactMatch
+lung,UBERON:0002048,adventitial cell,PV:0000111,alveolar adventitial fibroblast,CL:4028006,skos:exactMatch
 lung,UBERON:0002048,basal cell,PV:0000112,basal cell,CL:0000646,skos:exactMatch
 lung,UBERON:0002048,basophil,PV:0000113,basophil,CL:0000767,skos:exactMatch
 lung,UBERON:0002048,blood vessel endothelial cell,PV:0000114,blood vessel endothelial cell,CL:0000071,skos:exactMatch
@@ -133,7 +133,7 @@ lung,UBERON:0002048,endothelial cell of artery,PV:0000122,endothelial cell of ar
 lung,UBERON:0002048,endothelial cell of lymphatic vessel,PV:0000123,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
 lung,UBERON:0002048,fibroblast,PV:0000124,fibroblast,CL:0000057,skos:exactMatch
 lung,UBERON:0002048,intermediate monocyte,PV:0000125,intermediate monocyte,CL:0002393,skos:exactMatch
-lung,UBERON:0002048,lung ciliated cell,PV:0000126,lung ciliated cell,CL:1000271,skos:exactMatch
+lung,UBERON:0002048,lung ciliated cell,PV:0000126,lung multiciliated epithelial cell,CL:1000271,skos:exactMatch
 lung,UBERON:0002048,lung microvascular endothelial cell,PV:0000127,lung microvascular endothelial cell,CL:2000016,skos:exactMatch
 lung,UBERON:0002048,macrophage,PV:0000128,macrophage,CL:0000235,skos:exactMatch
 lung,UBERON:0002048,mature NK T cell,PV:0000129,mature NK T cell,CL:0000814,skos:exactMatch
@@ -144,11 +144,11 @@ lung,UBERON:0002048,pericyte,PV:0000133,pericyte,CL:0000669,skos:exactMatch
 lung,UBERON:0002048,plasma cell,PV:0000134,plasma cell,CL:0000786,skos:exactMatch
 lung,UBERON:0002048,plasmacytoid dendritic cell,PV:0000135,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
 lung,UBERON:0002048,pulmonary ionocyte,PV:0000136,pulmonary ionocyte,CL:0017000,skos:exactMatch
-lung,UBERON:0002048,respiratory goblet cell,PV:0000137,respiratory goblet cell,CL:0002370,skos:exactMatch
+lung,UBERON:0002048,respiratory goblet cell,PV:0000137,respiratory tract goblet cell,CL:0002370,skos:exactMatch
 lung,UBERON:0002048,serous cell of epithelium of bronchus,PV:0000138,serous cell of epithelium of bronchus,CL:1000331,skos:exactMatch
 lung,UBERON:0002048,smooth muscle cell,PV:0000139,smooth muscle cell,CL:0000192,skos:exactMatch
-lung,UBERON:0002048,type I pneumocyte,PV:0000140,type I pneumocyte,CL:0002062,skos:exactMatch
-lung,UBERON:0002048,type II pneumocyte,PV:0000141,type II pneumocyte,CL:0002063,skos:exactMatch
+lung,UBERON:0002048,type I pneumocyte,PV:0000140,pulmonary alveolar type 1 cell,CL:0002062,skos:exactMatch
+lung,UBERON:0002048,type II pneumocyte,PV:0000141,pulmonary alveolar type 2 cell,CL:0002063,skos:exactMatch
 lung,UBERON:0002048,vascular associated smooth muscle cell,PV:0000142,vascular associated smooth muscle cell,CL:0000359,skos:exactMatch
 lung,UBERON:0002048,vein endothelial cell,PV:0000143,vein endothelial cell,CL:0002543,skos:exactMatch
 lymph node,UBERON:0000029,B cell,PV:0000144,B cell,CL:0000236,skos:exactMatch
@@ -267,7 +267,7 @@ respiratory system,UBERON:0001004,endothelial cell of artery,PV:0000256,endothel
 respiratory system,UBERON:0001004,endothelial cell of lymphatic vessel,PV:0000257,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
 respiratory system,UBERON:0001004,fibroblast,PV:0000258,fibroblast,CL:0000057,skos:exactMatch
 respiratory system,UBERON:0001004,intermediate monocyte,PV:0000259,intermediate monocyte,CL:0002393,skos:exactMatch
-respiratory system,UBERON:0001004,lung ciliated cell,PV:0000260,lung ciliated cell,CL:1000271,skos:exactMatch
+respiratory system,UBERON:0001004,lung ciliated cell,PV:0000260,lung multiciliated epithelial cell,CL:1000271,skos:exactMatch
 respiratory system,UBERON:0001004,lung microvascular endothelial cell,PV:0000261,lung microvascular endothelial cell,CL:2000016,skos:exactMatch
 respiratory system,UBERON:0001004,macrophage,PV:0000262,macrophage,CL:0000235,skos:exactMatch
 respiratory system,UBERON:0001004,mature NK T cell,PV:0000263,mature NK T cell,CL:0000814,skos:exactMatch
@@ -278,11 +278,11 @@ respiratory system,UBERON:0001004,pericyte,PV:0000267,pericyte,CL:0000669,skos:e
 respiratory system,UBERON:0001004,plasma cell,PV:0000268,plasma cell,CL:0000786,skos:exactMatch
 respiratory system,UBERON:0001004,plasmacytoid dendritic cell,PV:0000269,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
 respiratory system,UBERON:0001004,pulmonary ionocyte,PV:0000270,pulmonary ionocyte,CL:0017000,skos:exactMatch
-respiratory system,UBERON:0001004,respiratory goblet cell,PV:0000271,respiratory goblet cell,CL:0002370,skos:exactMatch
+respiratory system,UBERON:0001004,respiratory goblet cell,PV:0000271,respiratory tract goblet cell,CL:0002370,skos:exactMatch
 respiratory system,UBERON:0001004,serous cell of epithelium of bronchus,PV:0000272,serous cell of epithelium of bronchus,CL:1000331,skos:exactMatch
 respiratory system,UBERON:0001004,smooth muscle cell,PV:0000273,smooth muscle cell,CL:0000192,skos:exactMatch
-respiratory system,UBERON:0001004,type I pneumocyte,PV:0000274,type I pneumocyte,CL:0002062,skos:exactMatch
-respiratory system,UBERON:0001004,type II pneumocyte,PV:0000275,type II pneumocyte,CL:0002063,skos:exactMatch
+respiratory system,UBERON:0001004,type I pneumocyte,PV:0000274,pulmonary alveolar type 1 cell,CL:0002062,skos:exactMatch
+respiratory system,UBERON:0001004,type II pneumocyte,PV:0000275,pulmonary alveolar type 2 cell,CL:0002063,skos:exactMatch
 respiratory system,UBERON:0001004,vascular associated smooth muscle cell,PV:0000276,vascular associated smooth muscle cell,CL:0000359,skos:exactMatch
 respiratory system,UBERON:0001004,vein endothelial cell,PV:0000277,vein endothelial cell,CL:0002543,skos:exactMatch
 skin,UBERON:0002097,CD141-positive myeloid dendritic cell,PV:0000278,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
@@ -410,3 +410,49 @@ uterus,UBERON:0000995,mature NK T cell,PV:0000399,mature NK T cell,CL:0000814,sk
 uterus,UBERON:0000995,myometrial cell,PV:0000400,myometrial cell,CL:0002366,skos:exactMatch
 uterus,UBERON:0000995,pericyte,PV:0000401,pericyte,CL:0000669,skos:exactMatch
 uterus,UBERON:0000995,vascular associated smooth muscle cell,PV:0000402,vascular associated smooth muscle cell,CL:0000359,skos:exactMatch
+large intestine,UBERON:0000059,colon epithelial cell,,colon epithelial cell,CL:0011108,skos:exactMatch
+large intestine,UBERON:0000059,epithelial cell of large intestine,,epithelial cell of large intestine,CL:0002253,skos:exactMatch
+blood,UBERON:0000178,"B cell, CD19-positive",,"B cell, CD19-positive",CL:0001201,skos:exactMatch
+blood,UBERON:0000178,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+eye,UBERON:0000970,bipolar neuron,,bipolar neuron,CL:0000103,skos:exactMatch
+eye,UBERON:0000970,blood vessel endothelial cell,,blood vessel endothelial cell,CL:0000071,skos:exactMatch
+eye,UBERON:0000970,sensory neuron,,sensory neuron,CL:0000101,skos:exactMatch
+adipose tissue,UBERON:0001013,B cell,,B cell,CL:0000236,skos:exactMatch
+adipose tissue,UBERON:0001013,T cell,,T cell,CL:0000084,skos:exactMatch
+adipose tissue,UBERON:0001013,endothelial cell,,endothelial cell,CL:0000115,skos:exactMatch
+adipose tissue,UBERON:0001013,fibroblast,,fibroblast,CL:0000057,skos:exactMatch
+adipose tissue,UBERON:0001013,leukocyte,,leukocyte,CL:0000738,skos:exactMatch
+adipose tissue,UBERON:0001013,macrophage,,macrophage,CL:0000235,skos:exactMatch
+adipose tissue,UBERON:0001013,mature NK T cell,,mature NK T cell,CL:0000814,skos:exactMatch
+adipose tissue,UBERON:0001013,mesenchymal stem cell,,mesenchymal stem cell,CL:0000134,skos:exactMatch
+adipose tissue,UBERON:0001013,myofibroblast cell,,myofibroblast cell,CL:0000186,skos:exactMatch
+adipose tissue,UBERON:0001013,neutrophil,,neutrophil,CL:0000775,skos:exactMatch
+adipose tissue,UBERON:0001013,plasma cell,,plasma cell,CL:0000786,skos:exactMatch
+adipose tissue,UBERON:0001013,smooth muscle cell,,smooth muscle cell,CL:0000192,skos:exactMatch
+urinary bladder,UBERON:0001255,plasmacytoid dendritic cell,,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
+tongue,UBERON:0001723,basal cell,,basal cell,CL:0000646,skos:exactMatch
+tongue,UBERON:0001723,capillary endothelial cell,,capillary endothelial cell,CL:0002144,skos:exactMatch
+tongue,UBERON:0001723,endothelial cell of artery,,endothelial cell of artery,CL:1000413,skos:exactMatch
+tongue,UBERON:0001723,endothelial cell of lymphatic vessel,,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
+tongue,UBERON:0001723,epithelial cell,,epithelial cell,CL:0000066,skos:exactMatch
+tongue,UBERON:0001723,fibroblast,,fibroblast,CL:0000057,skos:exactMatch
+tongue,UBERON:0001723,keratinocyte,,keratinocyte,CL:0000312,skos:exactMatch
+tongue,UBERON:0001723,leukocyte,,leukocyte,CL:0000738,skos:exactMatch
+tongue,UBERON:0001723,pericyte,,pericyte,CL:0000669,skos:exactMatch
+tongue,UBERON:0001723,tongue muscle cell,,tongue muscle cell,CL:0002673,skos:exactMatch
+tongue,UBERON:0001723,vein endothelial cell,,vein endothelial cell,CL:0002543,skos:exactMatch
+lung,UBERON:0002048,bronchial epithelial cell,,bronchial epithelial cell,CL:0002328,skos:exactMatch
+lung,UBERON:0002048,microvascular endothelial cell,,microvascular endothelial cell,CL:2000008,skos:exactMatch
+lung,UBERON:0002048,pneumocyte,,pulmonary alveolar epithelial cell,CL:0000322,skos:exactMatch
+skin of body,UBERON:0002097,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+skin of body,UBERON:0002097,"CD8-positive, alpha-beta T cell",,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
+skin of body,UBERON:0002097,conventional dendritic cell,,conventional dendritic cell,CL:0000990,skos:exactMatch
+spleen,UBERON:0002106,"B cell, CD19-positive",,"B cell, CD19-positive",CL:0001201,skos:exactMatch
+spleen,UBERON:0002106,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+spleen,UBERON:0002106,"CD8-positive, alpha-beta T cell",,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
+small intestine,UBERON:0002108,epithelial cell of small intestine,,epithelial cell of small intestine,CL:0002254,skos:exactMatch
+prostate gland,UBERON:0002367,bronchial epithelial cell,,epithelial cell,CL:0000066,skos:narrowMatch
+thymus,UBERON:0002370,"CD4-positive, CD25-positive, alpha-beta regulatory T cell",,"CD4-positive, CD25-positive, alpha-beta regulatory T cell",CL:0000792,skos:exactMatch
+thymus,UBERON:0002370,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+bone marrow,UBERON:0002371,"B cell, CD19-positive",,"B cell, CD19-positive",CL:0001201,skos:exactMatch
+mesenteric lymph node,UBERON:0002509,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
