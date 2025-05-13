@@ -38,7 +38,7 @@ async function readSummaryJsonLd(item, config) {
 
 async function main() {
   const config = getConfig();
-  const topGeneCount = Number(config.get('TOP_GENE_COUNT', 10));
+  const topGeneCount = Number(config.get('FINAL_TOP_GENE_COUNT', 10));
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
   const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-summaries.jsonl.gz');
   let output = createWriteStream(outputFile, { autoClose: true });

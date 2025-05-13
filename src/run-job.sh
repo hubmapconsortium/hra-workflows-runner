@@ -1,4 +1,7 @@
 #!/bin/bash
+if [ -e .venv ]; then
+  source .venv/bin/activate
+fi
 source constants.sh
 shopt -s extglob
 

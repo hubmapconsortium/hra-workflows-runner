@@ -33,6 +33,7 @@ const METADATA_FIELDS = [
 
   'donor_id',
   'donor_age',
+  'donor_development_stage',
   'donor_sex',
   'donor_bmi',
   'donor_race',

@@ -26,7 +26,7 @@ export class Listing extends XConsortiaListing {
             },
             {
               term: {
-                'ingest_metadata.files.rel_path.keyword': 'expr.h5ad',
+                'files.rel_path.keyword': 'expr.h5ad',
               },
             },
             {

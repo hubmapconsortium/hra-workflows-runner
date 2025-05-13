@@ -41,21 +41,21 @@ function should_run() {
 
 # Main logic
 if [[ $RUNNER != "slurm" ]]; then
-  rm -f progress
-
-  # Include parallel jobs functions
-  source ${SRC_DIR}/parallel_jobs.sh
+  rm -f jobs.txt jobs2.txt
 
   for DIR in ${DATASET_DIRS[@]}; do
-    echo $(basename $DIR) >> progress
-    for ALGORITHM in azimuth celltypist popv; do
+    for ALGORITHM in azimuth celltypist popv; do #pan-human-azimuth
       if should_run $DIR $ALGORITHM; then
-        queue_job "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}"
+        if [ -e "${DIR}/job-${ALGORITHM}.json" ]; then
+          echo "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
+        fi
       fi
     done
   done
 
-  wait_for_empty_queue
+  shuf jobs.txt -o jobs2.txt
+  node src/parallel-jobs.js jobs2.txt
+  rm -f jobs.txt jobs2.txt
 else
   DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
   printf "%s\n" "${DATASET_DIRS[@]}" >$DIRS_FILE
