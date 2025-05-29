@@ -26,15 +26,15 @@ export async function* readCsv(input, options = { skipEmptyLines: true, header: 
     let header;
     const newOpts = { ...options, header: false };
     for await (const line of readLines(input)) {
-      const row = Papa.parse(line.trim(), newOpts)?.data ?? [];
+      const row = Papa.parse(line, newOpts)?.data ?? [];
       if (row) {
         if (!header) {
-          header = row;
+          header = row[0];
         } else {
-          const result = header.reduce((acc, field, index) => {
-            acc[field] = row[index];
-            return acc;
-          }, {});
+          const result = {};
+          for (let i = 0; i < header.length; i++) {
+            result[header[i]] = row[0][i];
+          }
           yield result;
         }
       }

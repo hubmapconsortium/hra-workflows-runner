@@ -87,12 +87,18 @@ async function main() {
           confidence_score,
         };
         const content = Papa.unparse([header.map((field) => entry[field])]);
-        if (!output.write(content + '\n')) {
-          // Drain buffer periodically
-          await new Promise((resolve) => {
-            output.once('drain', resolve);
-          });
-        }
+        output.write(content + '\n');
+      }
+      if (output.flush) {
+        // Drain gzip buffer periodically
+        await new Promise((resolve) => {
+          output.flush(resolve);
+        });
+      } else {
+        // Drain buffer periodically
+        await new Promise((resolve) => {
+          output.once('drain', resolve);
+        });
       }
     }
   }
