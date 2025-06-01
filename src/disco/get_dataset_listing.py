@@ -1,51 +1,26 @@
-#!/usr/bin/env python3
-
+import argparse
 import json
-import sys
-import os
+from pathlib import Path
 
-def get_dataset_listing(mapping_file):
-    """
-    Read the mapping file that contains information about which datasets are in which tar.gz files
-    and at what byte offsets.
+
+def main(args: argparse.Namespace):
+    """Prints all sample_ids (keys) from DISCO's map.json file."""
+    with open(args.file, "r") as f:
+        disco_map = json.load(f)
     
-    Returns a list of dataset information in JSON format.
-    """
-    try:
-        with open(mapping_file, 'r') as f:
-            mapping_data = json.load(f)
-            
-        datasets = []
-        for tar_file, file_data in mapping_data.items():
-            for dataset in file_data['datasets']:
-                dataset_info = {
-                    'id': f"disco_{dataset['name']}",
-                    'tar_file': tar_file,
-                    'byte_offset': dataset['offset'],
-                    'byte_length': dataset['length'],
-                    'tissue': dataset.get('tissue', ''),
-                    'donor_id': dataset.get('donor_id', ''),
-                    'cell_count': dataset.get('cell_count', 0),
-                }
-                datasets.append(dataset_info)
-                
-        return datasets
-    except Exception as e:
-        print(f"Error reading mapping file: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    # Get all keys (which are sample IDs)
+    sample_ids = list(disco_map.keys())
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 get_dataset_listing.py <mapping_file>", file=sys.stderr)
-        sys.exit(1)
-        
-    mapping_file = sys.argv[1]
-    if not os.path.exists(mapping_file):
-        print(f"Mapping file not found: {mapping_file}", file=sys.stderr)
-        sys.exit(1)
-        
-    datasets = get_dataset_listing(mapping_file)
-    print(json.dumps(datasets))
+    print(json.dumps(sample_ids))
+
+
+def _get_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Get the dataset listing for DISCO")
+    parser.add_argument("file", type=Path, help="Path to map.json file")
+    return parser
+
 
 if __name__ == "__main__":
-    main()
+    parser = _get_arg_parser()
+    args = parser.parse_args()
+    main(args)
