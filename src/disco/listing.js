@@ -43,13 +43,9 @@ export class Listing {
       overwrite: this.config.get(FORCE, false),
     });
     
-    const args = [
-      this.metadataFilePath,
-      ...this.batchFiles
-    ];
     const { stdout } = await execFile('python3', [
       this.getListingScriptFilePath,
-      ...args
+      this.metadataFilePath// ...args
     ]);
     return JSON.parse(stdout);
   }
