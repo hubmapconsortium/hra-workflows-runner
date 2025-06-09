@@ -1,5 +1,6 @@
 import { execFile as callbackExecFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { FORCE } from '../util/constants.js';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { OrganMetadataCollection } from '../organ/metadata.js';
@@ -8,17 +9,26 @@ import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 
-const DISCO_BASE_URL = 'DISCO_BASE_URL';
-const DEFAULT_DISCO_BASE_URL = 'https://path/to/disco/data'; // Update with actual base URL
-const DISCO_DATA_MAPPING = 'DISCO_DATA_MAPPING';
-const DEFAULT_DISCO_DATA_MAPPING = 'path/to/mapping.json'; // Update with actual mapping path
-const DISCO_DOI_URL = 'https://doi.org/your-doi'; // Update with actual DOI
-const DISCO_PUBLICATION_NAME = 'DISCO Publication Name'; // Update with actual publication name
-const DISCO_PUBLICATION_LEAD_AUTHOR = 'Lead Author Name'; // Update with actual author name
+
+ const DISCO_BATCH_URLS = [
+  "https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1",
+  "https://zenodo.org/records/14160154/files/batch_2.tar.gz?download=1",
+  "https://zenodo.org/records/14160213/files/batch_3.tar.gz?download=1",
+  "https://zenodo.org/records/14160221/files/batch_4.tar.gz?download=1",
+  "https://zenodo.org/records/14160748/files/batch_5.tar.gz?download=1",
+  "https://zenodo.org/records/14160802/files/batch_6.tar.gz?download=1",
+  "https://zenodo.org/records/14166702/files/batch_7.tar.gz?download=1",
+  "https://zenodo.org/records/15236185/files/batch_8.tar.gz?download=1",
+  "https://zenodo.org/records/15236615/files/batch_9.tar.gz?download=1"
+];
+const DISCO_METADATA_URL = "https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata";
+
+const DISCO_DOI_URL = "https://doi.org/10.5281/zenodo.14159931";
+// add more declrations as needed
 
 const ORGAN_MAPPING = {
-  // Add organ mappings similar to GTEx implementation
-  // This should map DISCO tissue names to UBERON IDs
+
+  // Add more mappings as needed
 };
 
 const execFile = promisify(callbackExecFile);
@@ -29,11 +39,20 @@ export class Downloader {
     /** @type {Config} */
     this.config = config;
     /** @type {string} */
-    this.baseUrl = config.get(DISCO_BASE_URL, DEFAULT_DISCO_BASE_URL);
+    this.cacheDir = getCacheDir(config);
     /** @type {string} */
-    this.mappingPath = config.get(DISCO_DATA_MAPPING, DEFAULT_DISCO_DATA_MAPPING);
+    this.baseUrl = config.get(DISCO_BASE_URL, DEFAULT_DISCO_BASE_URL); 
+    /** @type {string[]} */
+    this.batchFiles = DISCO_BATCH_URLS.map(url => {
+      const batchName = url.match(/batch_\d+\.tar\.gz/)[0];
+      return join(this.cacheDir, batchName);
+    });
     /** @type {string} */
     this.extractScriptFile = 'extract_dataset.py';
+    /** @type {string} */
+    this.metadataFile = "disco_metadata.tsv";
+        /** @type {string} */
+    this.metadataFilePath = join(this.cacheDir, this.metadataFile);
     /** @type {string} */
     this.extractScriptFilePath = getSrcFilePath(
       config,
@@ -45,7 +64,20 @@ export class Downloader {
   }
 
   async prepareDownload(datasets) {
+
     this.organMetadata = await OrganMetadataCollection.load(this.config);
+      await downloadFile(this.metadataFilePath, DISCO_METADATA_URL, {
+        overwrite: this.config.get(FORCE, false)
+      });
+
+    // Download all batch tar files
+    for (let i = 0; i < DISCO_BATCH_URLS.length; i++) {
+      await downloadFile(
+        this.batchFiles[i], 
+        DISCO_BATCH_URLS[i], 
+        { overwrite: this.config.get(FORCE, false) }
+      );
+    }
 
     for (const dataset of datasets) {
       dataset.dataset_id = `${DISCO_DOI_URL}#${dataset.id}`;
@@ -64,10 +96,12 @@ export class Downloader {
     // Execute Python script to extract the dataset using the mapping file
     const { stdout } = await execFile('python3', [
       this.extractScriptFilePath,
+      '--metadata', this.metadataFilePath,
       '--dataset', dataset.id,
-      '--mapping-file', this.mappingPath,
-      '--data-dir', getCacheDir(this.config),
-      '--output', dataset.dataFilePath
+      '--output', dataset.dataFilePath,
+      // '--data-dir', getCacheDir(this.config),
+      ...this.batchFiles
+      
     ]);
 
     // Parse metadata from stdout
