@@ -47,7 +47,7 @@ def main(args):
     map_dict = build_map_dict(tar_dict, meta_dict, verbose=False)
     samples_list = list(map_dict.keys()) + samples_h5ad
 
-    print(json.dumps(sorted(samples_list)))
+    # print(json.dumps(sorted(samples_list)))
 
     dataset_id = args.dataset
     sample_id = dataset_id.rstrip('/').split('/')[-1]
@@ -182,7 +182,7 @@ def safe_cleanup(path):
 def extract_h5_from_tar(batch_tar_path, offset, h5_filename, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, h5_filename)
-    with indexed_gzip.IndexedGzipFile(batch_tar_path) as f:
+    with indexed_gzip.IndexedGzipFile(str(batch_tar_path)) as f:
         f.seek(offset)
         with tarfile.open(fileobj=f, mode='r|') as tar:
             for member in tar:
