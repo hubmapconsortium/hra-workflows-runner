@@ -4,10 +4,13 @@ import { FORCE } from '../util/constants.js';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { OrganMetadataCollection } from '../organ/metadata.js';
+import { downloadFile } from '../util/fs.js';
+import { existsSync } from 'node:fs';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/constants.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
+
 
 
  const DISCO_BATCH_URLS = [
@@ -23,7 +26,9 @@ import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 ];
 const DISCO_METADATA_URL = "https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata";
 
-const DISCO_DOI_URL = "https://doi.org/10.5281/zenodo.14159931";
+// const DEFAULT_DISCO_DOI = "https://disco.bii.a-star.edu.sg/";
+
+const DISCO_BASE_URL = "https://disco.bii.a-star.edu.sg/"
 // add more declrations as needed
 
 const ORGAN_MAPPING = {
@@ -41,7 +46,7 @@ export class Downloader {
     /** @type {string} */
     this.cacheDir = getCacheDir(config);
     /** @type {string} */
-    this.baseUrl = config.get(DISCO_BASE_URL, DEFAULT_DISCO_BASE_URL); 
+    this.baseUrl = DISCO_BASE_URL; 
     /** @type {string[]} */
     this.batchFiles = DISCO_BATCH_URLS.map(url => {
       const batchName = url.match(/batch_\d+\.tar\.gz/)[0];
@@ -72,22 +77,30 @@ export class Downloader {
 
     // Download all batch tar files
     for (let i = 0; i < DISCO_BATCH_URLS.length; i++) {
+      const batchPath = this.batchFiles[i];
+
+      // Check if file exists and we're not forcing
+      if (existsSync(batchPath) && !this.config.get(FORCE, false)) {
+        console.log(`Skipping existing file: ${batchPath}`);
+        continue;
+      }
+
       await downloadFile(
-        this.batchFiles[i], 
+        batchPath, 
         DISCO_BATCH_URLS[i], 
         { overwrite: this.config.get(FORCE, false) }
       );
     }
 
     for (const dataset of datasets) {
-      dataset.dataset_id = `${DISCO_DOI_URL}#${dataset.id}`;
-      dataset.publication = DISCO_DOI_URL;
-      dataset.publication_title = DISCO_PUBLICATION_NAME;
-      dataset.publication_lead_author = DISCO_PUBLICATION_LEAD_AUTHOR;
+      dataset.dataset_id = `${this.baseUrl}/sample/${dataset.id}`;
+      dataset.publication = this.baseUrl;
+      //dataset.publication_title = DISCO_PUBLICATION_NAME;
+      //dataset.publication_lead_author = DISCO_PUBLICATION_LEAD_AUTHOR;
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
-      dataset.provider_uuid = 'your-provider-uuid'; // Update with actual UUID
-      dataset.dataset_link = `${this.baseUrl}/datasets/${dataset.id}`;
+      dataset.provider_uuid = 'disco-uuid'; // Update with actual UUID
+      dataset.dataset_link = `${this.baseUrl}/sample/${dataset.id}`;
       dataset.dataset_technology = 'OTHER';
     }
   }
@@ -98,32 +111,60 @@ export class Downloader {
       this.extractScriptFilePath,
       '--metadata', this.metadataFilePath,
       '--dataset', dataset.id,
-      '--output', dataset.dataFilePath,
-      // '--data-dir', getCacheDir(this.config),
+      '--output', dataset.metadataFilePath,
       ...this.batchFiles
       
     ]);
 
-    // Parse metadata from stdout
-    const cell_count_match = /cell_count:\s*(\d+)\s*\n/i.exec(stdout);
-    dataset.dataset_cell_count = parseInt(cell_count_match?.[1]);
+    const metadata = JSON.parse(stdout);
 
-    const gene_count_match = /gene_count:\s*(\d+)\s*\n/i.exec(stdout);
-    dataset.dataset_gene_count = parseInt(gene_count_match?.[1]);
+    // Helper to assign non-empty fields
+    const assignIfExists = (key) => {
+      const value = metadata[key];
+      if (value !== undefined && value !== null && value !== '') {
+        dataset[key] = value;
+      }
+    };
 
-    const tissue_match = /tissue:(.+)\n/i.exec(stdout);
-    const tissue = tissue_match?.[1].trim().toLowerCase() ?? '';
-    dataset.organ = this.organMetadata.resolve(ORGAN_MAPPING[tissue] ?? '');
-    dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
+    // Assign all fields from metadata
+    assignIfExists("project_id");
+    assignIfExists("sample_type");
+    assignIfExists("tissue");
 
-    const donor_id_match = /donor_id:(.+)\n/i.exec(stdout);
-    dataset.donor_id = `${DISCO_DOI_URL}#${donor_id_match?.[1].trim()}` ?? '';
+    // add logic for organ resolution (lowercasing and mapping)
 
-    const sex_match = /sex:(.+)\n/i.exec(stdout);
-    dataset.donor_sex = sex_match?.[1].trim() ?? '';
-
-    const age_match = /age:(.+)\n/i.exec(stdout);
-    dataset.donor_age_bin = age_match?.[1].trim() ?? '';
+    assignIfExists("anatomical_site");
+    assignIfExists("disease");
+    assignIfExists("platform");
+    assignIfExists("age_group");
+    assignIfExists("cell_sorting");
+    assignIfExists("disease_subtype");
+    assignIfExists("treatment");
+    assignIfExists("time_point");
+    assignIfExists("subject_id");
+    assignIfExists("age");
+    assignIfExists("gender");
+    assignIfExists("race");
+    assignIfExists("infection");
+    assignIfExists("batch");
+    assignIfExists("disease_stage");
+    assignIfExists("genotype");
+    assignIfExists("rna_source");
+    assignIfExists("other_metadata");
+    assignIfExists("disease_grade");
+    assignIfExists("cell_number");
+    assignIfExists("median_umi");
+    assignIfExists("rds_md5");
+    assignIfExists("rds_size");
+    assignIfExists("source_cell_line");
+    assignIfExists("source_tissue");
+    assignIfExists("source_disease");
+    assignIfExists("source_cell_type");
+    assignIfExists("induced_cell_tissue");
+    assignIfExists("collect_time");
+    assignIfExists("sample_id");
+    assignIfExists("dataset_cell_count");
+    assignIfExists("dataset_gene_count");
 
     const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
     if (dataset.dataset_cell_count < minCount) {
