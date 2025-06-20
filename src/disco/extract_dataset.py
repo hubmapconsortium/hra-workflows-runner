@@ -207,8 +207,8 @@ def process_sample(sample_id, disco_map, base_tar_dir, output_dir):
     batch_name = path.split('/')[0]
     h5_filename = path.split('/')[-1]
     tar_path = next(p for p in base_tar_dir if p.name == f"{batch_name}.tar.gz")
-    print("printing tar_path")
-    print(tar_path)
+    # print("printing tar_path")
+    # print(tar_path)
     extracted_h5_path = extract_h5_from_tar(tar_path, offset, h5_filename, output_dir)
     adata = sc.read_10x_h5(extracted_h5_path)
 

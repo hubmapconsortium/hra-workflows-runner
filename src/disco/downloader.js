@@ -106,15 +106,18 @@ export class Downloader {
   }
 
   async download(dataset) {
-    // Execute Python script to extract the dataset using the mapping file
-    const { stdout } = await execFile('python3', [
+    const args = [
       this.extractScriptFilePath,
       '--metadata', this.metadataFilePath,
       '--dataset', dataset.id,
-      '--output', dataset.metadataFilePath,
+      '--output', dataset.dataFilePath,
       ...this.batchFiles
-      
-    ]);
+    ];
+
+    console.log('Running Python with args:', ['python3', ...args].join(' '));
+
+    const { stdout } = await execFile('python3', args);
+
 
     const metadata = JSON.parse(stdout);
 
