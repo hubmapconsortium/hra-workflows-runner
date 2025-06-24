@@ -10,6 +10,8 @@ import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/constants.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
+import fs from 'node:fs';
+import { parse } from 'csv-parse/sync'; // npm install csv-parse
 
 
 
@@ -26,10 +28,8 @@ import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 ];
 const DISCO_METADATA_URL = "https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata";
 
-// const DEFAULT_DISCO_DOI = "https://disco.bii.a-star.edu.sg/";
+const DISCO_BASE_URL = "https://disco.bii.a-star.edu.sg/sample/"
 
-const DISCO_BASE_URL = "https://disco.bii.a-star.edu.sg/"
-// add more declrations as needed
 
 const ORGAN_MAPPING = {
 
@@ -93,19 +93,39 @@ export class Downloader {
     }
 
     for (const dataset of datasets) {
-      dataset.dataset_id = `${this.baseUrl}/sample/${dataset.id}`;
-      dataset.publication = this.baseUrl;
-      //dataset.publication_title = DISCO_PUBLICATION_NAME;
-      //dataset.publication_lead_author = DISCO_PUBLICATION_LEAD_AUTHOR;
+      dataset.dataset_id = `${this.baseUrl}${dataset.id}`;
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
-      dataset.provider_uuid = 'disco-uuid'; // Update with actual UUID
-      dataset.dataset_link = `${this.baseUrl}/sample/${dataset.id}`;
+      dataset.provider_uuid = 'bfe21f44-bf10-4371-8f4e-7f909f5a900c'; // Update with actual UUID
+      dataset.dataset_link = `${this.baseUrl}${dataset.id}`;
       dataset.dataset_technology = 'OTHER';
     }
   }
 
   async download(dataset) {
+      // Step 1: Parse the metadata file
+    const metadataContent = fs.readFileSync(this.metadataFilePath, 'utf-8');
+    const records = parse(metadataContent, {
+      delimiter: '\t',
+      columns: true,
+      skip_empty_lines: true,
+    });
+
+
+      // Step 2: Find metadata row for current dataset
+    const matched = records.find(row => row.sample_id === dataset.id);
+    if (!matched) {
+      throw new Error(`No metadata found for dataset id: ${dataset.id}`);
+    }
+
+    // Step 3: Assign all non-empty fields to dataset
+    for (const [key, value] of Object.entries(matched)) {
+    if (value !== undefined && value !== null && value.trim() !== '') {
+      dataset[key] = value;
+    }
+  }
+
+   // Step 4: Run Python extraction script
     const args = [
       this.extractScriptFilePath,
       '--metadata', this.metadataFilePath,
@@ -119,56 +139,12 @@ export class Downloader {
     const { stdout } = await execFile('python3', args);
 
 
-    const metadata = JSON.parse(stdout);
+    // Step 5: Parse Python output and assign counts
+    const counts = JSON.parse(stdout);
+    dataset.dataset_cell_count = counts.cell_count;
+    dataset.dataset_gene_count = counts.gene_count;
 
-    // Helper to assign non-empty fields
-    const assignIfExists = (key) => {
-      const value = metadata[key];
-      if (value !== undefined && value !== null && value !== '') {
-        dataset[key] = value;
-      }
-    };
-
-    // Assign all fields from metadata
-    assignIfExists("project_id");
-    assignIfExists("sample_type");
-    assignIfExists("tissue");
-
-    // add logic for organ resolution (lowercasing and mapping)
-
-    assignIfExists("anatomical_site");
-    assignIfExists("disease");
-    assignIfExists("platform");
-    assignIfExists("age_group");
-    assignIfExists("cell_sorting");
-    assignIfExists("disease_subtype");
-    assignIfExists("treatment");
-    assignIfExists("time_point");
-    assignIfExists("subject_id");
-    assignIfExists("age");
-    assignIfExists("gender");
-    assignIfExists("race");
-    assignIfExists("infection");
-    assignIfExists("batch");
-    assignIfExists("disease_stage");
-    assignIfExists("genotype");
-    assignIfExists("rna_source");
-    assignIfExists("other_metadata");
-    assignIfExists("disease_grade");
-    assignIfExists("cell_number");
-    assignIfExists("median_umi");
-    assignIfExists("rds_md5");
-    assignIfExists("rds_size");
-    assignIfExists("source_cell_line");
-    assignIfExists("source_tissue");
-    assignIfExists("source_disease");
-    assignIfExists("source_cell_type");
-    assignIfExists("induced_cell_tissue");
-    assignIfExists("collect_time");
-    assignIfExists("sample_id");
-    assignIfExists("dataset_cell_count");
-    assignIfExists("dataset_gene_count");
-
+    // Enforce minimum cell count
     const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cells. Cell count: ${dataset.dataset_cell_count}`);
