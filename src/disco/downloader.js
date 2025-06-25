@@ -11,7 +11,12 @@ import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 import fs from 'node:fs';
-import { parse } from 'csv-parse/sync'; // npm install csv-parse
+import Papa from 'papaparse' ;
+import { spawn } from 'node:child_process';
+import { pipeline } from 'node:stream';
+import { createWriteStream } from 'node:fs';
+import https from 'node:https';
+
 
 
 
@@ -26,6 +31,7 @@ import { parse } from 'csv-parse/sync'; // npm install csv-parse
   "https://zenodo.org/records/15236185/files/batch_8.tar.gz?download=1",
   "https://zenodo.org/records/15236615/files/batch_9.tar.gz?download=1"
 ];
+
 const DISCO_METADATA_URL = "https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata";
 
 const DISCO_BASE_URL = "https://disco.bii.a-star.edu.sg/sample/"
@@ -37,6 +43,8 @@ const ORGAN_MAPPING = {
 };
 
 const execFile = promisify(callbackExecFile);
+const streamPipeline = promisify(pipeline);
+
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -76,21 +84,47 @@ export class Downloader {
       });
 
     // Download all batch tar files
-    for (let i = 0; i < DISCO_BATCH_URLS.length; i++) {
-      const batchPath = this.batchFiles[i];
 
-      // Check if file exists and we're not forcing
-      if (existsSync(batchPath) && !this.config.get(FORCE, false)) {
-        console.log(`Skipping existing file: ${batchPath}`);
-        continue;
-      }
+    await Promise.all(DISCO_BATCH_URLS.map(async (url) =>  {
 
-      await downloadFile(
-        batchPath, 
-        DISCO_BATCH_URLS[i], 
-        { overwrite: this.config.get(FORCE, false) }
-      );
+    // Extract batch name 
+    const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
+    const expectedExtractedDir = join(this.cacheDir, batchName);
+
+    // Skip if already extracted
+    if (existsSync(expectedExtractedDir) && !this.config.get(FORCE, false)) {
+      console.log(`Skipping already extracted batch: ${batchName}`);
+      return;
     }
+
+    console.log(`Streaming and extracting: ${url}`);
+
+    await new Promise((resolve, reject) => {
+      https.get(url, (res) => {
+        if (res.statusCode !== 200) {
+          return reject(new Error(`Request failed with status ${res.statusCode}`));
+        }
+
+        // tars are nested as batch_X/batch_X/ therefore stripping components
+        const targetDir = join(this.cacheDir, batchName);
+        fs.mkdirSync(targetDir, { recursive: true });  // ensure target dir exists
+        
+        const tar = spawn('tar', ['-xz', '--strip-components=1', '-C', targetDir]);
+        res.pipe(tar.stdin);
+
+        tar.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`tar exited with code ${code}`));
+          }
+        });
+
+        tar.on('error', reject);
+      }).on('error', reject);
+    });
+  }));
+
 
     for (const dataset of datasets) {
       dataset.dataset_id = `${this.baseUrl}${dataset.id}`;
@@ -105,10 +139,10 @@ export class Downloader {
   async download(dataset) {
       // Step 1: Parse the metadata file
     const metadataContent = fs.readFileSync(this.metadataFilePath, 'utf-8');
-    const records = parse(metadataContent, {
+    const { data: records, errors } = Papa.parse(metadataContent, {
+      header: true,
       delimiter: '\t',
-      columns: true,
-      skip_empty_lines: true,
+      skipEmptyLines: true
     });
 
 
@@ -118,20 +152,42 @@ export class Downloader {
       throw new Error(`No metadata found for dataset id: ${dataset.id}`);
     }
 
-    // Step 3: Assign all non-empty fields to dataset
-    for (const [key, value] of Object.entries(matched)) {
-    if (value !== undefined && value !== null && value.trim() !== '') {
+  // Step 3: Assign only non-NA and non-empty fields to dataset
+  for (const [key, value] of Object.entries(matched)) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value.trim() !== '' &&
+      value.trim().toUpperCase() !== 'NA'
+    ) {
       dataset[key] = value;
     }
   }
+
+    // Step 3.5: Locate the .h5 file path for this sample
+    const batchDirs = fs.readdirSync(this.cacheDir)
+      .filter(name => name.startsWith('batch_') && fs.statSync(join(this.cacheDir, name)).isDirectory());
+
+    let h5FilePath = null;
+    for (const dir of batchDirs) {
+      const candidatePath = join(this.cacheDir, dir, `${dataset.id}.h5`);
+      if (fs.existsSync(candidatePath)) {
+        h5FilePath = candidatePath;
+        break;
+      }
+    }
+
+    if (!h5FilePath) {
+      throw new Error(`Could not find .h5 file for ${dataset.id}`);
+    }
+
 
    // Step 4: Run Python extraction script
     const args = [
       this.extractScriptFilePath,
       '--metadata', this.metadataFilePath,
-      '--dataset', dataset.id,
+      '--dataset', h5FilePath,
       '--output', dataset.dataFilePath,
-      ...this.batchFiles
     ];
 
     console.log('Running Python with args:', ['python3', ...args].join(' '));
