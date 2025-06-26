@@ -37,7 +37,6 @@ const ORGAN_MAPPING = {
 };
 
 const execFile = promisify(callbackExecFile);
-const streamPipeline = promisify(pipeline);
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -71,6 +70,18 @@ export class Downloader {
       overwrite: this.config.get(FORCE, false),
     });
 
+    const metadataContent = fs.readFileSync(this.metadataFilePath, 'utf-8');
+    const { data: records } = Papa.parse(metadataContent, {
+      header: true,
+      delimiter: '\t',
+      skipEmptyLines: true,
+    });
+
+    // lookup table
+    this.metadataLookup = {};
+    for (const row of records) {
+      this.metadataLookup[row.sample_id] = row;
+    }
     // Download all batch tar files
 
     await Promise.all(
@@ -96,31 +107,25 @@ export class Downloader {
       dataset.dataset_id = `${this.baseUrl}${dataset.id}`;
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
-      dataset.provider_uuid = 'bfe21f44-bf10-4371-8f4e-7f909f5a900c'; 
+      dataset.provider_uuid = 'bfe21f44-bf10-4371-8f4e-7f909f5a900c';
       dataset.dataset_link = `${this.baseUrl}${dataset.id}`;
-      dataset.dataset_technology = 'OTHER';
     }
   }
 
   async prepareData(dataset) {
     // Parse the metadata
-    const metadataContent = fs.readFileSync(this.metadataFilePath, 'utf-8');
-    const { data: records, errors } = Papa.parse(metadataContent, {
-      header: true,
-      delimiter: '\t',
-      skipEmptyLines: true,
-    });
 
-    // Find matching metadata row 
-    const matched = records.find((row) => row.sample_id === dataset.id);
+    // Find matching metadata row
+    const matched = this.metadataLookup[dataset.id];
     if (!matched) {
       throw new Error(`No metadata found for dataset id: ${dataset.id}`);
     }
 
-    // Step 3: Assign cleaned metadata fields to dataset
+    // Assign cleaned metadata fields to dataset
     for (const [key, value] of Object.entries(matched)) {
       if (value !== undefined && value !== null && value.trim() !== '' && value.trim().toUpperCase() !== 'NA') {
-        dataset[key] = value;
+        const targetKey = key === 'platform' ? 'dataset_technology' : key;
+        dataset[targetKey] = value;
       }
     }
 
@@ -145,9 +150,12 @@ export class Downloader {
     // Run Python extraction script
     const args = [
       this.extractScriptFilePath,
-      '--metadata', this.metadataFilePath,
-      '--dataset', h5FilePath,
-      '--output', dataset.dataFilePath,
+      '--metadata',
+      this.metadataFilePath,
+      '--dataset',
+      h5FilePath,
+      '--output',
+      dataset.dataFilePath,
     ];
 
     console.log('Running Python with args:', ['python3', ...args].join(' '));
