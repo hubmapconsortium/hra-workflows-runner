@@ -34,6 +34,23 @@ const DISCO_BASE_URL = 'https://disco.bii.a-star.edu.sg/sample/';
 
 const ORGAN_MAPPING = {
   // Add finalized mappings
+  lung: 'UBERON:0002048',
+  thymus: 'UBERON:0002370',
+  eye: 'UBERON:0000970',
+  uterus: 'UBERON:0000995',
+  heart: 'UBERON:0000948',
+  kidney: 'UBERON:0002113',
+  trachea: 'UBERON:0003126',
+  liver: 'UBERON:0002107',
+  lymph_node: 'UBERON:0000029',
+  spleen: 'UBERON:0002106',
+  brain: 'UBERON:0000955',
+  fallopian_tube: 'UBERON:0003889',
+  ureter: 'UBERON:0000056',
+  larynx: 'UBERON:0001737',
+  pancreas: 'UBERON:0001264',
+  spinal_cord: 'UBERON:0002240',
+
 };
 
 const execFile = promisify(callbackExecFile);
@@ -111,6 +128,12 @@ export class Downloader {
         dataset[targetKey] = value;
       }
     }
+
+    // Resolve organ name from tissue using ORGAN_MAPPING
+    const tissue = matched.tissue ?? '';
+    const organCode = ORGAN_MAPPING[tissue] ?? '';
+    dataset.organ = this.organMetadata.resolve(organCode);
+
 
     // Locate the .h5 file path for this sample
     const batchDirs = fs
