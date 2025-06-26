@@ -84,24 +84,7 @@ export class Downloader {
     }
     // Download all batch tar files
 
-    await Promise.all(
-      DISCO_BATCH_URLS.map(async (url) => {
-        const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
-        const targetDir = join(this.cacheDir, batchName);
-
-        // Skip if already extracted
-        if (existsSync(targetDir) && !this.config.get(FORCE, false)) {
-          console.log(`Skipping already extracted batch: ${batchName}`);
-          return;
-        }
-
-        fs.mkdirSync(targetDir, { recursive: true }); // Ensure target dir exists
-
-        const cmd = `curl -L "${url}" | tar -xz --strip-components=1 -C "${targetDir}"`;
-        console.log(`Running command: ${cmd}`);
-        await exec(cmd);
-      })
-    );
+    await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
     for (const dataset of datasets) {
       dataset.dataset_id = `${this.baseUrl}${dataset.id}`;
@@ -172,5 +155,20 @@ export class Downloader {
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cells. Cell count: ${dataset.dataset_cell_count}`);
     }
+  }
+  async downloadAndExtractBatch(url) {
+    const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
+    const targetDir = join(this.cacheDir, batchName);
+
+    if (existsSync(targetDir) && !this.config.get(FORCE, false)) {
+      console.log(`Skipping already extracted batch: ${batchName}`);
+      return;
+    }
+
+    fs.mkdirSync(targetDir, { recursive: true });
+
+    const cmd = `curl -L "${url}" | tar -xz --strip-components=1 -C "${targetDir}"`;
+    console.log(`Running command: ${cmd}`);
+    await exec(cmd);
   }
 }
