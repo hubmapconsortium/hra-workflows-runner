@@ -32,7 +32,7 @@ export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
 export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv';
 
 // Algorithms
-export const ALGORITHMS = ['azimuth', 'celltypist', 'popv'] // , 'pan-human-azimuth'];
+export const ALGORITHMS = ['azimuth', 'celltypist', 'popv', 'frmatch'] // , 'pan-human-azimuth'];
 
 // Default values
 export const DEFAULT_MAX_CONCURRENCY = 2;

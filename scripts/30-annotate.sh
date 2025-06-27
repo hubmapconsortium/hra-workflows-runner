@@ -44,7 +44,7 @@ if [[ $RUNNER != "slurm" ]]; then
   rm -f jobs.txt jobs2.txt
 
   for DIR in ${DATASET_DIRS[@]}; do
-    for ALGORITHM in azimuth celltypist popv; do #pan-human-azimuth
+    for ALGORITHM in azimuth celltypist popv frmatch; do #pan-human-azimuth
       if should_run $DIR $ALGORITHM; then
         if [ -e "${DIR}/job-${ALGORITHM}.json" ]; then
           echo "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
