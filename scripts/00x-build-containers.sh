@@ -3,7 +3,7 @@ source constants.sh
 shopt -s extglob
 set -ev
 
-CONTAINERS=(azimuth celltypist popv pan-human-azimuth extract-summary gene-expression crosswalking)
+CONTAINERS=(azimuth celltypist popv pan-human-azimuth frmatch extract-summary gene-expression crosswalking)
 
 mkdir -p "$SIF_CACHE_DIR"
 cd "$SIF_CACHE_DIR"
