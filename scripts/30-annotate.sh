@@ -3,7 +3,10 @@ source constants.sh
 shopt -s extglob
 set -ev
 
-readarray -t DATASET_DIRS < <(node $SRC_DIR/list-downloaded-dirs.js)
+DATASET_DIRS=
+for DIR in $(node $SRC_DIR/list-downloaded-dirs.js); do
+  DATASET_DIRS+=($DIR)
+done
 
 if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
   for DIR in ${DATASET_DIRS[@]}; do

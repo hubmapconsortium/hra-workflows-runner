@@ -1,20 +1,18 @@
-import { execFile as callbackExecFile } from 'node:child_process';
-import { FORCE } from '../util/constants.js';
+import { execFile as callbackExecFile, exec as rawExec } from 'node:child_process';
+import fs, { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { OrganMetadataCollection } from '../organ/metadata.js';
-import { downloadFile } from '../util/fs.js';
-import { existsSync } from 'node:fs';
-import { Config } from '../util/config.js';
-import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/constants.js';
-import { IDownloader } from '../util/handler.js';
-import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
-import fs from 'node:fs';
 import Papa from 'papaparse';
-import { pipeline } from 'node:stream';
-import { exec as rawExec } from 'node:child_process';
+import { OrganMetadataCollection } from '../organ/metadata.js';
+import { Config } from '../util/config.js';
+import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
+import { downloadFile } from '../util/fs.js';
+import { IDownloader } from '../util/handler.js';
+import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 
 const exec = promisify(rawExec);
+const execFile = promisify(callbackExecFile);
+
 
 const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1',
@@ -50,10 +48,7 @@ const ORGAN_MAPPING = {
   larynx: 'UBERON:0001737',
   pancreas: 'UBERON:0001264',
   spinal_cord: 'UBERON:0002240',
-
 };
-
-const execFile = promisify(callbackExecFile);
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -97,22 +92,23 @@ export class Downloader {
     // lookup table
     this.metadataLookup = {};
     for (const row of records) {
-      this.metadataLookup[row.sample_id] = row;
+      this.metadataLookup['DISCO-' + row.sample_id] = row;
     }
+  
     // Download all batch tar files
-
     await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
     for (const dataset of datasets) {
-      dataset.dataset_id = `${this.baseUrl}${dataset.id}`;
+      const sample_id = dataset.id.replace('DISCO-', '');
+      dataset.dataset_id = `${this.baseUrl}${sample_id}`;
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
       dataset.provider_uuid = 'bfe21f44-bf10-4371-8f4e-7f909f5a900c';
-      dataset.dataset_link = `${this.baseUrl}${dataset.id}`;
+      dataset.dataset_link = `${this.baseUrl}${sample_id}`;
     }
   }
 
-  async prepareData(dataset) {
+  async download(dataset) {
     // Parse the metadata
 
     // Find matching metadata row
@@ -134,7 +130,6 @@ export class Downloader {
     const organCode = ORGAN_MAPPING[tissue] ?? '';
     dataset.organ = this.organMetadata.resolve(organCode);
 
-
     // Locate the .h5 file path for this sample
     const batchDirs = fs
       .readdirSync(this.cacheDir)
@@ -142,7 +137,7 @@ export class Downloader {
 
     let h5FilePath = null;
     for (const dir of batchDirs) {
-      const candidatePath = join(this.cacheDir, dir, `${dataset.id}.h5`);
+      const candidatePath = join(this.cacheDir, dir, `${matched.sample_id}.h5`);
       if (fs.existsSync(candidatePath)) {
         h5FilePath = candidatePath;
         break;
@@ -163,9 +158,6 @@ export class Downloader {
       '--output',
       dataset.dataFilePath,
     ];
-
-    console.log('Running Python with args:', ['python3', ...args].join(' '));
-
     const { stdout } = await execFile('python3', args);
 
     // Parse Python output and assign counts
@@ -179,6 +171,7 @@ export class Downloader {
       throw new Error(`Dataset has fewer than ${minCount} cells. Cell count: ${dataset.dataset_cell_count}`);
     }
   }
+  
   async downloadAndExtractBatch(url) {
     const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
     const targetDir = join(this.cacheDir, batchName);

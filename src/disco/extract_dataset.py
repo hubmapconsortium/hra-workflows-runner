@@ -2,10 +2,7 @@ import json
 import os
 import pandas as pd
 import argparse
-from pathlib import Path
 import scanpy as sc
-import tarfile
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def main(args):
     append_meta_and_convert_to_h5ad(args.dataset, args.metadata, args.output)
