@@ -32,13 +32,13 @@ export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
 export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv';
 
 // Algorithms
-export const ALGORITHMS = ['azimuth', 'celltypist', 'popv', 'frmatch'] // , 'pan-human-azimuth'];
+export const ALGORITHMS = ['azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth'];
 
 // Default values
 export const DEFAULT_MAX_CONCURRENCY = 2;
 export const DEFAULT_PYTHON_LOG_LEVEL = 40; // Error level
 export const DEFAULT_CACHE_DIR = './tmp';
-export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'sennet', 'gtex', 'cellxgene']; // , 'ts2'
+export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'sennet', 'gtex', 'cellxgene', 'ts2'];
 export const DEFAULT_DATASET_LIST = 'listing.csv';
 export const DEFAULT_DATASET_MIN_CELL_COUNT = 100;
 export const DEFAULT_DATASET_DATA_MAX_SIZE = 10 * 1024 * 1024 * 1024; // 10GiB
