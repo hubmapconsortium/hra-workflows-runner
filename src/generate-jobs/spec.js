@@ -35,6 +35,16 @@ function getAlgorithmDefaults(config) {
         path: join(getModelsDir(config), 'popv/models'),
       },
     },
+    frmatch: {
+      referenceDataDir: {
+        class: 'Directory',
+        path: join(getModelsDir(config), 'frmatch/reference-data'),
+      },
+      modelsDir: {
+        class: 'Directory',
+        path: join(getModelsDir(config), 'frmatch/models'),
+      },
+    },
     'pan-human-azimuth': {},
   };
 }

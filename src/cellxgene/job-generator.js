@@ -39,6 +39,9 @@ export class JobGenerator {
       'pan-human-azimuth': {
         queryLayersKey: 'raw',
       },
+      'frmatch': {
+        queryLayersKey: 'raw'
+      },
       cellSource: dataset.dataset_id,
     };
   }

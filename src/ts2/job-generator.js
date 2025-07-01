@@ -31,6 +31,9 @@ export class JobGenerator {
       'pan-human-azimuth': {
         queryLayersKey: 'raw_counts',
       },
+      'frmatch': {
+        queryLayersKey: 'raw_counts',
+      },
       cellSource: dataset.dataset_id,
     };
   }
