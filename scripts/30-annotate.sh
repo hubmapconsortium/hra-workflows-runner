@@ -50,16 +50,21 @@ if [[ $RUNNER != "slurm" ]]; then
     for ALGORITHM in azimuth celltypist popv frmatch pan-human-azimuth; do
       if should_run $DIR $ALGORITHM; then
         if [ -e "${DIR}/job-${ALGORITHM}.json" ]; then
-          #echo "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
-          ${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}
+          if [ "${MAX_PROCESSES}" == "1" ]; then
+            ${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}
+          else
+            echo "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
+          fi
         fi
       fi
     done
   done
 
-  # shuf jobs.txt -o jobs2.txt
-  # node src/parallel-jobs.js jobs2.txt
-  # rm -f jobs.txt jobs2.txt
+  if [ "${MAX_PROCESSES}" != "1" ]; then
+    shuf jobs.txt -o jobs2.txt
+    node src/parallel-jobs.js jobs2.txt
+    rm -f jobs.txt jobs2.txt
+  fi
 else
   DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
   printf "%s\n" "${DATASET_DIRS[@]}" >$DIRS_FILE
