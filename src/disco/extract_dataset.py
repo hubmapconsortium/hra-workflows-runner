@@ -18,10 +18,11 @@ def append_meta_and_convert_to_h5ad(extracted_h5_path, args_metadata, args_outpu
     # Drop null values
     adata.obs = adata.obs.dropna(axis=1, how='all')
     # Rename gene_ids to feature_name to be consistent with other h5ad datasets
-    adata.var.rename(columns={'gene_ids': 'feature_name'}, inplace=True) 
+    adata.var.rename(columns={'gene_ids': 'feature_name'}, inplace=True)
+    # Add counts layer to be consistent with other h5ad datasets
+    adata.layers['counts'] = adata.X.copy()
     # Write to .h5ad
     adata.write(args_output)
-    
     # Prepare summary
     summary = {
         "cell_count": adata.n_obs,
