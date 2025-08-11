@@ -30,6 +30,7 @@ const DISCO_METADATA_URL = 'https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit
 
 const DISCO_BASE_URL = 'https://disco.bii.a-star.edu.sg/sample/';
 
+// Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
 const ORGAN_MAPPING = {
   pituitary_gland: 'UBERON:0000007',
   lymph_node: 'UBERON:0000029',
@@ -100,6 +101,26 @@ const ORGAN_MAPPING = {
   abdominal_wall: 'UBERON:0003697',
   fallopian_tube: 'UBERON:0003889',
   chest_wall: 'UBERON:0016435',
+  umbilical_cord_blood: 'UBERON_0012168',
+  gonad: 'UBERON:0000991',
+  oral_cavity: 'UBERON:0000167',
+  mucosa: 'UBERON:0000344',
+  embryo: 'UBERON:0000922',
+  urine: 'UBERON:0001088',
+  mesonephros: 'UBERON:0000080',
+  decidua: 'UBERON:0002450',
+  nose: 'UBERON:0000004',
+  dorsal_root_ganglion: 'UBERON:0000044',
+  dental_pulp: 'UBERON:0001754',
+  nucleus_pulposus: 'UBERON:0002242',
+  corpus_cavernosum: 'UBERON:0006609',
+  vestibulocochlear_nerve: 'UBERON:0001648',
+  umbilical_vein: 'UBERON:0002066',
+  annulus_fibrosus: 'UBERON:0006444',
+  sympathetic_ganglion: 'UBERON:0001806',
+  parietal_pleura: 'UBERON:0002400',
+  vestibular_nerve: 'UBERON:0003723',
+  pleural_fluid: 'UBERON:0001087',
 };
 
 
