@@ -12,7 +12,10 @@ CWL_PIPELINE="https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/m
 CWL_OPTS=()
 
 if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
-  CWL_OPTS+=(--singularity)
+  # If singularity doesn't exist, do not add the singularity option
+  if [[ `which singularity` != "" ]]; then
+    CWL_OPTS+=(--singularity)
+  fi
 fi
 
 if [[ -n $TEMP ]]; then
