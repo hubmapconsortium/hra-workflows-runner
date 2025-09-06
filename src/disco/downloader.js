@@ -9,6 +9,7 @@ import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '.
 import { downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
+import { getOrganLookup } from '../util/organ-lookup.js';
 
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
@@ -31,7 +32,7 @@ const DISCO_METADATA_URL = 'https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit
 const DISCO_BASE_URL = 'https://disco.bii.a-star.edu.sg/sample/';
 
 // Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
-const ORGAN_MAPPING = {
+const TISSUE_MAPPING = {
   pituitary_gland: 'UBERON:0000007',
   lymph_node: 'UBERON:0000029',
   head: 'UBERON:0000033',
@@ -123,6 +124,8 @@ const ORGAN_MAPPING = {
   pleural_fluid: 'UBERON:0001087',
 };
 
+// can have buckets for organs, tissues(this can be mapped to organ lookup)
+
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -199,11 +202,17 @@ export class Downloader {
       }
     }
 
-    // Resolve organ name from tissue using ORGAN_MAPPING
+    // Resolve organ name from tissue using TISSUE_MAPPING
     const tissue = matched.tissue ?? '';
     const tissueKey = tissue.replace(/\s+/g, '_'); // Replace all spaces with underscores
-    const organCode = ORGAN_MAPPING[tissueKey] ?? '';
-    dataset.organ = this.organMetadata.resolve(organCode);
+    const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
+    //dataset.organ = this.organMetadata.resolve(organCode);
+
+    // Changed Step : Tissue UBERON ID → organ UBERON ID (dynamic lookup)
+    if (tissueUberonId) {
+      const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
+      dataset.organ = organLookup.get(tissueUberonId) ?? tissue;
+    }
 
     // Locate the .h5 file path for this sample
     const batchDirs = fs
