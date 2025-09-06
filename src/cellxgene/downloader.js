@@ -214,7 +214,7 @@ export class Downloader {
     const organLookup = await getOrganLookup(uniqueTissueIds, this.config);
 
     for (const dataset of datasets) {
-      dataset.organ = organLookup.get(dataset.tissueId) ?? '';
+      dataset.organ = organLookup.get(dataset.tissueId) ?? dataset.tissueId;
       if (dataset.organ === '') {
         const msg = `Cannot determine organ for tissue '${dataset.tissue}' (${dataset.tissueId})`;
         dataset.scratch.summary_ref.comments = msg;
