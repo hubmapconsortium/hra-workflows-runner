@@ -102,7 +102,7 @@ const TISSUE_MAPPING = {
   abdominal_wall: 'UBERON:0003697',
   fallopian_tube: 'UBERON:0003889',
   chest_wall: 'UBERON:0016435',
-  umbilical_cord_blood: 'UBERON_0012168',
+  umbilical_cord_blood: 'UBERON:0012168',
   gonad: 'UBERON:0000991',
   oral_cavity: 'UBERON:0000167',
   mucosa: 'UBERON:0000344',
@@ -204,14 +204,14 @@ export class Downloader {
 
     // Resolve organ name from tissue using TISSUE_MAPPING
     const tissue = matched.tissue ?? '';
-    const tissueKey = tissue.replace(/\s+/g, '_'); // Replace all spaces with underscores
+    const tissueKey = tissue.normalize('NFKC').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
     const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
     //dataset.organ = this.organMetadata.resolve(organCode);
 
     // Changed Step : Tissue UBERON ID → organ UBERON ID (dynamic lookup)
     if (tissueUberonId) {
       const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
-      dataset.organ = organLookup.get(tissueUberonId) ?? tissue;
+      dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
     }
 
     // Locate the .h5 file path for this sample
