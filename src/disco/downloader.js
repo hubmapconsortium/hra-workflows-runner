@@ -9,10 +9,10 @@ import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '.
 import { downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
+import { getOrganLookup } from '../util/organ-lookup.js';
 
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
-
 
 const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1',
@@ -31,7 +31,7 @@ const DISCO_METADATA_URL = 'https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit
 const DISCO_BASE_URL = 'https://disco.bii.a-star.edu.sg/sample/';
 
 // Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
-const ORGAN_MAPPING = {
+const TISSUE_MAPPING = {
   pituitary_gland: 'UBERON:0000007',
   lymph_node: 'UBERON:0000029',
   head: 'UBERON:0000033',
@@ -101,7 +101,7 @@ const ORGAN_MAPPING = {
   abdominal_wall: 'UBERON:0003697',
   fallopian_tube: 'UBERON:0003889',
   chest_wall: 'UBERON:0016435',
-  umbilical_cord_blood: 'UBERON_0012168',
+  umbilical_cord_blood: 'UBERON:0012168',
   gonad: 'UBERON:0000991',
   oral_cavity: 'UBERON:0000167',
   mucosa: 'UBERON:0000344',
@@ -122,7 +122,6 @@ const ORGAN_MAPPING = {
   vestibular_nerve: 'UBERON:0003723',
   pleural_fluid: 'UBERON:0001087',
 };
-
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -168,7 +167,7 @@ export class Downloader {
     for (const row of records) {
       this.metadataLookup['DISCO-' + row.sample_id] = row;
     }
-  
+
     // Download all batch tar files
     await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
@@ -199,11 +198,19 @@ export class Downloader {
       }
     }
 
-    // Resolve organ name from tissue using ORGAN_MAPPING
+    // Resolve organ name from tissue using TISSUE_MAPPING
     const tissue = matched.tissue ?? '';
-    const tissueKey = tissue.replace(/\s+/g, '_'); // Replace all spaces with underscores
-    const organCode = ORGAN_MAPPING[tissueKey] ?? '';
-    dataset.organ = this.organMetadata.resolve(organCode);
+    const tissueKey = tissue
+      .normalize('NFKC')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
+    const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
+    if (tissueUberonId) {
+      const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
+      dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
+    }
 
     // Locate the .h5 file path for this sample
     const batchDirs = fs
@@ -246,7 +253,6 @@ export class Downloader {
       throw new Error(`Dataset has fewer than ${minCount} cells. Cell count: ${dataset.dataset_cell_count}`);
     }
   }
-  
   async downloadAndExtractBatch(url) {
     const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
     const targetDir = join(this.cacheDir, batchName);

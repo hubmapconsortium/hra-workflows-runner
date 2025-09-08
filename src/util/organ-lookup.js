@@ -14,7 +14,7 @@ const SPARQL_ENDPOINT = 'https://ubergraph.apps.renci.org/sparql';
  * @param {string[]} ids Tissue ids
  * @returns {Promise<[string, string][]>}
  */
-async function getTissueOrganPairs(organs, ids) {
+async function getTissueOrganPairs(organs, ids, sourceLabel) {
   if (organs.length === 0 || ids.length === 0) {
     return [];
   }
@@ -46,7 +46,7 @@ async function getTissueOrganPairs(organs, ids) {
     },
     body: query,
   });
-  checkFetchResponse(resp, 'CellxGene organ lookup failed');
+  checkFetchResponse(resp, `${sourceLabel} organ lookup failed`);
 
   const text = await resp.text();
   const {
@@ -103,12 +103,13 @@ function resolveOrgansInLookup(metadata, lookup) {
  * @param {Config} config Configuration
  * @returns {Promise<Map<string, string>>}
  */
-export async function getOrganLookup(ids, config) {
+export async function getOrganLookup(ids, config, sourceLabel) {
   const metadata = await OrganMetadataCollection.load(config);
-  const pairs = await logEvent('CellXGene:GetTissueOrganPairs', () =>
+  const pairs = await logEvent(`${sourceLabel}:GetTissueOrganPairs`, () =>
     getTissueOrganPairs(
       metadata.organs,
-      ids.filter((id) => !metadata.has(id))
+      ids.filter((id) => !metadata.has(id)),
+      sourceLabel
     )
   );
   const lookup = /** @type {Map<string, string>} */ new Map();
