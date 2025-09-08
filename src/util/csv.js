@@ -1,4 +1,5 @@
 import { createReadStream } from 'fs';
+import { createGunzip } from 'zlib';
 import Papa from 'papaparse';
 
 export async function* readLines(inputFile) {
