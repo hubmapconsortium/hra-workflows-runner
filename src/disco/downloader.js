@@ -14,7 +14,6 @@ import { getOrganLookup } from '../util/organ-lookup.js';
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
 
-
 const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1',
   'https://zenodo.org/records/14160154/files/batch_2.tar.gz?download=1',
@@ -124,9 +123,6 @@ const TISSUE_MAPPING = {
   pleural_fluid: 'UBERON:0001087',
 };
 
-// can have buckets for organs, tissues(this can be mapped to organ lookup)
-
-
 /** @implements {IDownloader} */
 export class Downloader {
   constructor(config) {
@@ -171,7 +167,7 @@ export class Downloader {
     for (const row of records) {
       this.metadataLookup['DISCO-' + row.sample_id] = row;
     }
-  
+
     // Download all batch tar files
     await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
@@ -204,11 +200,13 @@ export class Downloader {
 
     // Resolve organ name from tissue using TISSUE_MAPPING
     const tissue = matched.tissue ?? '';
-    const tissueKey = tissue.normalize('NFKC').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
+    const tissueKey = tissue
+      .normalize('NFKC')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
     const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
-    //dataset.organ = this.organMetadata.resolve(organCode);
-
-    // Changed Step : Tissue UBERON ID → organ UBERON ID (dynamic lookup)
     if (tissueUberonId) {
       const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
       dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
@@ -255,7 +253,6 @@ export class Downloader {
       throw new Error(`Dataset has fewer than ${minCount} cells. Cell count: ${dataset.dataset_cell_count}`);
     }
   }
-  
   async downloadAndExtractBatch(url) {
     const batchName = url.match(/batch_\d+\.tar\.gz/)[0].replace('.tar.gz', '');
     const targetDir = join(this.cacheDir, batchName);
