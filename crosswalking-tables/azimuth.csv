@@ -82,9 +82,9 @@ Kidney_L3,UBERON:0002113,Vascular Smooth Muscle / Pericyte,AZ:0000070,renal inte
 Lung_v2_finest_level,UBERON:0002048,Adventitial fibroblasts,AZ:0000071,adventitial fibroblast,CL:4052030,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Alveolar fibroblasts,AZ:0000072,alveolar type 1 fibroblast cell,CL:4028004,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Alveolar macrophages,AZ:0000073,alveolar macrophage,CL:0000583,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Alveolar M_ CCL3+,AZ:0000074,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Alveolar M_ MT-positive,AZ:0000075,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Alveolar M_ proliferating,AZ:0000076,cycling alveolar macrophage,CL:4033077,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Alveolar Mφ CCL3+,AZ:0000074,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Alveolar Mφ MT-positive,AZ:0000075,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Alveolar Mφ proliferating,AZ:0000076,cycling alveolar macrophage,CL:4033077,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,AT1,AZ:0000077,pulmonary alveolar type 1 cell,CL:0002062,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,AT2,AZ:0000078,pulmonary alveolar type 2 cell,CL:0002063,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,AT2 proliferating,AZ:0000079,cycling pulmonary alveolar type 2 cell,CL:4033080,skos:exactMatch
@@ -107,7 +107,7 @@ Lung_v2_finest_level,UBERON:0002048,Fibromyocytes,AZ:0000095,fibroblast of lung:
 Lung_v2_finest_level,UBERON:0002048,Goblet (bronchial),AZ:0000096,tracheobronchial goblet cell,CL:0019003,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Goblet (nasal),AZ:0000097,nasal mucosa goblet cell,CL:0002480,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Goblet (subsegmental),AZ:0000098,lung goblet cell,CL:1000143,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Interstitial M_ perivascular,AZ:0000099,lung interstitial macrophage,CL:4033043,skos:exactMatch
+Lung_v2_finest_level,UBERON:0002048,Interstitial Mφ perivascular,AZ:0000099,lung interstitial macrophage,CL:4033043,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Ionocyte,AZ:0000100,pulmonary ionocyte,CL:0017000,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Lymphatic EC differentiating,AZ:0000101,endothelial cell of respiratory system lymphatic vessel:differentiating,CL:0009086,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Lymphatic EC mature,AZ:0000102,endothelial cell of respiratory system lymphatic vessel:mature,CL:0009086,skos:narrowMatch
@@ -115,7 +115,7 @@ Lung_v2_finest_level,UBERON:0002048,Lymphatic EC proliferating,AZ:0000103,cyclin
 Lung_v2_finest_level,UBERON:0002048,Mast cells,AZ:0000104,mast cell,CL:0000097,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Mesothelium,AZ:0000105,mesothelial cell of pleura,CL:1000491,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Migratory DCs,AZ:0000106,lung migratory dendritic cell,CL:4033045,skos:exactMatch
-Lung_v2_finest_level,UBERON:0002048,Monocyte derived M_,AZ:0000107,lung macrophage:monocyte derived,CL:1001603,skos:narrowMatch
+Lung_v2_finest_level,UBERON:0002048,Monocyte-derived Mφ,AZ:0000107,lung macrophage:monocyte derived,CL:1001603,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Multiciliated (nasal),AZ:0000108,multiciliated epithelial cell:nasal,CL:0005012,skos:narrowMatch
 Lung_v2_finest_level,UBERON:0002048,Multiciliated (non-nasal),AZ:0000109,multiciliated columnar cell of tracheobronchial tree,CL:0002145,skos:exactMatch
 Lung_v2_finest_level,UBERON:0002048,Myofibroblasts,AZ:0000110,myofibroblast cell,CL:0000186,skos:exactMatch
@@ -382,20 +382,20 @@ Lung_v2_L4,UBERON:0002048,Plasmacytoid DCs,AZ:0000370,plasmacytoid dendritic cel
 Lung_v2_L4,UBERON:0002048,T cells proliferating,AZ:0000371,cycling T cell,CL:4033069,skos:exactMatch
 Lung_v2_L4,UBERON:0002048,Subpleural fibroblasts,AZ:0000372,fibroblast of lung:subpleural,CL:0002553,skos:narrowMatch
 Lung_v2_L4,UBERON:0002048,Migratory DCs,AZ:0000373,lung migratory dendritic cell,CL:4033045,skos:exactMatch
-Lung_v2_L5,UBERON:0002048,Alveolar M_ CCL3+,AZ:0000374,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
+Lung_v2_L5,UBERON:0002048,Alveolar Mφ CCL3+,AZ:0000374,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Multiciliated (non-nasal),AZ:0000375,multiciliated columnar cell of tracheobronchial tree,CL:0002145,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Goblet (nasal),AZ:0000376,goblet cell:nasal,CL:0000160,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Club (nasal),AZ:0000377,club cell:nasal,CL:0000158,skos:narrowMatch
-Lung_v2_L5,UBERON:0002048,Monocyte derived M_,AZ:0000378,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
-Lung_v2_L5,UBERON:0002048,Alveolar M_ proliferating,AZ:0000379,cycling macrophage,CL:4033076,skos:exactMatch
+Lung_v2_L5,UBERON:0002048,Monocyte-derived Mφ,AZ:0000378,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
+Lung_v2_L5,UBERON:0002048,Alveolar Mφ proliferating,AZ:0000379,cycling macrophage,CL:4033076,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Club (non-nasal),AZ:0000380,club cell:tracheobronchial,CL:0000158,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,SMG serous (bronchial),AZ:0000381,serous secreting cell of bronchus submucosal gland,CL:4033005,skos:exactMatch
 Lung_v2_L5,UBERON:0002048,Multiciliated (nasal),AZ:0000382,multiciliated epithelial cell:nasal,CL:0005012,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Goblet (bronchial),AZ:0000383,bronchial goblet cell,CL:1000312,skos:exactMatch
-Lung_v2_L5,UBERON:0002048,Interstitial M_ perivascular,AZ:0000384,lung interstitial macrophage:perivascular,CL:4033043,skos:narrowMatch
+Lung_v2_L5,UBERON:0002048,Interstitial Mφ perivascular,AZ:0000384,lung interstitial macrophage:perivascular,CL:4033043,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,Goblet (subsegmental),AZ:0000385,bronchial goblet cell:subsegmental,CL:1000312,skos:narrowMatch
 Lung_v2_L5,UBERON:0002048,SMG serous (nasal),AZ:0000386,serous secreting cell:submucosal gland nasal,CL:0000313,skos:narrowMatch
-Lung_v2_L5,UBERON:0002048,Alveolar M_ MT-positive,AZ:0000387,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
+Lung_v2_L5,UBERON:0002048,Alveolar Mφ MT-positive,AZ:0000387,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
 Pancreas_L1,UBERON:0001264,cycling,AZ:0000388,pancreatic endocrine cell:cycling,CL:0008024,skos:narrowMatch
 Pancreas_L1,UBERON:0001264,immune,AZ:0000389,leukocyte,CL:0000738,skos:exactMatch
 Pancreas_L1,UBERON:0001264,quiescent_stellate,AZ:0000390,pancreatic stellate cell:quiescent,CL:0002410,skos:narrowMatch
@@ -760,11 +760,11 @@ Primary_Motor_Cortex,UBERON:0001384,Sst,,sst GABAergic cortical interneuron,CL:4
 Primary_Motor_Cortex,UBERON:0001384,Sst Chodl,,sst chodl GABAergic cortical interneuron,CL:4023121,skos:exactMatch
 Primary_Motor_Cortex,UBERON:0001384,VLMC,,vascular leptomeningeal cell,CL:4023051,skos:exactMatch
 Primary_Motor_Cortex,UBERON:0001384,Vip,,VIP GABAergic cortical interneuron,CL:4023016,skos:exactMatch
-Lung,UBERON:0002048,Alveolar MÔøΩÔøΩ CCL3+,,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
-Lung,UBERON:0002048,Alveolar MÔøΩÔøΩ MT-positive,,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
-Lung,UBERON:0002048,Alveolar MÔøΩÔøΩ proliferating,,cycling alveolar macrophage,CL:4033077,skos:exactMatch
-Lung,UBERON:0002048,Interstitial MÔøΩÔøΩ perivascular,,lung interstitial macrophage:perivascular,CL:4033043,skos:narrowMatch
-Lung,UBERON:0002048,Monocyte-derived MÔøΩÔøΩ,,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
+Lung,UBERON:0002048,Alveolar Mφ CCL3+,,CCL3-positive alveolar macrophage,CL:4033041,skos:exactMatch
+Lung,UBERON:0002048,Alveolar Mφ MT-positive,,metallothionein-positive alveolar macrophage,CL:4033042,skos:exactMatch
+Lung,UBERON:0002048,Alveolar Mφ proliferating,,cycling alveolar macrophage,CL:4033077,skos:exactMatch
+Lung,UBERON:0002048,Interstitial Mφ perivascular,,lung interstitial macrophage:perivascular,CL:4033043,skos:narrowMatch
+Lung,UBERON:0002048,Monocyte-derived Mφ,,macrophage:monocyte-derived,CL:0000235,skos:narrowMatch
 Lung,UBERON:0002048,Non-classical monocytes,,non-classical monocyte,CL:0000875,skos:exactMatch
 Lung,UBERON:0002048,Transitional Club-AT2,,pulmonary alveolar epithelial cell:Transitional Club-AT2,CL:0000322,skos:narrowMatch
 Kidney,UBERON:0002113,Descending Vasa Recta Endothelial,,vasa recta descending limb cell,CL:1001285,skos:exactMatch
