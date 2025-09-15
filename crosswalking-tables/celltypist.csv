@@ -767,7 +767,7 @@ Large_Intestine,UBERON:0000059,myofibroblast,,myofibroblast cell,CL:0000186,skos
 Large_Intestine,UBERON:0000059,myofibroblast (RSPO2+),,myofibroblast cell:RSPO2+,CL:0000186,skos:narrowMatch
 Large_Intestine,UBERON:0000059,pDC,,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
 Large_Intestine,UBERON:0000059,venous capillary,,pre-venule capillary cell,CL:4047030,skos:exactMatch
-Large_Intestine,UBERON:0000059,ÔøΩÔøΩ cells (INS+),,cell:INS+,CL:0000000,skos:narrowMatch
+Large_Intestine,UBERON:0000059,β cells (INS+),,cell:INS+,CL:0000000,skos:narrowMatch
 Small_Intestine,UBERON:0002108,Activated CD4 T,,"activated CD4-positive, alpha-beta T cell",CL:0000896,skos:exactMatch
 Small_Intestine,UBERON:0002108,Activated CD8 T,,"activated CD8-positive, alpha-beta T cell",CL:0000906,skos:exactMatch
 Small_Intestine,UBERON:0002108,Activated T,,T cell:activated,CL:0000084,skos:narrowMatch
@@ -901,4 +901,4 @@ Small_Intestine,UBERON:0002108,myofibroblast,,myofibroblast cell,CL:0000186,skos
 Small_Intestine,UBERON:0002108,myofibroblast (RSPO2+),,myofibroblast cell:RSPO2+,CL:0000186,skos:narrowMatch
 Small_Intestine,UBERON:0002108,pDC,,plasmacytoid dendritic cell,CL:0000784,skos:exactMatch
 Small_Intestine,UBERON:0002108,venous capillary,,pre-venule capillary cell,CL:4047030,skos:exactMatch
-Small_Intestine,UBERON:0002108,ÔøΩÔøΩ cells (INS+),,cell:INS+,CL:0000000,skos:narrowMatch
+Small_Intestine,UBERON:0002108,β cells (INS+),,cell:INS+,CL:0000000,skos:narrowMatch
