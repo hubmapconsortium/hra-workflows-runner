@@ -15,8 +15,10 @@ function filterSummaries(datasets) {
   for (const dataset of datasets) {
     if (!dataset.scratch.exclude) {
       const summary = getSummaryRef(dataset);
-      summary.organ = dataset.organ;
-      summaries.push(summary);
+      if (summary) {
+        summary.organ = dataset.organ;
+        summaries.push(summary);
+      }
     }
   }
 
