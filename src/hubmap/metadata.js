@@ -79,7 +79,7 @@ export async function metadataToLookup(result, organMetadata, token = undefined)
       throw new Error(ancestors.error);
     }
 
-    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? 'organ');
+    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? organ);
     const { block_id, rui_location } = getSampleBlockId(ancestors, HUBMAP_ENTITY_ENDPOINT);
     lookup.set(hubmap_id, {
       organ: mapped_organ,
