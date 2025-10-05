@@ -30,6 +30,8 @@ try {
       parseFloat(cell['mapping.score']) ||
       parseFloat(cell.conf_score) ||
       parseFloat(cell.popv_prediction_score) / popvMethodCount ||
+      parseFloat(cell.final_level_confidence) ||
+      parseFloat(cell.frmatch_confidence) ||
       0;
 
     /**
@@ -39,7 +41,7 @@ try {
       dataset.dataset_id,
       dataset.organ ?? '',
       tool,
-      cell[''],
+      cell[''] || cell['index'],
       cell.clid,
       cell.hra_prediction,
       cell.match_type,
