@@ -1,6 +1,7 @@
-import fs from 'fs';
 import { exec } from 'child_process';
+import fs from 'fs';
 import { promisify } from 'util';
+import { RuntimeEstimator } from './runtime-estimator.js';
 
 // Promisified exec for async/await support
 const execAsync = promisify(exec);
@@ -21,12 +22,19 @@ if (!JOB_FILE || HOSTS.length === 0 || isNaN(MAX_PROCESSES)) {
 }
 
 // Read all job lines from the file
-const jobQueue = fs.readFileSync(JOB_FILE, 'utf-8').split('\n').filter(line => line.trim());
-const totalJobs = jobQueue.length;
-let completedJobs = 0;
+const jobQueue = fs
+  .readFileSync(JOB_FILE, 'utf-8')
+  .split('\n')
+  .filter((line) => line.trim());
+const estimator = new RuntimeEstimator({
+  windowSeconds: 3600,
+  minSamples: MAX_PROCESSES * (HOSTS.length + 1),
+  precision: 2,
+});
+estimator.start(jobQueue.length);
 
 // Create queues for each host with their own job lists
-const hostQueues = HOSTS.map(host => ({ host, running: 0, queue: [] }));
+const hostQueues = HOSTS.map((host) => ({ host, running: 0, queue: [] }));
 
 // Distribute jobs round-robin across hosts
 for (let i = 0; i < jobQueue.length; i++) {
@@ -50,8 +58,8 @@ async function runJob(host, command) {
   } catch (err) {
     console.error(`[${host} FAILED]`, err.message);
   } finally {
-    completedJobs++;
-    process.stdout.write(`Progress: ${completedJobs} / ${totalJobs} jobs completed at ${new Date().toLocaleString()}\n`);
+    estimator.markJobComplete();
+    console.log(estimator.getPrettyEstimate());
   }
 }
 

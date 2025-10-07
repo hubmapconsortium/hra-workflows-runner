@@ -29,9 +29,9 @@ try {
     const confidence_score =
       parseFloat(cell['mapping.score']) ||
       parseFloat(cell.conf_score) ||
-      parseFloat(cell.popv_prediction_score) / popvMethodCount ||
       parseFloat(cell.final_level_confidence) ||
       parseFloat(cell.frmatch_confidence) ||
+      parseFloat(cell.popv_prediction_score) / popvMethodCount ||
       0;
 
     /**

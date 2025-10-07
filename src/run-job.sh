@@ -19,7 +19,12 @@ if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
 fi
 
 if [[ -n $TEMP ]]; then
-  CWL_OPTS+=(--tmpdir-prefix $TEMP)
+  if [[ `which singularity` != "" ]]; then
+    CWL_OPTS+=(--tmpdir-prefix $TEMP)
+  else
+    # Docker needs to have temp data in /tmp
+    CWL_OPTS+=(--tmpdir-prefix /tmp/dcta/tmp)
+  fi
 fi
 
 cd $DIR
