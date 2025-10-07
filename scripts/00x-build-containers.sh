@@ -11,16 +11,19 @@ cd "$SIF_CACHE_DIR"
 # Main hra-workflows-runner container
 sif="ghcr.io_hubmapconsortium_hra-workflows-runner:main.sif"
 url="docker://ghcr.io/hubmapconsortium/hra-workflows-runner:main"
+rm -f "$sif"
 apptainer pull --force --name "$sif" "$url"
 
 # hra-workflows containers
 for name in "${CONTAINERS[@]}"; do
   sif="ghcr.io_hubmapconsortium_hra-workflows_$name:main.sif"
   url="docker://ghcr.io/hubmapconsortium/hra-workflows/$name:main"
+  rm -f "$sif"
   apptainer pull --force --name "$sif" "$url"
 done
 
 # nodejs
 sif="node_alpine.sif"
 url="docker://node:20-alpine"
+rm -f "$sif"
 apptainer pull --force --name "$sif" "$url"
