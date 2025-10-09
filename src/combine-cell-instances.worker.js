@@ -27,11 +27,11 @@ try {
      * Divides popv_prediction_score by the method count if necessary.
      */
     const confidence_score =
-      parseFloat(cell['mapping.score']) ||
-      parseFloat(cell.conf_score) ||
-      parseFloat(cell.final_level_confidence) ||
-      parseFloat(cell.frmatch_confidence) ||
-      parseFloat(cell.popv_prediction_score) / popvMethodCount ||
+      parseFloat(cell['mapping.score']) || // azimuth
+      parseFloat(cell.conf_score) || // celltypist
+      parseFloat(cell.final_level_confidence) || // pan-human-azimuth
+      parseFloat(cell.frmatch_confidence) || // frmatch
+      parseFloat(cell.popv_prediction_score) / popvMethodCount || // popv
       0;
 
     /**

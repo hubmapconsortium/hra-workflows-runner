@@ -52,7 +52,7 @@ async function main() {
     for (const entries of jsonld.flat().filter((s) => !!s)) {
       for (const entry of entries['@graph']) {
         for (const cellInfo of entry?.summary ?? []) {
-          cellInfo['gene_expr'] = cellInfo['gene_expr'].slice(0, topGeneCount);
+          cellInfo['gene_expr'] = cellInfo['gene_expr']?.slice(0, topGeneCount) ?? [];
         }
         const content = JSON.stringify(entry);
         if (!output.write(content + '\n')) {
