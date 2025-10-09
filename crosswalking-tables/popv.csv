@@ -158,6 +158,7 @@ lymph node,UBERON:0000029,T cell,PV:0000147,T cell,CL:0000084,skos:exactMatch
 lymph node,UBERON:0000029,classical monocyte,PV:0000148,classical monocyte,CL:0000860,skos:exactMatch
 lymph node,UBERON:0000029,"effector CD4-positive, alpha-beta T cell",PV:0000149,"effector CD4-positive, alpha-beta T cell",CL:0001044,skos:exactMatch
 lymph node,UBERON:0000029,"effector CD8-positive, alpha-beta T cell",PV:0000150,"effector CD8-positive, alpha-beta T cell",CL:0001050,skos:exactMatch
+lymph node,UBERON:0000029,"CD8-positive, alpha-beta T cell",PV:0000082,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
 lymph node,UBERON:0000029,endothelial cell,PV:0000151,endothelial cell,CL:0000115,skos:exactMatch
 lymph node,UBERON:0000029,erythrocyte,PV:0000152,erythrocyte,CL:0000232,skos:exactMatch
 lymph node,UBERON:0000029,hematopoietic stem cell,PV:0000153,hematopoietic stem cell,CL:0000037,skos:exactMatch
@@ -207,6 +208,7 @@ mesenteric lymph node,UBERON:0002509,T cell,PV:0000196,T cell,CL:0000084,skos:ex
 mesenteric lymph node,UBERON:0002509,classical monocyte,PV:0000197,classical monocyte,CL:0000860,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,"effector CD4-positive, alpha-beta T cell",PV:0000198,"effector CD4-positive, alpha-beta T cell",CL:0001044,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,"effector CD8-positive, alpha-beta T cell",PV:0000199,"effector CD8-positive, alpha-beta T cell",CL:0001050,skos:exactMatch
+mesenteric lymph node,UBERON:0002509,"CD8-positive, alpha-beta T cell",PV:0000082,"CD8-positive, alpha-beta T cell",CL:0000625,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,endothelial cell,PV:0000200,endothelial cell,CL:0000115,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,erythrocyte,PV:0000201,erythrocyte,CL:0000232,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,hematopoietic stem cell,PV:0000202,hematopoietic stem cell,CL:0000037,skos:exactMatch
