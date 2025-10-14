@@ -33,13 +33,11 @@ const estimator = new RuntimeEstimator({
 });
 estimator.start(jobQueue.length);
 
-// Create queues for each host with their own job lists
-const hostQueues = HOSTS.map((host) => ({ host, running: 0, queue: [] }));
+// Create a single shared queue for all hosts
+const sharedQueue = jobQueue.slice(); // Create a copy of the job queue
 
-// Distribute jobs round-robin across hosts
-for (let i = 0; i < jobQueue.length; i++) {
-  hostQueues[i % HOSTS.length].queue.push(jobQueue[i]);
-}
+// Track running jobs per host
+const hostStates = HOSTS.map((host) => ({ host, running: 0 }));
 
 /**
  * Executes a given command on a remote host over SSH in the current working directory.
@@ -64,11 +62,11 @@ async function runJob(host, command) {
 }
 
 /**
- * Processes a queue of jobs for a specific host with concurrency control.
- * @param {{host: string, running: number, queue: string[]}} hostQueue - The queue object for a specific host.
- * @returns {Promise<void>} - A promise that resolves when all jobs for the host are completed.
+ * Processes jobs from the shared queue for a specific host with concurrency control.
+ * @param {{host: string, running: number}} hostState - The state object for a specific host.
+ * @returns {Promise<void>} - A promise that resolves when all jobs are completed.
  */
-async function processHostQueue(hostQueue) {
+async function processHostQueue(hostState) {
   const promises = [];
 
   /**
@@ -76,13 +74,15 @@ async function processHostQueue(hostQueue) {
    * @returns {Promise<void>|void}
    */
   async function next() {
-    if (hostQueue.queue.length === 0) return;
-    if (hostQueue.running >= MAX_PROCESSES) return;
+    if (sharedQueue.length === 0) return;
+    if (hostState.running >= MAX_PROCESSES) return;
 
-    const job = hostQueue.queue.shift();
-    hostQueue.running++;
-    const p = runJob(hostQueue.host, job).finally(() => {
-      hostQueue.running--;
+    const job = sharedQueue.shift();
+    if (!job) return; // Check if job was taken by another host
+
+    hostState.running++;
+    const p = runJob(hostState.host, job).finally(() => {
+      hostState.running--;
       next(); // Continue launching next job once this one completes
     });
     promises.push(p);
@@ -102,5 +102,5 @@ async function processHostQueue(hostQueue) {
  * Entry point for the script: starts processing all host queues in parallel.
  */
 (async () => {
-  await Promise.all(hostQueues.map(processHostQueue));
+  await Promise.all(hostStates.map(processHostQueue));
 })();
