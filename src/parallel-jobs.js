@@ -1,10 +1,6 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs';
-import { promisify } from 'util';
 import { RuntimeEstimator } from './runtime-estimator.js';
-
-// Promisified exec for async/await support
-const execAsync = promisify(exec);
 
 // Read SSH hosts from the HOSTS environment variable, separated by spaces
 const HOSTS = process.env.HOSTS?.split(/\s+/) || [];
@@ -21,13 +17,39 @@ if (!JOB_FILE || HOSTS.length === 0 || isNaN(MAX_PROCESSES)) {
   process.exit(1);
 }
 
+function spawnAsync(command, args = [], options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { shell: true, ...options });
+
+    let stdout = '';
+    let stderr = '';
+
+    if (child.stdout) child.stdout.on('data', (data) => (stdout += data.toString()));
+    if (child.stderr) child.stderr.on('data', (data) => (stderr += data.toString()));
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve({ stdout, stderr, code });
+      } else {
+        const error = new Error(`Command failed: ${command} ${args.join(' ')}\n${stderr}`);
+        error.code = code;
+        error.stdout = stdout;
+        error.stderr = stderr;
+        reject(error);
+      }
+    });
+
+    child.on('error', reject);
+  });
+}
+
 // Read all job lines from the file
 const jobQueue = fs
   .readFileSync(JOB_FILE, 'utf-8')
   .split('\n')
   .filter((line) => line.trim());
 const estimator = new RuntimeEstimator({
-  windowSeconds: 3600,
+  windowSeconds: 3600 * 8, // eight hours
   minSamples: MAX_PROCESSES * (HOSTS.length + 1),
   precision: 2,
 });
@@ -48,9 +70,9 @@ const hostStates = HOSTS.map((host) => ({ host, running: 0 }));
 async function runJob(host, command) {
   const pwd = process.cwd();
   // Ensure we cd into the current working directory before running the command remotely
-  const wrappedCommand = `ssh ${host} 'cd ${pwd} && ${command.replace(/'/g, "'\\''")}'`;
+  const remoteCommand = `cd ${pwd} && ${command}`;
   try {
-    const { stdout, stderr } = await execAsync(wrappedCommand);
+    const { stdout, stderr } = await spawnAsync('ssh', [host, remoteCommand]);
     if (stdout) process.stdout.write(`[${host}] ${stdout}`);
     if (stderr) process.stderr.write(`[${host} ERROR] ${stderr}`);
   } catch (err) {
