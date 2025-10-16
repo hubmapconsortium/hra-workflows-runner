@@ -355,7 +355,6 @@ body_proper,UBERON:0013702,LYVE1 macrophage,PAZ:0000343,macrophage:LYVE1,CL:0000
 body_proper,UBERON:0013702,M1 macrophage,PAZ:0000344,inflammatory macrophage,CL:0000863,skos:exactMatch
 body_proper,UBERON:0013702,Tissue resident macrophage,PAZ:0000345,tissue-resident macrophage,CL:0000864,skos:exactMatch
 body_proper,UBERON:0013702,CD14 monocyte,PAZ:0000346,CD14-positive monocyte,CL:0001054,skos:exactMatch
-body_proper,UBERON:0013702,CD14orCD16 monocyte,PAZ:0000347,monocyte:CD14orCD16,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,CD14/CD16 monocyte,PAZ:0000347,monocyte:CD14orCD16,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,CD16 monocyte,PAZ:0000348,monocyte:CD16,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,Placenta CAMP+ monocyte,PAZ:0000349,monocyte:placenta CAMP+,CL:0000576,skos:narrowMatch

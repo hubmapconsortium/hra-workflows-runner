@@ -150,6 +150,7 @@ lung,UBERON:0002048,smooth muscle cell,PV:0000139,smooth muscle cell,CL:0000192,
 lung,UBERON:0002048,type I pneumocyte,PV:0000140,pulmonary alveolar type 1 cell,CL:0002062,skos:exactMatch
 lung,UBERON:0002048,type II pneumocyte,PV:0000141,pulmonary alveolar type 2 cell,CL:0002063,skos:exactMatch
 lung,UBERON:0002048,vascular associated smooth muscle cell,PV:0000142,vascular associated smooth muscle cell,CL:0000359,skos:exactMatch
+lung,UBERON:0002048,squamous epithelial cell,,squamous epithelial cell,CL:0000076,skos:exactMatch
 lung,UBERON:0002048,vein endothelial cell,PV:0000143,vein endothelial cell,CL:0002543,skos:exactMatch
 lymph node,UBERON:0000029,B cell,PV:0000144,B cell,CL:0000236,skos:exactMatch
 lymph node,UBERON:0000029,CD141-positive myeloid dendritic cell,PV:0000145,CD141-positive myeloid dendritic cell,CL:0002394,skos:exactMatch
