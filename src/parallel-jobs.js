@@ -20,5 +20,6 @@ const runner = new DistributedJobRunner({
   await runner.start();
   console.error(`Streaming jobs from: ${JOB_FILE == process.stdin ? 'stdin' : JOB_FILE}`);
   await runner.streamJobs(JOB_FILE);
+  await runner.waitForEmptyQueue();
   await runner.shutdown();
 })();

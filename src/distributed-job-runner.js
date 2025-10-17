@@ -123,7 +123,7 @@ export class DistributedJobRunner extends EventEmitter {
 
   /**
    * Streams jobs from a file path or readable stream, adding them to the queue.
-   * The returned Promise resolves once all streamed jobs are completed.
+   * The returned Promise resolves once all streamed jobs are added.
    * @param {string|import('stream').Readable} input - Path to a file or readable stream.
    * @returns {Promise<void>}
    */
@@ -203,7 +203,7 @@ export class DistributedJobRunner extends EventEmitter {
    */
   async #runJob(host, command) {
     const cwd = process.cwd();
-    const remoteCmd = `cd ${cwd} && ${command}`;
+    const remoteCmd = `'cd ${cwd} && ${command.replace(/'/g, "'\\''")}'`;
 
     try {
       const { stdout, stderr } = await this.spawnAsync('ssh', [host, remoteCmd]);
@@ -261,6 +261,23 @@ export class DistributedJobRunner extends EventEmitter {
 
     while (!this.shuttingDown || active.size > 0) {
       await Promise.race([...(active.size > 0 ? active : []), new Promise((r) => setTimeout(r, 200))]);
+    }
+  }
+
+  /**
+   * Wait until all jobs have been processed — including any pending in the sharedQueue.
+   * This resolves when the queue is empty and no jobs are still running.
+   * Safe to call repeatedly; returns immediately if no jobs remain.
+   * @returns {Promise<void>}
+   */
+  async waitForEmptyQueue() {
+    await new Promise((r) => setTimeout(r, 1000));
+    while (true) {
+      const queueEmpty = this.sharedQueue.length === 0;
+      const activeJobs = this.jobPromises.size;
+      if (queueEmpty && activeJobs === 0) return;
+      // Wait briefly before checking again to avoid busy loop
+      await new Promise((r) => setTimeout(r, 200));
     }
   }
 
