@@ -459,3 +459,4 @@ thymus,UBERON:0002370,"CD4-positive, CD25-positive, alpha-beta regulatory T cell
 thymus,UBERON:0002370,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
 bone marrow,UBERON:0002371,"B cell, CD19-positive",,"B cell, CD19-positive",CL:0001201,skos:exactMatch
 mesenteric lymph node,UBERON:0002509,"CD4-positive, alpha-beta T cell",,"CD4-positive, alpha-beta T cell",CL:0000624,skos:exactMatch
+mesenteric lymph node,UBERON:0002509,conventional dendritic cell,,conventional dendritic cell,CL:0000990,skos:exactMatch
