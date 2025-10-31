@@ -31,7 +31,7 @@ const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolki
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
 
 // Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
-// Load mapping from CSV: crosswalking-tables/organ_mapping.csv
+
 function loadTissueMappingFromCsv(csvPath) {
   if (!existsSync(csvPath)) {
     console.warn(`organ_mapping.csv not found at ${csvPath}; proceeding with empty mapping`);
