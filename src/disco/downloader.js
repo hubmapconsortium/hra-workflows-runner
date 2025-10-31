@@ -1,11 +1,13 @@
 import { execFile as callbackExecFile, exec as rawExec } from 'node:child_process';
 import fs, { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import Papa from 'papaparse';
 import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
+import { readCsv } from '../util/csv.js';
 import { downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getOrganLookup } from '../util/organ-lookup.js';
@@ -30,31 +32,35 @@ const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolki
 
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
 
-// Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
+// Source Sheet can be downloaded from here: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
 
-function loadTissueMappingFromCsv(csvPath) {
+async function loadTissueMappingFromCsv(csvPath) {
   if (!existsSync(csvPath)) {
     console.warn(`organ_mapping.csv not found at ${csvPath}; proceeding with empty mapping`);
     return {};
   }
-  const content = fs.readFileSync(csvPath, 'utf-8');
-  const { data: rows } = Papa.parse(content, { header: true, skipEmptyLines: true });
   /** @type {Record<string, string>} */
   const mapping = {};
-  for (const row of rows) {
+  for await (const row of readCsv(csvPath)) {
     if (!row) continue;
     const rawLabel = (row.ontology_label ?? '').toString().trim();
     const rawId = (row.ontology_id ?? '').toString().trim();
     if (!rawLabel || !rawId) continue;
-    const key = rawLabel.toLowerCase().replace(/\s+/g, '_');
+    const key = rawLabel
+      .normalize('NFKC')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_|_$/g, '');
     mapping[key] = rawId;
   }
   return mapping;
 }
 
-// Use CSV colocated with DISCO code
-const TISSUE_CSV = join(process.cwd(), 'src', 'disco', 'organ_mapping.csv');
-const TISSUE_MAPPING = loadTissueMappingFromCsv(TISSUE_CSV);
+// Use CSV colocated with DISCO code (in same directory as this file)
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const TISSUE_CSV = join(__dirname, 'organ_mapping.csv');
+let TISSUE_MAPPING = null;
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -120,9 +126,7 @@ export class Downloader {
   }
 
   async download(dataset) {
-    // Parse the metadata
-
-    // Find matching metadata row
+    // Parse the metadata & find matching metadata row
     const matched = this.metadataLookup[dataset.id];
     if (!matched) {
       throw new Error(`No metadata found for dataset id: ${dataset.id}`);
@@ -163,6 +167,9 @@ export class Downloader {
     }
 
     // Resolve organ name from tissue using TISSUE_MAPPING
+    if (TISSUE_MAPPING === null) {
+      TISSUE_MAPPING = await loadTissueMappingFromCsv(TISSUE_CSV);
+    }
     const tissue = matched.tissue ?? '';
     const tissueKey = tissue
       .normalize('NFKC')
