@@ -8,7 +8,7 @@ import { getCacheDir, getDataRepoDir } from '../util/paths.js';
 import { readFile } from 'node:fs/promises';
 import Papa from 'papaparse';
 
-const DISCO_METADATA_URL = 'https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata';
+const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolkit/getSampleMetadata';
 
 /** @implements {IListing} */
 export class Listing {

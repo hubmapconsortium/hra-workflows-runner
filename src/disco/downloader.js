@@ -8,8 +8,8 @@ import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
-import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { getOrganLookup } from '../util/organ-lookup.js';
+import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
@@ -26,9 +26,9 @@ const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/15236615/files/batch_9.tar.gz?download=1',
 ];
 
-const DISCO_METADATA_URL = 'https://disco.bii.a-star.edu.sg/disco_v3_api/toolkit/getSampleMetadata';
+const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolkit/getSampleMetadata';
 
-const DISCO_BASE_URL = 'https://disco.bii.a-star.edu.sg/sample/';
+const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
 
 // Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
 const TISSUE_MAPPING = {
@@ -174,10 +174,15 @@ export class Downloader {
     for (const dataset of datasets) {
       const sample_id = dataset.id.replace('DISCO-', '');
       dataset.dataset_id = `${this.baseUrl}${sample_id}`;
+      dataset.donor_id = `${this.baseUrl}${sample_id}$Donor`;
+      dataset.block_id = `${this.baseUrl}${sample_id}$TissueBlock`;
+      dataset.rui_location = '';
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
       dataset.provider_uuid = 'bfe21f44-bf10-4371-8f4e-7f909f5a900c';
       dataset.dataset_link = `${this.baseUrl}${sample_id}`;
+      dataset.donor_link = `${this.baseUrl}${sample_id}`;
+      dataset.block_link = `${this.baseUrl}${sample_id}`;
     }
   }
 
@@ -191,9 +196,35 @@ export class Downloader {
     }
 
     // Assign cleaned metadata fields to dataset
-    for (const [key, value] of Object.entries(matched)) {
+    for (let [key, value] of Object.entries(matched)) {
       if (value !== undefined && value !== null && value.trim() !== '' && value.trim().toUpperCase() !== 'NA') {
-        const targetKey = key === 'platform' ? 'dataset_technology' : key;
+        let targetKey = key;
+        switch (key) {
+          case 'platform':
+            targetKey = 'dataset_technology';
+            break;
+          case 'gender':
+            targetKey = 'donor_sex';
+            value = value === 'F' ? 'Female' : 'Male';
+            break;
+          case 'age':
+            targetKey = 'donor_age';
+            value = +value;
+            break;
+          case 'age_group':
+            targetKey = 'donor_age_group';
+            break;
+          case 'race':
+            targetKey = 'donor_race';
+            break;
+          case 'rna_source':
+            targetKey = 'dataset_rna_source';
+            break;
+          case 'disease':
+            targetKey = 'donor_disease';
+            value = value === 'control' ? 'healthy' : value;
+            break;
+        }
         dataset[targetKey] = value;
       }
     }
@@ -210,6 +241,9 @@ export class Downloader {
     if (tissueUberonId) {
       const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
       dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
+      dataset.organ_id = dataset.organ.replace('UBERON:', 'http://purl.obolibrary.org/obo/UBERON_');
+    } else {
+      throw new Error(`Could not determine organ for ${dataset.id}, tissue: ${tissue}`);
     }
 
     // Locate the .h5 file path for this sample
