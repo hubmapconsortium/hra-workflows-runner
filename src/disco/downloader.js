@@ -31,97 +31,30 @@ const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolki
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
 
 // Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
-const TISSUE_MAPPING = {
-  pituitary_gland: 'UBERON:0000007',
-  lymph_node: 'UBERON:0000029',
-  head: 'UBERON:0000033',
-  tendon: 'UBERON:0000043',
-  ureter: 'UBERON:0000056',
-  intestine: 'UBERON:0000160',
-  blood: 'UBERON:0000178',
-  breast: 'UBERON:0000310',
-  scalp: 'UBERON:0000403',
-  testis: 'UBERON:0000473',
-  stomach: 'UBERON:0000945',
-  heart: 'UBERON:0000948',
-  brain: 'UBERON:0000955',
-  eye: 'UBERON:0000970',
-  neck: 'UBERON:0000974',
-  pleura: 'UBERON:0000977',
-  leg: 'UBERON:0000978',
-  ovary: 'UBERON:0000992',
-  uterus: 'UBERON:0000995',
-  seminal_vesicle: 'UBERON:0000998',
-  nerve: 'UBERON:0001021',
-  esophagus: 'UBERON:0001043',
-  hypopharynx: 'UBERON:0001051',
-  parathyroid_gland: 'UBERON:0001132',
-  caecum: 'UBERON:0001153',
-  colon: 'UBERON:0001155',
-  peritoneal_cavity: 'UBERON:0001179',
-  pancreas: 'UBERON:0001264',
-  endometrium: 'UBERON:0001295',
-  myometrium: 'UBERON:0001296',
-  epididymis: 'UBERON:0001301',
-  cerebrospinal_fluid: 'UBERON:0001359',
-  arm: 'UBERON:0001460',
-  ear: 'UBERON:0001690',
-  nail: 'UBERON:0001705',
-  nasal_cavity: 'UBERON:0001707',
-  tongue: 'UBERON:0001723',
-  nasopharynx: 'UBERON:0001728',
-  oropharynx: 'UBERON:0001729',
-  submandibular_gland: 'UBERON:0001736',
-  larynx: 'UBERON:0001737',
-  gingiva: 'UBERON:0001828',
-  parotid_gland: 'UBERON:0001831',
-  blood_vessel: 'UBERON:0001981',
-  placenta: 'UBERON:0001987',
-  thyroid_gland: 'UBERON:0002046',
-  lung: 'UBERON:0002048',
-  spleen: 'UBERON:0002106',
-  liver: 'UBERON:0002107',
-  gallbladder: 'UBERON:0002110',
-  kidney: 'UBERON:0002113',
-  duodenum: 'UBERON:0002114',
-  jejunum: 'UBERON:0002115',
-  ileum: 'UBERON:0002116',
-  bronchiole: 'UBERON:0002186',
-  spinal_cord: 'UBERON:0002240',
-  brainstem: 'UBERON:0002298',
-  umbilical_cord: 'UBERON:0002331',
-  peritoneum: 'UBERON:0002358',
-  adrenal_gland: 'UBERON:0002369',
-  thymus: 'UBERON:0002370',
-  bone_marrow: 'UBERON:0002371',
-  tonsil: 'UBERON:0002372',
-  bile_duct: 'UBERON:0002394',
-  trachea: 'UBERON:0003126',
-  omentum: 'UBERON:0003688',
-  abdominal_wall: 'UBERON:0003697',
-  fallopian_tube: 'UBERON:0003889',
-  chest_wall: 'UBERON:0016435',
-  umbilical_cord_blood: 'UBERON:0012168',
-  gonad: 'UBERON:0000991',
-  oral_cavity: 'UBERON:0000167',
-  mucosa: 'UBERON:0000344',
-  embryo: 'UBERON:0000922',
-  urine: 'UBERON:0001088',
-  mesonephros: 'UBERON:0000080',
-  decidua: 'UBERON:0002450',
-  nose: 'UBERON:0000004',
-  dorsal_root_ganglion: 'UBERON:0000044',
-  dental_pulp: 'UBERON:0001754',
-  nucleus_pulposus: 'UBERON:0002242',
-  corpus_cavernosum: 'UBERON:0006609',
-  vestibulocochlear_nerve: 'UBERON:0001648',
-  umbilical_vein: 'UBERON:0002066',
-  annulus_fibrosus: 'UBERON:0006444',
-  sympathetic_ganglion: 'UBERON:0001806',
-  parietal_pleura: 'UBERON:0002400',
-  vestibular_nerve: 'UBERON:0003723',
-  pleural_fluid: 'UBERON:0001087',
-};
+// Load mapping from CSV: crosswalking-tables/organ_mapping.csv
+function loadTissueMappingFromCsv(csvPath) {
+  if (!existsSync(csvPath)) {
+    console.warn(`organ_mapping.csv not found at ${csvPath}; proceeding with empty mapping`);
+    return {};
+  }
+  const content = fs.readFileSync(csvPath, 'utf-8');
+  const { data: rows } = Papa.parse(content, { header: true, skipEmptyLines: true });
+  /** @type {Record<string, string>} */
+  const mapping = {};
+  for (const row of rows) {
+    if (!row) continue;
+    const rawLabel = (row.ontology_label ?? '').toString().trim();
+    const rawId = (row.ontology_id ?? '').toString().trim();
+    if (!rawLabel || !rawId) continue;
+    const key = rawLabel.toLowerCase().replace(/\s+/g, '_');
+    mapping[key] = rawId;
+  }
+  return mapping;
+}
+
+// Use CSV colocated with DISCO code
+const TISSUE_CSV = join(process.cwd(), 'src', 'disco', 'organ_mapping.csv');
+const TISSUE_MAPPING = loadTissueMappingFromCsv(TISSUE_CSV);
 
 /** @implements {IDownloader} */
 export class Downloader {
