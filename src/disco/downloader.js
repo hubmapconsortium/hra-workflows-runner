@@ -49,7 +49,7 @@ function normalizeTissueLabel(str) {
 
 async function loadTissueMappingFromCsv(csvPath) {
   if (!existsSync(csvPath)) {
-    console.warn(`Creating organ_mapping.csv using the source sheet: ${DISCO_TISSUE_MAPPING_URL}`);
+    console.warn(`Creating tissue_mapping.csv using the source sheet: ${DISCO_TISSUE_MAPPING_URL}`);
     const downloadUrl = normalizeCsvUrl(DISCO_TISSUE_MAPPING_URL);
     await downloadFile(csvPath, downloadUrl);
   }
@@ -63,7 +63,6 @@ async function loadTissueMappingFromCsv(csvPath) {
   }
   return mapping;
 }
-
 
 /** @implements {IDownloader} */
 export class Downloader {
