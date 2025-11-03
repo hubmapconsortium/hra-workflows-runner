@@ -119,8 +119,8 @@ export class Downloader {
     for (const dataset of datasets) {
       const sample_id = dataset.id.replace('DISCO-', '');
       dataset.dataset_id = `${this.baseUrl}${sample_id}`;
-      dataset.donor_id = `${this.baseUrl}${sample_id}$Donor`;
-      dataset.block_id = `${this.baseUrl}${sample_id}$TissueBlock`;
+      dataset.donor_id = `${this.baseUrl}${sample_id}#Donor`;
+      dataset.block_id = `${this.baseUrl}${sample_id}#TissueBlock`;
       dataset.rui_location = '';
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
@@ -173,7 +173,7 @@ export class Downloader {
     }
 
     // Resolve organ name via tissue mapping
-    const tissueKey = normalizeTissueLabel(tissue ?? '');
+    const tissueKey = normalizeTissueLabel(matched.tissue ?? '');
     const tissueUberonId = this.tissueLookup[tissueKey] ?? '';
     const organId = this.organLookup[tissueUberonId] ?? FALLBACK_ORGAN;
     dataset.organ = organId;
