@@ -1,11 +1,13 @@
 import { execFile as callbackExecFile, exec as rawExec } from 'node:child_process';
 import fs, { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import Papa from 'papaparse';
 import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
+import { normalizeCsvUrl, readCsv } from '../util/csv.js';
 import { downloadFile } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getOrganLookup } from '../util/organ-lookup.js';
@@ -13,6 +15,7 @@ import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1',
@@ -27,101 +30,39 @@ const DISCO_BATCH_URLS = [
 ];
 
 const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolkit/getSampleMetadata';
-
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
+const DISCO_TISSUE_MAPPING_URL =
+  'https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504';
 
-// Link to the mapping google sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
-const TISSUE_MAPPING = {
-  pituitary_gland: 'UBERON:0000007',
-  lymph_node: 'UBERON:0000029',
-  head: 'UBERON:0000033',
-  tendon: 'UBERON:0000043',
-  ureter: 'UBERON:0000056',
-  intestine: 'UBERON:0000160',
-  blood: 'UBERON:0000178',
-  breast: 'UBERON:0000310',
-  scalp: 'UBERON:0000403',
-  testis: 'UBERON:0000473',
-  stomach: 'UBERON:0000945',
-  heart: 'UBERON:0000948',
-  brain: 'UBERON:0000955',
-  eye: 'UBERON:0000970',
-  neck: 'UBERON:0000974',
-  pleura: 'UBERON:0000977',
-  leg: 'UBERON:0000978',
-  ovary: 'UBERON:0000992',
-  uterus: 'UBERON:0000995',
-  seminal_vesicle: 'UBERON:0000998',
-  nerve: 'UBERON:0001021',
-  esophagus: 'UBERON:0001043',
-  hypopharynx: 'UBERON:0001051',
-  parathyroid_gland: 'UBERON:0001132',
-  caecum: 'UBERON:0001153',
-  colon: 'UBERON:0001155',
-  peritoneal_cavity: 'UBERON:0001179',
-  pancreas: 'UBERON:0001264',
-  endometrium: 'UBERON:0001295',
-  myometrium: 'UBERON:0001296',
-  epididymis: 'UBERON:0001301',
-  cerebrospinal_fluid: 'UBERON:0001359',
-  arm: 'UBERON:0001460',
-  ear: 'UBERON:0001690',
-  nail: 'UBERON:0001705',
-  nasal_cavity: 'UBERON:0001707',
-  tongue: 'UBERON:0001723',
-  nasopharynx: 'UBERON:0001728',
-  oropharynx: 'UBERON:0001729',
-  submandibular_gland: 'UBERON:0001736',
-  larynx: 'UBERON:0001737',
-  gingiva: 'UBERON:0001828',
-  parotid_gland: 'UBERON:0001831',
-  blood_vessel: 'UBERON:0001981',
-  placenta: 'UBERON:0001987',
-  thyroid_gland: 'UBERON:0002046',
-  lung: 'UBERON:0002048',
-  spleen: 'UBERON:0002106',
-  liver: 'UBERON:0002107',
-  gallbladder: 'UBERON:0002110',
-  kidney: 'UBERON:0002113',
-  duodenum: 'UBERON:0002114',
-  jejunum: 'UBERON:0002115',
-  ileum: 'UBERON:0002116',
-  bronchiole: 'UBERON:0002186',
-  spinal_cord: 'UBERON:0002240',
-  brainstem: 'UBERON:0002298',
-  umbilical_cord: 'UBERON:0002331',
-  peritoneum: 'UBERON:0002358',
-  adrenal_gland: 'UBERON:0002369',
-  thymus: 'UBERON:0002370',
-  bone_marrow: 'UBERON:0002371',
-  tonsil: 'UBERON:0002372',
-  bile_duct: 'UBERON:0002394',
-  trachea: 'UBERON:0003126',
-  omentum: 'UBERON:0003688',
-  abdominal_wall: 'UBERON:0003697',
-  fallopian_tube: 'UBERON:0003889',
-  chest_wall: 'UBERON:0016435',
-  umbilical_cord_blood: 'UBERON:0012168',
-  gonad: 'UBERON:0000991',
-  oral_cavity: 'UBERON:0000167',
-  mucosa: 'UBERON:0000344',
-  embryo: 'UBERON:0000922',
-  urine: 'UBERON:0001088',
-  mesonephros: 'UBERON:0000080',
-  decidua: 'UBERON:0002450',
-  nose: 'UBERON:0000004',
-  dorsal_root_ganglion: 'UBERON:0000044',
-  dental_pulp: 'UBERON:0001754',
-  nucleus_pulposus: 'UBERON:0002242',
-  corpus_cavernosum: 'UBERON:0006609',
-  vestibulocochlear_nerve: 'UBERON:0001648',
-  umbilical_vein: 'UBERON:0002066',
-  annulus_fibrosus: 'UBERON:0006444',
-  sympathetic_ganglion: 'UBERON:0001806',
-  parietal_pleura: 'UBERON:0002400',
-  vestibular_nerve: 'UBERON:0003723',
-  pleural_fluid: 'UBERON:0001087',
-};
+// Tissues that don't map to a specific organ can still be processed with pan-organ tools
+const FALLBACK_ORGAN = 'UBERON:0013702';
+const TISSUE_CSV = join(__dirname, 'tissue_mapping.csv');
+
+function normalizeTissueLabel(str) {
+  return str
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '');
+}
+
+async function loadTissueMappingFromCsv(csvPath) {
+  if (!existsSync(csvPath)) {
+    console.warn(`Creating tissue_mapping.csv using the source sheet: ${DISCO_TISSUE_MAPPING_URL}`);
+    const downloadUrl = normalizeCsvUrl(DISCO_TISSUE_MAPPING_URL);
+    await downloadFile(csvPath, downloadUrl);
+  }
+  const mapping = {};
+  for await (const row of readCsv(csvPath)) {
+    const tissue = normalizeTissueLabel(row.tissue ?? '');
+    const ontologyId = (row.ontology_id ?? '').trim();
+    if (tissue && ontologyId) {
+      mapping[tissue] = ontologyId;
+    }
+  }
+  return mapping;
+}
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -168,14 +109,18 @@ export class Downloader {
       this.metadataLookup['DISCO-' + row.sample_id] = row;
     }
 
+    // tissue to ongology lookup
+    this.tissueLookup = await loadTissueMappingFromCsv(TISSUE_CSV);
+    this.organLookup = await getOrganLookup(Object.values(this.tissueLookup), this.config, 'DISCO');
+
     // Download all batch tar files
     await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
     for (const dataset of datasets) {
       const sample_id = dataset.id.replace('DISCO-', '');
       dataset.dataset_id = `${this.baseUrl}${sample_id}`;
-      dataset.donor_id = `${this.baseUrl}${sample_id}$Donor`;
-      dataset.block_id = `${this.baseUrl}${sample_id}$TissueBlock`;
+      dataset.donor_id = `${this.baseUrl}${sample_id}#Donor`;
+      dataset.block_id = `${this.baseUrl}${sample_id}#TissueBlock`;
       dataset.rui_location = '';
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
@@ -187,9 +132,7 @@ export class Downloader {
   }
 
   async download(dataset) {
-    // Parse the metadata
-
-    // Find matching metadata row
+    // Parse the metadata & find matching metadata row
     const matched = this.metadataLookup[dataset.id];
     if (!matched) {
       throw new Error(`No metadata found for dataset id: ${dataset.id}`);
@@ -229,22 +172,12 @@ export class Downloader {
       }
     }
 
-    // Resolve organ name from tissue using TISSUE_MAPPING
-    const tissue = matched.tissue ?? '';
-    const tissueKey = tissue
-      .normalize('NFKC')
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
-    const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
-    if (tissueUberonId) {
-      const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
-      dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
-      dataset.organ_id = dataset.organ.replace('UBERON:', 'http://purl.obolibrary.org/obo/UBERON_');
-    } else {
-      throw new Error(`Could not determine organ for ${dataset.id}, tissue: ${tissue}`);
-    }
+    // Resolve organ name via tissue mapping
+    const tissueKey = normalizeTissueLabel(matched.tissue ?? '');
+    const tissueUberonId = this.tissueLookup[tissueKey] ?? '';
+    const organId = this.organLookup[tissueUberonId] ?? FALLBACK_ORGAN;
+    dataset.organ = organId;
+    dataset.organ_id = organId.replace('UBERON:', 'http://purl.obolibrary.org/obo/UBERON_');
 
     // Locate the .h5 file path for this sample
     const batchDirs = fs
