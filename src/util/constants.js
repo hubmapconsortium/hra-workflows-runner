@@ -29,7 +29,7 @@ export const DATA_FILE = 'data.h5ad';
 export const JOB_FILE = 'job.json';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
-export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv';
+export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv.gz';
 
 // Algorithms
 export const ALGORITHMS = ['azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth'];

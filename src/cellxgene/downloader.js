@@ -22,7 +22,7 @@ import { groupBy } from '../util/iter.js';
 import { logEvent } from '../util/logging.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { downloadCollectionMetadata, parseMetadataFromId } from './metadata.js';
-import { getOrganLookup } from './organ-lookup.js';
+import { getOrganLookup } from '../util/organ-lookup.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
@@ -218,10 +218,10 @@ export class Downloader {
   async lookupOrgan(datasets) {
     const tissueIds = datasets.map(({ tissueId }) => tissueId).filter((id) => UBERON_ID_REGEX.test(id));
     const uniqueTissueIds = Array.from(new Set(tissueIds));
-    const organLookup = await getOrganLookup(uniqueTissueIds, this.config);
+    const organLookup = await getOrganLookup(uniqueTissueIds, this.config, 'CellXGene');
 
     for (const dataset of datasets) {
-      dataset.organ = organLookup.get(dataset.tissueId) ?? '';
+      dataset.organ = organLookup.get(dataset.tissueId) ?? dataset.tissueId;
       if (dataset.organ === '') {
         const msg = `Cannot determine organ for tissue '${dataset.tissue}' (${dataset.tissueId})`;
         dataset.scratch.summary_ref.comments = msg;

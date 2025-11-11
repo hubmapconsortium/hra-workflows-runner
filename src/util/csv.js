@@ -1,5 +1,18 @@
 import { createReadStream } from 'fs';
+import { createGunzip } from 'zlib';
 import Papa from 'papaparse';
+
+export function normalizeCsvUrl(url) {
+  if (url.startsWith('https://docs.google.com/spreadsheets/d/') && url.indexOf('export?format=csv') === -1) {
+    const splitUrl = url.split('/');
+    if (splitUrl.length === 7) {
+      const sheetId = splitUrl[5];
+      const gid = splitUrl[6].split('=')[1];
+      return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+    }
+  }
+  return url;
+}
 
 export async function* readLines(inputFile) {
   let inputStream = !inputFile || inputFile === '-' ? process.stdin : createReadStream(inputFile, { autoClose: true });

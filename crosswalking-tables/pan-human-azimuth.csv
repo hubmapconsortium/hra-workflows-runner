@@ -28,7 +28,7 @@ body_proper,UBERON:0013702,Arterial EC,PAZ:0000016,endothelial cell of artery,CL
 body_proper,UBERON:0013702,Capillary EC,PAZ:0000017,capillary endothelial cell,CL:0002144,skos:exactMatch
 body_proper,UBERON:0013702,Cycling EC,PAZ:0000018,endothelial cell:cycling,CL:0000115,skos:narrowMatch
 body_proper,UBERON:0013702,Endocardial cell,PAZ:0000019,endocardial cell,CL:0002350,skos:exactMatch
-body_proper,UBERON:0013702,Endothelial-mesenchymal transition EC,PAZ:0000020,endothelial cell:endothelial-mesenchymal transition,CL:0000115,skos:narrowMatch
+body_proper,UBERON:0013702,Endothelial‑mesenchymal transition EC,PAZ:0000020,endothelial cell:endothelial-mesenchymal transition,CL:0000115,skos:narrowMatch
 body_proper,UBERON:0013702,Lymphatic EC,PAZ:0000021,endothelial cell of lymphatic vessel,CL:0002138,skos:exactMatch
 body_proper,UBERON:0013702,Tip EC,PAZ:0000022,endothelial tip cell,CL:0000704,skos:exactMatch
 body_proper,UBERON:0013702,Venous EC,PAZ:0000023,vein endothelial cell,CL:0002543,skos:exactMatch
@@ -355,7 +355,7 @@ body_proper,UBERON:0013702,LYVE1 macrophage,PAZ:0000343,macrophage:LYVE1,CL:0000
 body_proper,UBERON:0013702,M1 macrophage,PAZ:0000344,inflammatory macrophage,CL:0000863,skos:exactMatch
 body_proper,UBERON:0013702,Tissue resident macrophage,PAZ:0000345,tissue-resident macrophage,CL:0000864,skos:exactMatch
 body_proper,UBERON:0013702,CD14 monocyte,PAZ:0000346,CD14-positive monocyte,CL:0001054,skos:exactMatch
-body_proper,UBERON:0013702,CD14orCD16 monocyte,PAZ:0000347,monocyte:CD14orCD16,CL:0000576,skos:narrowMatch
+body_proper,UBERON:0013702,CD14/CD16 monocyte,PAZ:0000347,monocyte:CD14orCD16,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,CD16 monocyte,PAZ:0000348,monocyte:CD16,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,Placenta CAMP+ monocyte,PAZ:0000349,monocyte:placenta CAMP+,CL:0000576,skos:narrowMatch
 body_proper,UBERON:0013702,Placenta defensin+ monocyte,PAZ:0000350,monocyte:placenta defensin+,CL:0000576,skos:narrowMatch
@@ -462,3 +462,4 @@ body_proper,UBERON:0013702,KLRB1 CD8 T cell,PAZ:0000450,"CD8-positive, alpha-bet
 body_proper,UBERON:0013702,Cycling S100A+ preNeutrophil,PAZ:0000451,neutrophil progenitor cell:S100A+ cycling,CL:0000834,skos:narrowMatch
 body_proper,UBERON:0013702,GZMK+IL7R- CD8 T cell,PAZ:0000452,granzyme K-associated CD8 T cell:IL7R-negative,CL:4052021,skos:narrowMatch
 body_proper,UBERON:0013702,GZMK+IL7R+ CD8 T cell,PAZ:0000453,granzyme K-associated CD8 T cell:IL7R-positive,CL:4052021,skos:narrowMatch
+body_proper,UBERON:0013702,Pulmonary ionocyte,PAZ:0000454,pulmonary ionocyte,CL:0017000,skos:narrowMatch

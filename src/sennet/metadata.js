@@ -76,7 +76,7 @@ export async function toLookup(result, organMetadata, token = undefined) {
       throw new Error(ancestors.error);
     }
 
-    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? '');
+    const mapped_organ = organMetadata.resolve(ORGAN_MAPPING[organ.toUpperCase()]?.organ_id ?? organ);
     const { block_id, rui_location } = getSampleBlockId(ancestors, SENNET_ENTITY_ENDPOINT);
     lookup.set(sennet_id, {
       organ: mapped_organ,

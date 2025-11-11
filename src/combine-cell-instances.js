@@ -12,9 +12,11 @@
  * - MAX_PROCESSES: Maximum number of worker threads to run concurrently (default: all available cores)
  */
 
+import { exec } from 'node:child_process';
 import { createWriteStream, existsSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 import { Worker } from 'node:worker_threads';
 import { createGzip } from 'node:zlib';
 import Papa from 'papaparse';
@@ -28,6 +30,9 @@ import {
   getOutputDir,
   getSummariesFilePath,
 } from './util/paths.js';
+
+// Promisified exec for async/await support
+const execAsync = promisify(exec);
 
 /**
  * Attempts to load dataset metadata as a JSON object.
@@ -111,7 +116,7 @@ async function main() {
   const popvMethodCount = parseInt(config.get(POPV_METHOD_COUNT, '6'));
 
   const summaries = await DatasetSummaries.load(getSummariesFilePath(config));
-  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-instances2.csv.gz');
+  const outputFile = join(getOutputDir(config), 'sc-transcriptomics-cell-instances.csv');
 
   // Create output stream (optionally gzipped)
   let output = createWriteStream(outputFile);
@@ -121,6 +126,11 @@ async function main() {
     output = gzip;
   }
   output.setMaxListeners(maxProcesses * 3);
+
+  let flushInterval = setInterval(() => {
+    if (output.flush) output.flush();
+  }, 10000);
+  output.on('finish', () => clearInterval(flushInterval));
 
   const tasks = [];
 
@@ -153,6 +163,8 @@ async function main() {
   console.log(`Starting ${tasks.length} tasks with max concurrency ${maxProcesses}...`);
   await runWithPool(tasks, (line) => output.write(line), maxProcesses);
   output.end();
+  console.log(`Compressing ${outputFile}...`);
+  await execAsync(`gzip --force -9 ${outputFile}`);
   console.log('Done!');
 }
 

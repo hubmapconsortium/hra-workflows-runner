@@ -5,6 +5,11 @@ export LANG=C.UTF-8
 export PYTHONPATH=".:./src"
 export GPG_TTY=$(tty)
 
+# Activate virtual environment if available
+if [ -e .venv/bin/activate ]; then
+  source .venv/bin/activate
+fi
+
 # Load environment
 if [ -e env.sh ]; then
   source env.sh

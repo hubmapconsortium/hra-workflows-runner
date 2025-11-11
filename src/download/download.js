@@ -57,7 +57,7 @@ async function alreadyDownloaded(dataset) {
  * @param {Dataset} dataset
  */
 function markSuccess(dataset) {
-  getSummaryRef(dataset).setSuccess(DOWNLOAD_STEP);
+  getSummaryRef(dataset)?.setSuccess(DOWNLOAD_STEP);
 }
 
 /**
@@ -67,7 +67,7 @@ function markSuccess(dataset) {
  * @param {any} error
  */
 function markFailure(dataset, error) {
-  getSummaryRef(dataset).setFailure(DOWNLOAD_STEP, error.message ?? error);
+  getSummaryRef(dataset)?.setFailure(DOWNLOAD_STEP, error.message ?? error);
 }
 
 /**

@@ -15,8 +15,10 @@ function filterSummaries(datasets) {
   for (const dataset of datasets) {
     if (!dataset.scratch.exclude) {
       const summary = getSummaryRef(dataset);
-      summary.organ = dataset.organ;
-      summaries.push(summary);
+      if (summary) {
+        summary.organ = dataset.organ;
+        summaries.push(summary);
+      }
     }
   }
 
@@ -33,6 +35,15 @@ function filterListing(listing, summaries, config) {
   return listing.filter(shouldIncludeRow);
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0; // unbiased random index
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+
 async function main() {
   const config = getConfig();
   await ensureDirsExist(getDataRepoDir(config), getCacheDir(config));
@@ -44,6 +55,8 @@ async function main() {
   const listing = await loadCsv(listingPath);
 
   const datasets = await createDatasets(summaries, config);
+  shuffle(datasets);
+
   const preparedDatasets = await prepareDownloads(datasets, config);
   await download(preparedDatasets, config);
 
