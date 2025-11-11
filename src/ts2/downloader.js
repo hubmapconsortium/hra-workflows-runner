@@ -6,6 +6,7 @@ import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/constants.js';
 import { ensureDirsExist } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
+import { inferPrepFromH5ad } from '../util/infer-prep.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
 import { cacheCollections } from './utils.js';
 
@@ -150,6 +151,12 @@ export class Downloader {
     const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
+    }
+
+    // Infer RNA source (cell vs nucleus) from h5ad file
+    const inferenceResult = await inferPrepFromH5ad(dataset.dataFilePath, this.config);
+    if (inferenceResult.verdict !== 'error') {
+      dataset.rna_source_inferred = inferenceResult.verdict;
     }
   }
 }
