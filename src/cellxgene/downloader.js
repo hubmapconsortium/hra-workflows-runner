@@ -21,7 +21,7 @@ import { groupBy } from '../util/iter.js';
 import { logEvent } from '../util/logging.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { downloadCollectionMetadata, parseMetadataFromId } from './metadata.js';
-import { getOrganLookup } from './organ-lookup.js';
+import { getOrganLookup } from '../util/organ-lookup.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
