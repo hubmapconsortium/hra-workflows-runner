@@ -119,7 +119,7 @@ def get_symbols_array(adata, ensemble_lookup=ENSEMBL_LOOKUP_DEFAULT):
 
     if need_feature_name and ensemble_lookup:
         add_ensembl_data(adata, lookup_path=ensemble_lookup)
-        print(adata.var["feature_name"].unique())
+        # print(adata.var["feature_name"].unique(), file=sys.stderr)
 
     # final fallback: use var_names if still no feature_name
     if "feature_name" in adata.var:
