@@ -74,7 +74,7 @@ export class XConsortiaDownloader {
     // Infer RNA source (cell vs nucleus) from h5ad file
     const inferenceResult = await inferPrepFromH5ad(dataset.dataFilePath, this.config);
     if (inferenceResult.verdict !== 'error') {
-      dataset.rna_source_inferred = inferenceResult.verdict;
+      dataset.rna_source = inferenceResult.verdict;
     }
   }
 
