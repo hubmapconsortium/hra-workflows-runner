@@ -14,6 +14,7 @@ import { groupBy } from '../util/iter.js';
  * @property {string} publication_lead_author
  * @property {string[]} consortium_name
  * @property {string} provider_name
+ * @property {Map<string, string[]>} rnaSourceLookup
  */
 
 /** Portal endpoint */
@@ -67,13 +68,13 @@ export async function downloadCollectionMetadata(url) {
     }
   }
 
-  const suspensionTypeLookup = new Map(
+  const rnaSourceLookup = new Map(
     [...donorTissueSuspension.entries()].map(([key, set]) => [key, [...set]])
   );
 
   return {
     ...parsed,
-    suspensionTypeLookup,
+    rnaSourceLookup,
   };
 }
 

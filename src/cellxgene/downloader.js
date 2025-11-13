@@ -180,12 +180,14 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
-        suspensionTypeLookup,
+        rnaSourceLookup,
       } = await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
+
+      // donor+tissue-specific suspension type (exposed as rna_source)
       const suspKey = `${metadata.donor}|${tissue}`;
-      const donorSuspension = suspensionTypeLookup?.get(suspKey) ?? [];
+      const donorRnaSource = rnaSourceLookup?.get(suspKey) ?? [];
 
       Object.assign(dataset, metadata, {
         assets,
@@ -199,7 +201,7 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
-        suspension_type: donorSuspension,
+        rna_source: donorRnaSource,
       });
     };
 
