@@ -36,13 +36,45 @@ export function parseMetadataFromId(id) {
  * Downloads collection metadata
  *
  * @param {string} url Collection metadata url
- * @returns Parsed metadata
+ * @returns Parsed metadata enriched with donor+tissue suspension lookup
  */
 export async function downloadCollectionMetadata(url) {
   const resp = await fetch(url, { method: 'GET' });
   checkFetchResponse(resp, 'CellXGene collection download failed');
   const raw = await resp.json();
-  return parseCollectionMetadata(raw);
+
+  const parsed = parseCollectionMetadata(raw);
+
+  // Build donor+tissue -> suspension_type lookup
+  const donorTissueSuspension = new Map();
+  for (const ds of raw.datasets ?? []) {
+    const suspensions = ds.suspension_type ?? [];
+    const donors = ds.donor_id ?? [];
+    const tissues = ds.tissue ?? [];
+
+    for (const donor of donors) {
+      for (const tissue of tissues) {
+        const key = `${donor}|${(tissue.label ?? '').toLowerCase()}`;
+        let set = donorTissueSuspension.get(key);
+        if (!set) {
+          set = new Set();
+          donorTissueSuspension.set(key, set);
+        }
+        for (const susp of suspensions) {
+          set.add(susp);
+        }
+      }
+    }
+  }
+
+  const suspensionTypeLookup = new Map(
+    [...donorTissueSuspension.entries()].map(([key, set]) => [key, [...set]])
+  );
+
+  return {
+    ...parsed,
+    suspensionTypeLookup,
+  };
 }
 
 /**
