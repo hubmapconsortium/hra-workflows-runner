@@ -1,10 +1,10 @@
 import { execFile as callbackExecFile } from 'node:child_process';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT } from '../util/constants.js';
-import { ensureDirsExist, fileExists } from '../util/fs.js';
+import { ensureDirsExist } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { inferPrepFromH5ad } from '../util/infer-prep.js';
 import { getCacheDir, getDataRepoDir, getSrcFilePath } from '../util/paths.js';
@@ -154,11 +154,6 @@ export class Downloader {
     }
 
     // Infer RNA source (cell vs nucleus) from h5ad file
-    const absoluteDataPath = resolve(dataset.dataFilePath);
-    if (!(await fileExists(absoluteDataPath))) {
-      throw new Error(`Data file does not exist at ${absoluteDataPath} for dataset ${dataset.id}`);
-    }
-
     const inferenceResult = await inferPrepFromH5ad(absoluteDataPath, this.config);
     if (inferenceResult.verdict !== 'error') {
       dataset.rna_source = inferenceResult.verdict;
