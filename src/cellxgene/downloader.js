@@ -180,9 +180,13 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
+        rnaSourceLookup,
       } = await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
+      const suspKey = `${metadata.donor}|${tissue}`;
+      const donorRnaSource = (rnaSourceLookup?.get(suspKey) ?? [])[0] ?? '';
+
       Object.assign(dataset, metadata, {
         assets,
         tissueId,
@@ -195,6 +199,7 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
+        rna_source: donorRnaSource,
       });
     };
 
@@ -211,10 +216,10 @@ export class Downloader {
   async lookupOrgan(datasets) {
     const tissueIds = datasets.map(({ tissueId }) => tissueId).filter((id) => UBERON_ID_REGEX.test(id));
     const uniqueTissueIds = Array.from(new Set(tissueIds));
-    const organLookup = await getOrganLookup(uniqueTissueIds, this.config, 'CellXGene');
+    const organLookup = await getOrganLookup(uniqueTissueIds, this.config);
 
     for (const dataset of datasets) {
-      dataset.organ = organLookup.get(dataset.tissueId) ?? dataset.tissueId;
+      dataset.organ = organLookup.get(dataset.tissueId) ?? '';
       if (dataset.organ === '') {
         const msg = `Cannot determine organ for tissue '${dataset.tissue}' (${dataset.tissueId})`;
         dataset.scratch.summary_ref.comments = msg;
