@@ -157,5 +157,7 @@ export class Downloader {
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
     }
+
+    dataset.rna_source = 'nucleus';
   }
 }
