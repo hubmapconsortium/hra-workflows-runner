@@ -1,13 +1,13 @@
 import { execFile as callbackExecFile, exec as rawExec } from 'node:child_process';
 import fs, { existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import Papa from 'papaparse';
 import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
-import { readCsv } from '../util/csv.js';
+import { normalizeCsvUrl, readCsv } from '../util/csv.js';
 import { downloadFile, ensureDirsExist } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getOrganLookup } from '../util/organ-lookup.js';
@@ -15,6 +15,7 @@ import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 
 const exec = promisify(rawExec);
 const execFile = promisify(callbackExecFile);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const DISCO_BATCH_URLS = [
   'https://zenodo.org/records/14159931/files/batch_1.tar.gz?download=1',
@@ -31,36 +32,38 @@ const DISCO_BATCH_URLS = [
 const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolkit/getSampleMetadata';
 const DISCO_API_BASE_URL = 'https://www.immunesinglecell.com/disco_v3_api/';
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
+const DISCO_TISSUE_MAPPING_URL =
+  'https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504';
 
-// Source Sheet can be downloaded from here: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504
+// Tissues that don't map to a specific organ can still be processed with pan-organ tools
+const FALLBACK_ORGAN = 'UBERON:0013702';
+const TISSUE_CSV = join(__dirname, 'tissue_mapping.csv');
+
+function normalizeTissueLabel(str) {
+  return str
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '');
+}
 
 async function loadTissueMappingFromCsv(csvPath) {
   if (!existsSync(csvPath)) {
-    console.warn(`Please create organ_mapping.csv using the source sheet: https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504`);
-    return {};
+    console.warn(`Creating tissue_mapping.csv using the source sheet: ${DISCO_TISSUE_MAPPING_URL}`);
+    const downloadUrl = normalizeCsvUrl(DISCO_TISSUE_MAPPING_URL);
+    await downloadFile(csvPath, downloadUrl);
   }
-  /** @type {Record<string, string>} */
   const mapping = {};
   for await (const row of readCsv(csvPath)) {
-    if (!row) continue;
-    const rawLabel = (row.ontology_label ?? '').toString().trim();
-    const rawId = (row.ontology_id ?? '').toString().trim();
-    if (!rawLabel || !rawId) continue;
-    const key = rawLabel
-      .normalize('NFKC')
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_|_$/g, '');
-    mapping[key] = rawId;
+    const tissue = normalizeTissueLabel(row.tissue ?? '');
+    const ontologyId = (row.ontology_id ?? '').trim();
+    if (tissue && ontologyId) {
+      mapping[tissue] = ontologyId;
+    }
   }
   return mapping;
 }
-
-// Use CSV colocated with DISCO code (in same directory as this file)
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const TISSUE_CSV = join(__dirname, 'organ_mapping.csv');
-let TISSUE_MAPPING = null;
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -107,14 +110,18 @@ export class Downloader {
       this.metadataLookup['DISCO-' + row.sample_id] = row;
     }
 
+    // tissue to ongology lookup
+    this.tissueLookup = await loadTissueMappingFromCsv(TISSUE_CSV);
+    this.organLookup = await getOrganLookup(Object.values(this.tissueLookup), this.config, 'DISCO');
+
     // Download all batch tar files
     await Promise.all(DISCO_BATCH_URLS.map((url) => this.downloadAndExtractBatch(url)));
 
     for (const dataset of datasets) {
       const sample_id = dataset.id.replace('DISCO-', '');
       dataset.dataset_id = `${this.baseUrl}${sample_id}`;
-      dataset.donor_id = `${this.baseUrl}${sample_id}$Donor`;
-      dataset.block_id = `${this.baseUrl}${sample_id}$TissueBlock`;
+      dataset.donor_id = `${this.baseUrl}${sample_id}#Donor`;
+      dataset.block_id = `${this.baseUrl}${sample_id}#TissueBlock`;
       dataset.rui_location = '';
       dataset.consortium_name = 'DISCO';
       dataset.provider_name = 'DISCO';
@@ -154,6 +161,9 @@ export class Downloader {
           case 'race':
             targetKey = 'donor_race';
             break;
+          case 'rna_source':
+            targetKey = 'dataset_rna_source';
+            break;
           case 'disease':
             targetKey = 'donor_disease';
             value = value === 'control' ? 'healthy' : value;
@@ -163,25 +173,12 @@ export class Downloader {
       }
     }
 
-    // Resolve organ name from tissue using TISSUE_MAPPING
-    if (TISSUE_MAPPING === null) {
-      TISSUE_MAPPING = await loadTissueMappingFromCsv(TISSUE_CSV);
-    }
-    const tissue = matched.tissue ?? '';
-    const tissueKey = tissue
-      .normalize('NFKC')
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_|_$/g, ''); // Normalize and replace all spaces with underscores
-    const tissueUberonId = TISSUE_MAPPING[tissueKey] ?? '';
-    if (tissueUberonId) {
-      const organLookup = await getOrganLookup([tissueUberonId], this.config, 'DISCO');
-      dataset.organ = organLookup.get(tissueUberonId) ?? tissueUberonId;
-      dataset.organ_id = dataset.organ.replace('UBERON:', 'http://purl.obolibrary.org/obo/UBERON_');
-    } else {
-      throw new Error(`Could not determine organ for ${dataset.id}, tissue: ${tissue}`);
-    }
+    // Resolve organ name via tissue mapping
+    const tissueKey = normalizeTissueLabel(matched.tissue ?? '');
+    const tissueUberonId = this.tissueLookup[tissueKey] ?? '';
+    const organId = this.organLookup[tissueUberonId] ?? FALLBACK_ORGAN;
+    dataset.organ = organId;
+    dataset.organ_id = organId.replace('UBERON:', 'http://purl.obolibrary.org/obo/UBERON_');
 
     // Locate the .h5 file path for this sample
     const batchDirs = fs
@@ -245,30 +242,33 @@ export class Downloader {
     console.log(`Running command: ${cmd}`);
     await exec(cmd);
   }
-
   /**
-   * Downloads a DISCO dataset via the DISCOtoolkit R package when it is missing from cached batches.
-   *
-   * @param {string} sampleId Sample identifier without DISCO- prefix
-   * @param {string} projectId Associated project identifier
-   * @returns {Promise<string | null>} Absolute path to the downloaded .h5/.h5ad file
-   */
+    * Downloads a DISCO dataset via the DISCOtoolkit R package when it is missing from cached batches.
+    *
+    * @param {string} sampleId Sample identifier without DISCO- prefix
+    * @param {string} projectId Associated project identifier
+    * @returns {Promise<string | null>} Absolute path to the downloaded .h5/.h5ad file
+    */
   async fetchDatasetViaApi(sampleId, projectId) {
     if (!sampleId || !projectId) {
       return null;
     }
 
+
     const outputDir = join(this.cacheDir, 'batch_api');
     await ensureDirsExist(outputDir);
+
 
     const targetPath = join(outputDir, `${sampleId}.h5`);
     if (existsSync(targetPath) && !this.config.get(FORCE, false)) {
       return targetPath;
     }
 
+
     const tmpPath = `${targetPath}.tmp`;
     const downloadUrl = new URL(`download/getRawH5/${projectId}/${sampleId}`, DISCO_API_BASE_URL).toString();
     const cmd = `curl -sS -L --fail "${downloadUrl}" -o "${tmpPath}"`;
+
 
     try {
       await exec(cmd);
