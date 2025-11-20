@@ -199,7 +199,7 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
-        rna_source: donorRnaSource,
+        dataset_rna_source: donorRnaSource,
       });
     };
 

@@ -153,6 +153,6 @@ export class Downloader {
     }
 
     // TS2 datasets are generated from whole cells
-    dataset.rna_source = metadata.rna_source ?? 'cell';
+    dataset.dataset_rna_source = metadata.dataset_rna_source ?? 'cell';
   }
 }
