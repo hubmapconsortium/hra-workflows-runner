@@ -69,11 +69,14 @@ echo
 for script in scripts/??-*.sh; do
   [[ "$script" =~ ([0-9]{2})-.*\.sh ]]
   index="10#${BASH_REMATCH[1]}"
-  if (( index < from )); then
-    continue
-  elif (( index >= to )); then
-    break
-  fi
+  if (( index == 8 || index == 10 )); then
+   continue
+ fi
+  # if (( index < from )); then
+  #   continue
+  # elif (( index >= to )); then
+  #   break
+  # fi
 
   echo "Running $script..."
   if time bash "$script"; then
