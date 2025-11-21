@@ -1,7 +1,6 @@
 import { execFile as callbackExecFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { Config } from '../util/config.js';
-import { getSrcFilePath } from '../util/paths.js';
 
 const execFile = promisify(callbackExecFile);
 
@@ -14,24 +13,17 @@ const execFile = promisify(callbackExecFile);
  * @param {number} [unsplicedThreshold=0.30] Threshold for unspliced fraction to call nucleus
  * @returns {Promise<object>} Inference results with verdict, evidence, and metrics
  */
-export async function InferRnaSourceFromH5ad(h5adPath, config, unsplicedThreshold = 0.30) {
-
+export async function InferRnaSourceFromH5ad(h5adPath, config, unsplicedThreshold = 0.3) {
   const scriptPath = new URL('./infer-rna-source-from-h5ad.py', import.meta.url);
 
   try {
-    const args = [
-      scriptPath,
-      h5adPath,
-      '--unspliced-threshold',
-      unsplicedThreshold.toString(),
-    ];
+    const args = [scriptPath, h5adPath, '--unspliced-threshold', unsplicedThreshold.toString()];
     const { stdout } = await execFile('python3', args);
 
     // Parse the JSON output from stdout
     const result = JSON.parse(stdout);
     return result;
   } catch (error) {
-
     console.warn(`Failed to infer rna source from h5ad file ${h5adPath}: ${error.message}`);
     return {
       input_file: h5adPath,
@@ -42,4 +34,3 @@ export async function InferRnaSourceFromH5ad(h5adPath, config, unsplicedThreshol
     };
   }
 }
-

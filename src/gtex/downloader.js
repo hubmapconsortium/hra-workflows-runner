@@ -157,6 +157,6 @@ export class Downloader {
     const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
-    } 
+    }
   }
 }

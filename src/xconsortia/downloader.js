@@ -3,8 +3,8 @@ import { promisify } from 'node:util';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
-import { InferRnaSourceFromH5ad } from './infer-rna-source.js';
 import { getSrcFilePath } from '../util/paths.js';
+import { InferRnaSourceFromH5ad } from './infer-rna-source.js';
 
 const execFile = promisify(callbackExecFile);
 

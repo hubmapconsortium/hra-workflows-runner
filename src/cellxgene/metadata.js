@@ -43,7 +43,6 @@ export async function downloadCollectionMetadata(url) {
   const resp = await fetch(url, { method: 'GET' });
   checkFetchResponse(resp, 'CellXGene collection download failed');
   const raw = await resp.json();
-
   const parsed = parseCollectionMetadata(raw);
 
   // Build donor+tissue -> suspension_type lookup
@@ -68,9 +67,7 @@ export async function downloadCollectionMetadata(url) {
     }
   }
 
-  const rnaSourceLookup = new Map(
-    [...donorTissueSuspension.entries()].map(([key, set]) => [key, [...set]])
-  );
+  const rnaSourceLookup = new Map([...donorTissueSuspension.entries()].map(([key, set]) => [key, [...set]]));
 
   return {
     ...parsed,
