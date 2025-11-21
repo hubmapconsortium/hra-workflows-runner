@@ -16,7 +16,7 @@ const execFile = promisify(callbackExecFile);
  */
 export async function InferRnaSourceFromH5ad(h5adPath, config, unsplicedThreshold = 0.30) {
 
-  const scriptPath = getSrcFilePath(config, 'xconsortia', 'infer-rna-source-from-h5ad.py');
+  const scriptPath = new URL('./infer-rna-source-from-h5ad.py', import.meta.url);
 
   try {
     const args = [
