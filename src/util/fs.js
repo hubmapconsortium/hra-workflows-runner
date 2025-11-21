@@ -1,10 +1,8 @@
 import { access, constants, mkdir, open, writeFile } from 'node:fs/promises';
-//import { install, Agent } from 'undici';
+import { install, Agent } from 'undici';
 import { concurrentMap } from './concurrent-map.js';
-import undici from 'undici';
 
-const { install, Agent } = undici;
-install?.();
+install();
 
 /**
  * Ensure that all specified directories are created
