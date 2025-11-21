@@ -3,7 +3,7 @@ import { promisify } from 'node:util';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
-import { inferPrepFromH5ad } from './infer-prep.js';
+import { InferRnaSourceFromH5ad } from './infer-rna-source.js';
 import { getSrcFilePath } from '../util/paths.js';
 
 const execFile = promisify(callbackExecFile);
@@ -72,7 +72,7 @@ export class XConsortiaDownloader {
     }
 
     // Infer RNA source (cell vs nucleus) from h5ad file
-    const inferenceResult = await inferPrepFromH5ad(dataset.dataFilePath, this.config);
+    const inferenceResult = await InferRnaSourceFromH5ad(dataset.dataFilePath, this.config);
     if (inferenceResult.verdict === 'cell' || inferenceResult.verdict === 'nucleus') {
       dataset.dataset_rna_source = inferenceResult.verdict;
     } else if (inferenceResult.verdict === 'inconclusive') {
