@@ -4,6 +4,7 @@ import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { downloadFile } from '../util/fs.js';
 import { getSrcFilePath } from '../util/paths.js';
+import { InferRnaSourceFromH5ad } from './infer-rna-source.js';
 
 const execFile = promisify(callbackExecFile);
 
@@ -68,6 +69,16 @@ export class XConsortiaDownloader {
     const minCount = this.config.get(DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT);
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
+    }
+
+    // Infer RNA source (cell vs nucleus) from h5ad file
+    const inferenceResult = await InferRnaSourceFromH5ad(dataset.dataFilePath, this.config);
+    if (inferenceResult.verdict === 'cell' || inferenceResult.verdict === 'nucleus') {
+      dataset.dataset_rna_source = inferenceResult.verdict;
+    } else if (inferenceResult.verdict === 'inconclusive') {
+      console.warn(`RNA source inference inconclusive for dataset ${dataset.id}`);
+    } else {
+      console.warn(`Failed to infer RNA source for dataset ${dataset.id}: ${inferenceResult.error || 'unknown error'}`);
     }
   }
 

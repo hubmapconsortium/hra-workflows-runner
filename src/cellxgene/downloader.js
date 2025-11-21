@@ -19,9 +19,9 @@ import { checkFetchResponse, downloadFile, ensureDirsExist, fileExists } from '.
 import { IDownloader } from '../util/handler.js';
 import { groupBy } from '../util/iter.js';
 import { logEvent } from '../util/logging.js';
+import { getOrganLookup } from '../util/organ-lookup.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
 import { downloadCollectionMetadata, parseMetadataFromId } from './metadata.js';
-import { getOrganLookup } from '../util/organ-lookup.js';
 
 const CELLXGENE_API_ENDPOINT = 'CELLXGENE_API_ENDPOINT';
 const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
@@ -180,9 +180,13 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
+        rnaSourceLookup,
       } = await this.downloadCollection(metadata.collection);
       const tissue = metadata.tissue.toLowerCase();
       const tissueId = tissueIdLookup.get(tissue);
+      const suspKey = `${metadata.donor}|${tissue}`;
+      const donorRnaSource = (rnaSourceLookup?.get(suspKey) ?? [])[0] ?? '';
+
       Object.assign(dataset, metadata, {
         assets,
         tissueId,
@@ -195,6 +199,7 @@ export class Downloader {
         provider_name,
         provider_uuid,
         assay_type,
+        dataset_rna_source: donorRnaSource,
       });
     };
 

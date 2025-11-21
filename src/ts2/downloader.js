@@ -104,6 +104,7 @@ export class Downloader {
       dataset.provider_uuid = 'd65cd08e-7d9b-11ee-b962-0242ac120002';
       dataset.dataset_link = TS2_PORTAL_LINK;
       dataset.dataset_technology = 'OTHER';
+      dataset.dataset_rna_source = 'cell';
     }
 
     this.extractionSiteLookup = await this.fetchExtractionSiteLookup();
@@ -116,7 +117,9 @@ export class Downloader {
       .replace('_LI_', '_Large_Intestine_')
       .replace('_SI_', '_Small_Intestine_')
       .replace('_BM_', '_Bone_Marrow_')
-      .replace(/^TS2\-TSP[0-9]+\_/, '').toLowerCase().replace(/\_/g, '');
+      .replace(/^TS2\-TSP[0-9]+\_/, '')
+      .toLowerCase()
+      .replace(/\_/g, '');
     const dataFile = this.collections.find((file) => {
       // Filename Example: Heart_TSP1_30_version2d_10X_smartseq_scvi_Nov122024.h5ad
       const organ = file.name.split('_TSP')[0].toLowerCase().replace(/\_/g, '');
@@ -124,7 +127,7 @@ export class Downloader {
     })?.name;
     const dataFilePath = join(getCacheDir(this.config), 'ts2', dataFile);
     await ensureDirsExist(dataset.dirPath);
-    
+
     const { stdout } = await execFile('python3', [
       this.extractScriptFilePath,
       dataFilePath,
