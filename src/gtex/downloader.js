@@ -106,6 +106,7 @@ export class Downloader {
       dataset.provider_uuid = '083882bb-6cc6-4c12-a205-eac37c1a2640';
       dataset.dataset_link = GTEX_PORTAL_LINK;
       dataset.dataset_technology = 'OTHER';
+      dataset.dataset_rna_source = 'nucleus';
     }
 
     this.extractionSiteLookup = await this.fetchExtractionSiteLookup();
@@ -158,6 +159,6 @@ export class Downloader {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
     }
 
-    dataset.dataset_rna_source = 'nucleus';
+    
   }
 }

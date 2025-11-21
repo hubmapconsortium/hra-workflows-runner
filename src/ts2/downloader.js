@@ -104,6 +104,7 @@ export class Downloader {
       dataset.provider_uuid = 'd65cd08e-7d9b-11ee-b962-0242ac120002';
       dataset.dataset_link = TS2_PORTAL_LINK;
       dataset.dataset_technology = 'OTHER';
+      dataset.dataset_rna_source = "cell";
     }
 
     this.extractionSiteLookup = await this.fetchExtractionSiteLookup();
