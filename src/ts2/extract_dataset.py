@@ -36,7 +36,6 @@ def main(args: argparse.Namespace):
         "cell_count": len(subset.obs),
         "gene_count": len(subset.var),
         "tissue_site": subset.obs[AS_COLUMN].iloc[0],
-        "rna_source": "cell",
     }
     print(json.dumps(metadata, indent=2))
 

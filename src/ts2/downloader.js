@@ -152,8 +152,5 @@ export class Downloader {
     if (dataset.dataset_cell_count < minCount) {
       throw new Error(`Dataset has fewer than ${minCount} cell. Cell count: ${dataset.dataset_cell_count}`);
     }
-
-    // TS2 datasets are generated from whole cells
-    dataset.dataset_rna_source = metadata.dataset_rna_source ?? 'cell';
   }
 }
