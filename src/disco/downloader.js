@@ -8,7 +8,7 @@ import { OrganMetadataCollection } from '../organ/metadata.js';
 import { Config } from '../util/config.js';
 import { DATASET_MIN_CELL_COUNT, DEFAULT_DATASET_MIN_CELL_COUNT, FORCE } from '../util/constants.js';
 import { normalizeCsvUrl, readCsv } from '../util/csv.js';
-import { downloadFile } from '../util/fs.js';
+import { downloadFile, ensureDirsExist } from '../util/fs.js';
 import { IDownloader } from '../util/handler.js';
 import { getOrganLookup } from '../util/organ-lookup.js';
 import { getCacheDir, getSrcFilePath } from '../util/paths.js';
@@ -30,6 +30,7 @@ const DISCO_BATCH_URLS = [
 ];
 
 const DISCO_METADATA_URL = 'https://www.immunesinglecell.com/disco_v3_api/toolkit/getSampleMetadata';
+const DISCO_API_BASE_URL = 'https://www.immunesinglecell.com/disco_v3_api/';
 const DISCO_BASE_URL = 'https://www.immunesinglecell.com/sample/';
 const DISCO_TISSUE_MAPPING_URL =
   'https://docs.google.com/spreadsheets/d/1EkWBKOL-_YiR41MBv16w4KZzLxZ-0pgFx-FMJRJ5QiQ/edit?gid=470141504#gid=470141504';
@@ -194,7 +195,13 @@ export class Downloader {
     }
 
     if (!h5FilePath) {
-      throw new Error(`Could not find .h5 file for ${dataset.id}`);
+      console.warn(`Could not locate ${matched.sample_id}.h5 in batches. Attempting DISCO API download...`);
+      const projectId = matched.project_id ?? matched.project ?? matched.projectId ?? '';
+      h5FilePath = await this.fetchDatasetViaApi(matched.sample_id, projectId);
+    }
+
+    if (!h5FilePath) {
+      throw new Error(`Could not find .h5 file for ${dataset.id} in batches or via DISCO API.`);
     }
 
     // Run Python extraction script
@@ -234,5 +241,45 @@ export class Downloader {
     const cmd = `curl -L "${url}" | tar -xz --strip-components=1 -C "${targetDir}"`;
     console.log(`Running command: ${cmd}`);
     await exec(cmd);
+  }
+  /**
+    * Downloads a DISCO dataset via the DISCOtoolkit R package when it is missing from cached batches.
+    *
+    * @param {string} sampleId Sample identifier without DISCO- prefix
+    * @param {string} projectId Associated project identifier
+    * @returns {Promise<string | null>} Absolute path to the downloaded .h5/.h5ad file
+    */
+  async fetchDatasetViaApi(sampleId, projectId) {
+    if (!sampleId || !projectId) {
+      return null;
+    }
+
+
+    const outputDir = join(this.cacheDir, 'batch_api');
+    await ensureDirsExist(outputDir);
+
+
+    const targetPath = join(outputDir, `${sampleId}.h5`);
+    if (existsSync(targetPath) && !this.config.get(FORCE, false)) {
+      return targetPath;
+    }
+
+
+    const tmpPath = `${targetPath}.tmp`;
+    const downloadUrl = new URL(`download/getRawH5/${projectId}/${sampleId}`, DISCO_API_BASE_URL).toString();
+    const cmd = `curl -sS -L --fail "${downloadUrl}" -o "${tmpPath}"`;
+
+
+    try {
+      await exec(cmd);
+      fs.renameSync(tmpPath, targetPath);
+      return targetPath;
+    } catch (error) {
+      if (existsSync(tmpPath)) {
+        fs.unlinkSync(tmpPath);
+      }
+      console.warn(`Failed to download DISCO sample ${sampleId} via API: ${error.message}`);
+      return null;
+    }
   }
 }
