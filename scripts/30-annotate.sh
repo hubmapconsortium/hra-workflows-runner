@@ -32,7 +32,8 @@ function should_run() {
 
   if [[ -e "$report_file" ]]; then
     local -r is_success=$(grep -oe '"status":\s*"success"' "$report_file")
-    if [[ -n "$is_success" && "$FORCE" != true ]]; then
+    local -r not_supported=$(grep -oE "\"cause\": \"ValueError\('Organ UBERON:[0-9]{7} is not supported'\)\"" "$report_file")
+    if [[ ( -n "$is_success" || -n "$not_supported" ) && "$FORCE" != true ]]; then
       return 1
     elif [[ -z "$is_success" && "$SKIP_FAILED" == true ]]; then
       return 1
@@ -45,6 +46,7 @@ function should_run() {
 # Main logic
 if [[ $RUNNER != "slurm" ]]; then
   rm -f jobs.txt jobs2.txt
+  touch jobs.txt
 
   for DIR in ${DATASET_DIRS[@]}; do
     for ALGORITHM in azimuth celltypist popv frmatch pan-human-azimuth; do

@@ -1,9 +1,8 @@
-import { execFile as callbackExecFile } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
 import { Dataset } from '../dataset/dataset.js';
 import { Cache } from '../util/cache.js';
+import { spawnProcess } from '../util/child-process.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
 import {
@@ -28,8 +27,6 @@ const DEFAULT_CELLXGENE_API_ENDPOINT = 'https://api.cellxgene.cziscience.com';
 const COLLECTIONS_PATH = '/dp/v1/collections/';
 const ASSETS_PATH = '/dp/v1/datasets/';
 const UBERON_ID_REGEX = /^UBERON:\d{7}$/;
-
-const execFile = promisify(callbackExecFile);
 
 /** @implements {IDownloader} */
 export class Downloader {
@@ -85,7 +82,10 @@ export class Downloader {
       throw new Error(msg);
     }
 
-    const { stdout } = await execFile('python3', [this.extractMetdataScriptFilePath, dataset.dataFilePath]);
+    const { stdout } = await spawnProcess('python3', [
+      this.extractMetdataScriptFilePath,
+      dataset.dataFilePath,
+    ]);
 
     dataset.donor_id = dataset.id.split('$')[0];
     dataset.organ_id = dataset.organ ? `http://purl.obolibrary.org/obo/UBERON_${dataset.organ.split(':')[1]}` : '';
@@ -263,18 +263,29 @@ export class Downloader {
     const errorsLogFilePath = join(tempExtractDirPath, 'errors.txt');
     await ensureDirsExist(tempExtractDirPath);
 
-    const { stdout, stderr } = await execFile('python3', [
-      this.extractScriptFilePath,
-      extractInfoFilePath,
-      '--tmp-dir',
-      tempExtractDirPath,
-      '--log-level',
-      this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
-    ]);
+    let pendingOutput = '';
 
-    await writeFile(outputLogFilePath, stdout);
-    await writeFile(errorsLogFilePath, stderr);
-    this.processExtractOutput(stdout);
+    await spawnProcess(
+      'python3',
+      [
+        this.extractScriptFilePath,
+        extractInfoFilePath,
+        '--tmp-dir',
+        tempExtractDirPath,
+        '--log-level',
+        this.config.get(PYTHON_LOG_LEVEL, DEFAULT_PYTHON_LOG_LEVEL),
+      ],
+      {
+        captureStdout: false,
+        stdoutFile: outputLogFilePath,
+        stderrFile: errorsLogFilePath,
+        onStdoutChunk: (chunk) => {
+          pendingOutput = this.processExtractOutputChunk(pendingOutput, chunk.toString());
+        },
+      }
+    );
+
+    this.flushExtractOutputChunk(pendingOutput);
   }
 
   /**
@@ -312,6 +323,36 @@ export class Downloader {
       const id = match[1].trim();
       const status = match[2].trim().toLowerCase();
       this.extractStatuses[id] = status;
+    }
+  }
+
+  /**
+   * Processes completed stdout lines from the extract script while keeping only a partial line buffer.
+   *
+   * @param {string} pending Existing partial line
+   * @param {string} data New chunk data
+   * @returns {string} Remaining partial line
+   */
+  processExtractOutputChunk(pending, data) {
+    const combined = pending + data;
+    const lines = combined.split('\n');
+    const remaining = lines.pop() ?? '';
+
+    if (lines.length > 0) {
+      this.processExtractOutput(`${lines.join('\n')}\n`);
+    }
+
+    return remaining;
+  }
+
+  /**
+   * Flushes any remaining output line from the extract script.
+   *
+   * @param {string} pending Pending partial line
+   */
+  flushExtractOutputChunk(pending) {
+    if (pending !== '') {
+      this.processExtractOutput(`${pending}\n`);
     }
   }
 }
