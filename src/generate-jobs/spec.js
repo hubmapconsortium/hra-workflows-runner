@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DATA_FILE } from '../util/constants.js';
+import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE } from '../util/constants.js';
 import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
 /** Metadata where all algorithms are disabled by default */
@@ -18,6 +18,7 @@ const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
  */
 function getAlgorithmDefaults(config) {
   return {
+    qc: {},
     azimuth: {
       referenceDataDir: {
         class: 'Directory',
@@ -114,7 +115,7 @@ export function createSpec(metadata, config, crosswalks) {
     organ: metadata.organ,
     matrix: {
       class: 'File',
-      path: DATA_FILE,
+      path: metadata.qc !== undefined ? FILTERED_DATA_FILE : DATA_FILE,
     },
     algorithms: algorithmSpecs,
   };

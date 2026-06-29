@@ -26,13 +26,14 @@ export const LISTING_FILE = 'listing.csv';
 export const SUMMARIES_FILE = 'summaries.csv';
 export const DATASET_FILE = 'dataset.json';
 export const DATA_FILE = 'data.h5ad';
+export const FILTERED_DATA_FILE = 'qc/filtered_matrix.h5ad';
 export const JOB_FILE = 'job.json';
 export const ALGORITHM_REPORT_FILE = 'report.json';
 export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
 export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv.gz';
 
 // Algorithms
-export const ALGORITHMS = ['azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth'];
+export const ALGORITHMS = ['qc', 'azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth'];
 
 // Default values
 export const DEFAULT_MAX_CONCURRENCY = 2;

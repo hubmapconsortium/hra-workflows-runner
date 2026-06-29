@@ -3,6 +3,10 @@ source constants.sh
 shopt -s extglob
 set -ev
 
+QC_ZIP=$(realpath $OUTPUT_DIR/qc-data.zip)
+REPORT=$(realpath $OUTPUT_DIR/qc-report.csv.gz)
+REPORT_SQL=$(realpath $SRC_DIR/create-qc-report.sql)
+
 DATASET_DIRS=
 for DIR in $(node $SRC_DIR/list-downloaded-dirs.js); do
   DATASET_DIRS+=($DIR)
@@ -28,20 +32,11 @@ fi
 #   0 if the job should run, non-zero otherwise
 #######################################
 function should_run() {
-  local -r qc_report_file="$1/qc/report.json"
   local -r report_file="$1/$2/report.json"
-
-  # Do not annotate datasets which have not passed QC
-  if [[ -e "$qc_report_file" ]]; then
-    local -r is_qc_success=$(grep -oe '"status":\s*"success"' "$qc_report_file")
-    if [[ -z "$is_qc_success"  ]]; then
-      return 1
-    fi
-  fi
 
   if [[ -e "$report_file" ]]; then
     local -r is_success=$(grep -oe '"status":\s*"success"' "$report_file")
-    local -r not_supported=$(grep -oE "\"cause\": \"ValueError\('Organ UBERON:[0-9]{7} is not supported'\)\"" "$report_file")
+    local -r not_supported=$(grep -oE "\"cause\": \"ValueError\('Insufficient cells " "$report_file")
     if [[ ( -n "$is_success" || -n "$not_supported" ) && "$FORCE" != true ]]; then
       return 1
     elif [[ -z "$is_success" && "$SKIP_FAILED" == true ]]; then
@@ -58,13 +53,13 @@ if [[ $RUNNER != "slurm" ]]; then
   touch jobs.txt
 
   for DIR in ${DATASET_DIRS[@]}; do
-    for ALGORITHM in azimuth celltypist popv frmatch pan-human-azimuth; do
+    for ALGORITHM in qc; do
       if should_run $DIR $ALGORITHM; then
         if [ -e "${DIR}/job-${ALGORITHM}.json" ]; then
           if [ "${MAX_PROCESSES}" == "1" ]; then
-            ${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}
+            ${SRC_DIR}/run-qc-job.sh ${DIR} ${ALGORITHM}
           else
-            echo "${SRC_DIR}/run-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
+            echo "${SRC_DIR}/run-qc-job.sh ${DIR} ${ALGORITHM}" >> jobs.txt
           fi
         fi
       fi
@@ -80,6 +75,16 @@ else
   DIRS_FILE="$OUTPUT_DIR/annotate-dirs.txt"
   printf "%s\n" "${DATASET_DIRS[@]}" >$DIRS_FILE
 
-  echo "Use 30x-annotate.sh to run annotations. Exiting..."
+  echo "Use 25-qc-filter.sh to run annotations. Exiting..."
   exit $STOP_CODE
 fi
+
+
+cd $DATA_REPO_DIR
+
+# Create QC report
+duckdb -no-stdin -init $REPORT_SQL
+mv qc-report.csv.gz $REPORT
+
+# Zip up all qc_results + metadata
+find . \( -name 'dataset.json' -o -path '*/qc/qc_results' -o -path '*/qc_results/*' \) -print | zip -@ $QC_ZIP

@@ -6,7 +6,10 @@ source constants.sh
 shopt -s extglob
 
 DIR=$1
-CWL_PIPELINE="https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/refs/heads/main/containers/qc/pipeline.cwl"
+ALGORITHM=$2
+
+CWL_PIPELINE="https://raw.githubusercontent.com/hubmapconsortium/hra-workflows/main/steps/run-one-qc.cwl"
+# CWL_PIPELINE="/teradata/bherr/workspaces/hubmap/hra-workflows/steps/run-one-qc.cwl"
 CWL_OPTS=()
 
 if [[ $RUNNER == "slurm" || $RUNNER == "singularity" ]]; then
@@ -26,7 +29,7 @@ if [[ -n $TEMP ]]; then
 fi
 
 cd $DIR
-cwl-runner ${CWL_OPTS[@]} ${CWL_PIPELINE} --matrix data.h5ad &
+cwl-runner ${CWL_OPTS[@]} ${CWL_PIPELINE} "job-${ALGORITHM}.json" &
 
 wait
 
