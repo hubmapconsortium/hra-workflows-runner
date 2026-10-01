@@ -58,7 +58,7 @@ if [[ $RUNNER != "slurm" ]]; then
   touch jobs.txt
 
   for DIR in ${DATASET_DIRS[@]}; do
-    for ALGORITHM in azimuth celltypist popv frmatch pan-human-azimuth; do
+    for ALGORITHM in azimuth celltypist popv frmatch pan-human-azimuth author; do
       if should_run $DIR $ALGORITHM; then
         if [ -e "${DIR}/job-${ALGORITHM}.json" ]; then
           if [ "${MAX_PROCESSES}" == "1" ]; then

@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE } from '../util/constants.js';
+import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE, OPT_IN_ALGORITHMS } from '../util/constants.js';
 import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
 /** Metadata where all algorithms are disabled by default */
@@ -47,7 +47,23 @@ function getAlgorithmDefaults(config) {
       },
     },
     'pan-human-azimuth': {},
+    author: {},
   };
+}
+
+/**
+ * Checks whether an algorithm is enabled in the metadata.
+ * Opt-in algorithms must be explicitly enabled by the job generator.
+ *
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {string} algorithm Algorithm name
+ * @returns {boolean} Whether the algorithm is enabled
+ */
+export function isAlgorithmEnabled(metadata, algorithm) {
+  if (OPT_IN_ALGORITHMS.includes(algorithm)) {
+    return !!metadata[algorithm];
+  }
+  return metadata[algorithm] !== false;
 }
 
 /**
@@ -57,7 +73,7 @@ function getAlgorithmDefaults(config) {
  * @returns Names of enabled algorithms
  */
 function getEnabledAlgorithms(metadata) {
-  return ALGORITHMS.filter((algorithm) => metadata[algorithm] !== false);
+  return ALGORITHMS.filter((algorithm) => isAlgorithmEnabled(metadata, algorithm));
 }
 
 /**
@@ -103,8 +119,9 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
  * @param {import('../util/handler.js').JobMetadata} metadata Metadata
  * @param {Config} config Configuration
  * @param {{ [algorithm: string]: boolean }} crosswalks Whether crosswalk is enabled for each algorithm
+ * @param {boolean} [useFilteredMatrix] Whether to use the QC filtered matrix as input
  */
-export function createSpec(metadata, config, crosswalks) {
+export function createSpec(metadata, config, crosswalks, useFilteredMatrix = metadata.qc !== undefined) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
   const algorithmSpecs = algorithms.map((algorithm) =>
@@ -115,7 +132,7 @@ export function createSpec(metadata, config, crosswalks) {
     organ: metadata.organ,
     matrix: {
       class: 'File',
-      path: metadata.qc !== undefined ? FILTERED_DATA_FILE : DATA_FILE,
+      path: useFilteredMatrix ? FILTERED_DATA_FILE : DATA_FILE,
     },
     algorithms: algorithmSpecs,
   };
@@ -130,13 +147,14 @@ export function createSpec(metadata, config, crosswalks) {
  */
 export function createSpecs(metadata, config, crosswalks) {
   const result = /** @type {{ [algorithm: string]: ReturnType<typeof createSpec> }} */ ({});
+  const qcEnabled = isAlgorithmEnabled(metadata, 'qc');
   for (const algorithm of getEnabledAlgorithms(metadata)) {
     const newMetadata = {
       ...metadata,
       ...ALL_DISABLED_METADATA,
       [algorithm]: metadata[algorithm],
     };
-    result[algorithm] = createSpec(newMetadata, config, crosswalks);
+    result[algorithm] = createSpec(newMetadata, config, crosswalks, algorithm !== 'qc' && qcEnabled);
   }
 
   return result;
