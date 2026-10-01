@@ -2,7 +2,13 @@ import { join } from 'node:path';
 import { loadJson } from '../util/common.js';
 import { concurrentMap } from '../util/concurrent-map.js';
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DEFAULT_MAX_CONCURRENCY, FORCE, MAX_CONCURRENCY } from '../util/constants.js';
+import {
+  ALGORITHMS,
+  DEFAULT_MAX_CONCURRENCY,
+  FORCE,
+  MAX_CONCURRENCY,
+  PAN_ORGAN_ALGORITHMS,
+} from '../util/constants.js';
 import { downloadFile, ensureDirsExist } from '../util/fs.js';
 import { getOutputDir } from '../util/paths.js';
 
@@ -130,7 +136,8 @@ export class OrganMetadataCollection {
    * @param {Config} config Configuration
    */
   static async load(config) {
-    const collection = await concurrentMap(ALGORITHMS, (algorithm) => OrganMetadata.load(algorithm, config), {
+    const algorithms = ALGORITHMS.filter((algorithm) => !PAN_ORGAN_ALGORITHMS.includes(algorithm));
+    const collection = await concurrentMap(algorithms, (algorithm) => OrganMetadata.load(algorithm, config), {
       maxConcurrency: config.get(MAX_CONCURRENCY, DEFAULT_MAX_CONCURRENCY),
     });
 

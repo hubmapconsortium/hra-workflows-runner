@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE } from '../util/constants.js';
+import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE, OPT_IN_ALGORITHMS } from '../util/constants.js';
 import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
 /** Metadata where all algorithms are disabled by default */
@@ -47,7 +47,23 @@ function getAlgorithmDefaults(config) {
       },
     },
     'pan-human-azimuth': {},
+    author: {},
   };
+}
+
+/**
+ * Checks whether an algorithm is enabled in the metadata.
+ * Opt-in algorithms must be explicitly enabled by the job generator.
+ *
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {string} algorithm Algorithm name
+ * @returns {boolean} Whether the algorithm is enabled
+ */
+export function isAlgorithmEnabled(metadata, algorithm) {
+  if (OPT_IN_ALGORITHMS.includes(algorithm)) {
+    return !!metadata[algorithm];
+  }
+  return metadata[algorithm] !== false;
 }
 
 /**
@@ -57,7 +73,7 @@ function getAlgorithmDefaults(config) {
  * @returns Names of enabled algorithms
  */
 function getEnabledAlgorithms(metadata) {
-  return ALGORITHMS.filter((algorithm) => metadata[algorithm] !== false);
+  return ALGORITHMS.filter((algorithm) => isAlgorithmEnabled(metadata, algorithm));
 }
 
 /**

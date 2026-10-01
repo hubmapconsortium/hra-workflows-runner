@@ -33,13 +33,17 @@ export const ALGORITHM_SUMMARY_JSON_LD_FILE = 'summary.jsonld';
 export const ALGORITHM_ANNOTATIONS_FILE = 'annotations.csv.gz';
 
 // Algorithms
-export const ALGORITHMS = ['qc', 'azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth'];
+export const ALGORITHMS = ['qc', 'azimuth', 'celltypist', 'popv', 'frmatch', 'pan-human-azimuth', 'author'];
+// Algorithms that only run when explicitly enabled by a dataset handler's job generator
+export const OPT_IN_ALGORITHMS = ['author'];
+// Algorithms that are organ independent and have no organ specific metadata
+export const PAN_ORGAN_ALGORITHMS = ['author'];
 
 // Default values
 export const DEFAULT_MAX_CONCURRENCY = 2;
 export const DEFAULT_PYTHON_LOG_LEVEL = 40; // Error level
 export const DEFAULT_CACHE_DIR = './tmp';
-export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'sennet', 'gtex', 'cellxgene', 'ts2', 'disco'];
+export const DEFAULT_DATASET_HANDLERS = ['hubmap', 'sennet', 'gtex', 'cellxgene', 'ts2', 'disco', 'anatomogram'];
 export const DEFAULT_DATASET_LIST = 'listing.csv';
 export const DEFAULT_DATASET_MIN_CELL_COUNT = 100;
 export const DEFAULT_DATASET_DATA_MAX_SIZE = 10 * 1024 * 1024 * 1024; // 10GiB
