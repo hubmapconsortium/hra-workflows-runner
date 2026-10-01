@@ -21,6 +21,8 @@ export class JobGenerator {
     return {
       organ: dataset.organ,
       geneColumn: 'feature_name',
+      // SCEA datasets are already filtered by the atlas and many have fewer cells than the QC minimum
+      qc: false,
       azimuth: {
         queryLayersKey: 'counts',
       },
@@ -28,7 +30,7 @@ export class JobGenerator {
         queryLayersKey: 'counts',
       },
       popv: {
-        queryLayersKey: 'counts',
+        queryLayersKey: 'counts_rounded',
       },
       'pan-human-azimuth': {
         queryLayersKey: 'counts',

@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 import anndata
+import numpy as np
 import pandas as pd
 
 from anatomogram_utils import INDIVIDUAL_COLUMN, get_dataset_ids
@@ -50,7 +51,13 @@ def main(args: argparse.Namespace):
     subset.layers.clear()
     subset.X = counts
     subset.layers["counts"] = counts
-    subset.var = subset.var.rename(columns={GENE_SYMBOL_COLUMN: "feature_name"})
+    # The filtered counts are not always integers, which some algorithms (i.e. popv) require
+    counts_rounded = counts.copy()
+    counts_rounded.data = np.rint(counts_rounded.data)
+    subset.layers["counts_rounded"] = counts_rounded
+
+    # Only keep gene symbols. Other columns contain missing values which breaks some algorithms (i.e. frmatch)
+    subset.var = subset.var[[GENE_SYMBOL_COLUMN]].rename(columns={GENE_SYMBOL_COLUMN: "feature_name"})
     subset.write_h5ad(args.output, compression="gzip")
 
     obs = subset.obs

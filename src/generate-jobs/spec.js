@@ -119,8 +119,9 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
  * @param {import('../util/handler.js').JobMetadata} metadata Metadata
  * @param {Config} config Configuration
  * @param {{ [algorithm: string]: boolean }} crosswalks Whether crosswalk is enabled for each algorithm
+ * @param {boolean} [useFilteredMatrix] Whether to use the QC filtered matrix as input
  */
-export function createSpec(metadata, config, crosswalks) {
+export function createSpec(metadata, config, crosswalks, useFilteredMatrix = metadata.qc !== undefined) {
   const defaults = getAlgorithmDefaults(config);
   const algorithms = getEnabledAlgorithms(metadata);
   const algorithmSpecs = algorithms.map((algorithm) =>
@@ -131,7 +132,7 @@ export function createSpec(metadata, config, crosswalks) {
     organ: metadata.organ,
     matrix: {
       class: 'File',
-      path: metadata.qc !== undefined ? FILTERED_DATA_FILE : DATA_FILE,
+      path: useFilteredMatrix ? FILTERED_DATA_FILE : DATA_FILE,
     },
     algorithms: algorithmSpecs,
   };
@@ -146,13 +147,14 @@ export function createSpec(metadata, config, crosswalks) {
  */
 export function createSpecs(metadata, config, crosswalks) {
   const result = /** @type {{ [algorithm: string]: ReturnType<typeof createSpec> }} */ ({});
+  const qcEnabled = isAlgorithmEnabled(metadata, 'qc');
   for (const algorithm of getEnabledAlgorithms(metadata)) {
     const newMetadata = {
       ...metadata,
       ...ALL_DISABLED_METADATA,
       [algorithm]: metadata[algorithm],
     };
-    result[algorithm] = createSpec(newMetadata, config, crosswalks);
+    result[algorithm] = createSpec(newMetadata, config, crosswalks, algorithm !== 'qc' && qcEnabled);
   }
 
   return result;
