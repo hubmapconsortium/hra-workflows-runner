@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
 import { Config } from '../util/config.js';
-import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE, OPT_IN_ALGORITHMS } from '../util/constants.js';
+import { ALGORITHMS, DATA_FILE, FILTERED_DATA_FILE, OPT_IN_ALGORITHMS, QC_MIN_CELLS } from '../util/constants.js';
 import { getCrosswalkingFilePath, getModelsDir } from '../util/paths.js';
 
 /** Metadata where all algorithms are disabled by default */
@@ -17,8 +17,11 @@ const ALL_DISABLED_METADATA = ALGORITHMS.reduce(
  * @returns Default values
  */
 function getAlgorithmDefaults(config) {
+  const qcMinCells = config.get(QC_MIN_CELLS, undefined);
   return {
-    qc: {},
+    qc: {
+      ...(qcMinCells !== undefined && { minCells: Number(qcMinCells) }),
+    },
     azimuth: {
       referenceDataDir: {
         class: 'Directory',
@@ -86,6 +89,10 @@ function getEnabledAlgorithms(metadata) {
  * @param {boolean} crosswalkExists Whether to add crosswalking to the job
  */
 function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExists) {
+  if (algorithm === 'author' && metadata.author?.cellIdColumn) {
+    return createAuthorIdsAlgorithmSpec(config, metadata, defaults, crosswalkExists);
+  }
+
   return {
     [algorithm]: {
       ...defaults[algorithm],
@@ -110,6 +117,51 @@ function createAlgorithmSpec(config, algorithm, metadata, defaults, crosswalkExi
       cellSource: metadata.cellSource,
     },
     directory: algorithm,
+  };
+}
+
+/**
+ * Creates the algorithm specification for datasets where the authors already provide
+ * cell type ids (i.e. `author: { cellIdColumn, cellLabelColumn }` in the job metadata).
+ * QC is used as a pass through annotation step so the author columns are kept on the
+ * matrix and then used directly for gene expression and summaries.
+ *
+ * @param {Config} config Configuration
+ * @param {import('../util/handler.js').JobMetadata} metadata Metadata
+ * @param {{ [algorithm: string]: object }} defaults Algorithm default values
+ * @param {boolean} crosswalkExists Whether a crosswalk table exists (required by the crosswalk step)
+ */
+function createAuthorIdsAlgorithmSpec(config, metadata, defaults, crosswalkExists) {
+  const { cellIdColumn, cellLabelColumn } = metadata.author;
+  const geneExprCount = Number(config.get('TOP_GENE_COUNT', 200));
+  return {
+    qc: defaults.qc,
+    ...(crosswalkExists && {
+      crosswalk: {
+        table: {
+          class: 'File',
+          path: getCrosswalkingFilePath(config, 'author'),
+        },
+        tableLabelColumn: 'Annotation_Label',
+        tableClidColumn: 'CL_ID',
+        tableMatchColumn: 'CL_Match',
+      },
+    }),
+    geneExpression: {
+      clidColumn: cellIdColumn,
+      geneExprCount,
+    },
+    nsforest: {
+      clidColumn: cellIdColumn,
+      geneExprCount,
+    },
+    summarize: {
+      cellIdColumn,
+      cellLabelColumn,
+      annotationMethod: 'author',
+      cellSource: metadata.cellSource,
+    },
+    directory: 'author',
   };
 }
 
