@@ -11,14 +11,14 @@ WITH
         SELECT
             regexp_extract (filename, '([^/]+)/dataset.json', 1) AS folder_name,
             dataset_id,
-            * EXCLUDE (dataset_id, filename, assets)
+            COLUMNS (lambda c: c NOT IN ('dataset_id', 'filename', 'assets', 'rui_location'))
         FROM
             read_json ('*/dataset.json', union_by_name = TRUE, filename = TRUE, maximum_sample_files = 100000)
     )
 SELECT
     d.dataset_id,
     q.* EXCLUDE (input_file, filename, thresholds, files),
-    d.* EXCLUDE (folder_name, dataset_id, rui_location)
+    d.* EXCLUDE (folder_name, dataset_id)
 FROM
     qc_data q
     LEFT JOIN datasets d USING (folder_name);
