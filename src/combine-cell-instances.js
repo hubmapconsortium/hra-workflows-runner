@@ -27,6 +27,7 @@ import {
   getAlgorithmAnnotationsFilePath,
   getDatasetFilePath,
   getDirForId,
+  getJobFilePathWithSuffix,
   getOutputDir,
   getSummariesFilePath,
 } from './util/paths.js';
@@ -45,6 +46,24 @@ async function getDataset(dir, config) {
     return await loadJson(getDatasetFilePath(config, dir));
   } catch {
     return undefined;
+  }
+}
+
+/**
+ * Gets the cell id and label columns used when summarizing a dataset/tool.
+ * Jobs that use author provided annotations override these in their summarize options.
+ * @param {string} dir - Directory of the dataset
+ * @param {string} tool - Annotation tool
+ * @param {object} config - Config object
+ * @returns {Promise<{ cellIdColumn?: string, cellLabelColumn?: string }>}
+ */
+async function getSummarizeColumns(dir, tool, config) {
+  try {
+    const job = await loadJson(getJobFilePathWithSuffix(config, dir, tool));
+    const { cellIdColumn, cellLabelColumn } = job.algorithms?.[0]?.summarize ?? {};
+    return { cellIdColumn, cellLabelColumn };
+  } catch {
+    return {};
   }
 }
 
@@ -149,6 +168,7 @@ async function main() {
           dataset,
           popvMethodCount,
           path,
+          ...(await getSummarizeColumns(directory, tool, config)),
         });
       }
     }

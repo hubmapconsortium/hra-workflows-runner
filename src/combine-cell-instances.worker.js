@@ -8,7 +8,9 @@
  *   tool: string,
  *   dataset: object,
  *   popvMethodCount: number,
- *   path: string
+ *   path: string,
+ *   cellIdColumn?: string,
+ *   cellLabelColumn?: string
  * }
  */
 
@@ -16,7 +18,7 @@ import { parentPort, workerData } from 'node:worker_threads';
 import Papa from 'papaparse';
 import { readCsv } from './util/csv.js';
 
-const { tool, dataset, popvMethodCount, path } = workerData;
+const { tool, dataset, popvMethodCount, path, cellIdColumn, cellLabelColumn } = workerData;
 
 try {
   const csvStream = readCsv(path);
@@ -42,9 +44,10 @@ try {
       dataset.organ ?? '',
       tool,
       cell[''] || cell['index'],
-      cell.clid,
-      cell.hra_prediction,
-      cell.match_type,
+      cellIdColumn ? cell[cellIdColumn] : cell.clid,
+      cellLabelColumn ? cell[cellLabelColumn] : cell.hra_prediction,
+      // Author provided ids are already CL ids
+      cellIdColumn ? 'skos:exactMatch' : cell.match_type,
       confidence_score,
     ];
 
