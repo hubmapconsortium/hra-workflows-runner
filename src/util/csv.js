@@ -36,22 +36,18 @@ export async function* readLines(inputFile) {
 
 export async function* readCsv(input, options = { skipEmptyLines: true, header: true }) {
   if (options.header) {
-    let header;
-    const newOpts = { ...options, header: false };
-    for await (const line of readLines(input)) {
-      const row = Papa.parse(line, newOpts)?.data ?? [];
-      if (row) {
-        if (!header) {
-          header = row[0];
-        } else {
-          const result = {};
-          for (let i = 0; i < header.length; i++) {
-            result[header[i]] = row[0][i];
-          }
-          yield result;
-        }
-      }
+    // Parse the full content (rather than line by line) so quoted values containing newlines are handled
+    let inputStream = !input || input === '-' ? process.stdin : createReadStream(input, { autoClose: true });
+    if (input?.endsWith('.gz')) {
+      inputStream = inputStream.pipe(createGunzip());
     }
+    const decoder = new TextDecoder('utf-8');
+    let content = '';
+    for await (const chunk of inputStream) {
+      content += decoder.decode(chunk, { stream: true });
+    }
+    content += decoder.decode();
+    yield* Papa.parse(content, options).data;
   } else {
     return createReadStream(input).pipe(Papa.parse(Papa.NODE_STREAM_INPUT, options));
   }

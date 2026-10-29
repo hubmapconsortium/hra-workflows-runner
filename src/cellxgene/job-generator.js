@@ -42,6 +42,11 @@ export class JobGenerator {
       'frmatch': {
         queryLayersKey: 'raw'
       },
+      // Use the author provided cell type ids directly
+      author: {
+        cellIdColumn: 'cell_type_ontology_term_id',
+        cellLabelColumn: 'cell_type',
+      },
       cellSource: dataset.dataset_id,
     };
   }
